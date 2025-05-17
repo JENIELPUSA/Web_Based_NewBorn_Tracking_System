@@ -1,0 +1,42 @@
+.vaccinated-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #10b981; /* Green */
+  border-radius: 50%;
+  margin: 1px;
+}
+
+.dot-group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.vaccinated-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.vaccinated-mark:hover .tooltip {
+  opacity: 1;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
