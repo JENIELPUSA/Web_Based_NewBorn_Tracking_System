@@ -1,7 +1,6 @@
 const express = require('express');
 const authController = require('../Controller/authController');
 const router = express.Router();
-const Dash = require('../Controller/Dashboard')
 
 router.route('/signup')
 .post(authController.signup);
@@ -15,8 +14,7 @@ router.route('/forgotPassword').post(
 router.route('/resetPassword/:token')
 .patch(authController.resetPassword)
 
-router.route('/dashboard')
-.get(Dash.dashboard)
+
 
 
 

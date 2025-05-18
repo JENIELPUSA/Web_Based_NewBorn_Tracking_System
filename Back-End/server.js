@@ -6,8 +6,6 @@ const socketIo = require("socket.io");
 const app = require("./app");
 const user = require("./Models/usermodel");
 const sendEmail = require("../Back-End/Utils/email");
-const IncomingNotification = require("./Models/UnreadIncomingMaintenance");
-const requestmaintenance = require("./Models/RequestMaintenance")
 dotenv.config({ path: "./config.env" });
 
 // Handle uncaught exceptions
@@ -70,114 +68,7 @@ io.on("connection", (socket) => {
   });
 
 
-  socket.on("RequestMaintenance", async (data) => {
-    try {
-      const requestId = data._id;
-  
-      // Get the original request document
-      const originalRequest = await requestmaintenance.findById(requestId).lean();
-  
-      if (!originalRequest) {
-        console.error("Maintenance request not found.");
-        return;
-      }
-  
-      const [extraInfo] = await requestmaintenance.aggregate([
-        { $match: { _id: new mongoose.Types.ObjectId(requestId) } },
-        {
-          $lookup: {
-            from: "users",
-            localField: "Technician",
-            foreignField: "_id",
-            as: "TechnicianDetails"
-          }
-        },
-        { $unwind: { path: "$TechnicianDetails", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "departments",
-            localField: "Department",
-            foreignField: "_id",
-            as: "DepartmentInfo"
-          }
-        },
-        { $unwind: { path: "$DepartmentInfo", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "laboratories",
-            localField: "Laboratory",
-            foreignField: "_id",
-            as: "LaboratoryInfo"
-          }
-        },
-        { $unwind: { path: "$LaboratoryInfo", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "equipment",
-            localField: "Equipments",
-            foreignField: "_id",
-            as: "EquipmentsInfo"
-          }
-        },
-        { $unwind: { path: "$EquipmentsInfo", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "categories",
-            localField: "EquipmentsInfo.Category",
-            foreignField: "_id",
-            as: "CategoryInfo"
-          }
-        },
-        { $unwind: { path: "$CategoryInfo", preserveNullAndEmptyArrays: true } },
-        {
-          $project: {
-            id: 1,
-            DateTime: 1,
-            Ref: 1,
-            read: 1,
-            Status: 1,
-            feedback: 1,
-            feedbackread: 1,
-            Description: 1,
-            EquipmentId: { $ifNull: ["$EquipmentsInfo._id", "N/A"] },
-            EquipmentName: { $ifNull: ["$EquipmentsInfo.Brand", "N/A"] },
-            CategoryName: { $ifNull: ["$CategoryInfo.CategoryName", "N/A"] },
-            DepartmentId: "$DepartmentInfo._id",
-            _id: 1,
-            Remarks: 1,
-            Department: { $ifNull: ["$DepartmentInfo.DepartmentName", "N/A"] },
-            remarksread: 1,
-            laboratoryName: { $ifNull: ["$LaboratoryInfo.LaboratoryName", "N/A"] },
-            UserId: "$TechnicianDetails._id",
-            Technician: {
-              $concat: [
-                "$TechnicianDetails.FirstName",
-                " ",
-                { $ifNull: ["$TechnicianDetails.Middle", ""] },
-                " ",
-                "$TechnicianDetails.LastName"
-              ]
-            },
-            DateTimeAccomplish: 1
-          }
-        }
-      ]);
-  
-      const finalRequest = {
-        ...originalRequest,
-        ...extraInfo // Includes all projected fields
-      };
-  
-      // Emit to all connected clients
-      io.emit("Maintenance", finalRequest);
-      io.emit("UpdateMaintenance", finalRequest);
-  
-      console.log("Emitted Maintenance:", finalRequest);
-    } catch (error) {
-      console.error("Error in RequestMaintenance:", error);
-    }
-  });
-  
+
 
 socket.on("RefreshData",()=>{
   console.log("RunRefresh")
@@ -185,44 +76,6 @@ socket.on("RefreshData",()=>{
 })
 
   
-
-  socket.on("send-notifications", async (data) => {
-    if (adminSocketId) {
-      // Admin is online — send real-time notification
-      io.to(adminSocketId).emit("maintenance-notifications", data);
-    } else {
-      // Admin is offline — save to DB and send emails individually
-      try {
-        // Save to database
-        await IncomingNotification.create({
-          Description: data.Description,
-          Equipments: data.equipmentType,
-          Department: data.Department,
-          Laboratory: data.Laboratory,
-        });
-        console.log("Admin is offline. Notification saved to DB.");
-
-        // Get all admin users
-        const admins = await user.find({ role: "admin" });
-        const resetUrl = `https://myapp-xk0w.onrender.com`;
-        // Construct message
-        const msg = `
-          Please check your dashboard. A new maintenance request has been submitted and requires your attention.\nClick to login: ${resetUrl}
-        `;
-
-        // Send individual email to each admin
-        for (const admin of admins) {
-          await sendEmail({
-            email: admin.email,
-            subject: "New Maintenance Notification",
-            text: msg,
-          });
-        }
-      } catch (err) {
-        console.error("Failed to handle offline admin notification:", err.message);
-      }
-    }
-  });
 
   // Reset notification count when cleared
   socket.on("clearNotifications", () => {
@@ -266,5 +119,4 @@ process.on("unhandledRejection", (err) => {
   });
 });
 
-// Include your cron job if applicable
-require("./Utils/CronJob");
+

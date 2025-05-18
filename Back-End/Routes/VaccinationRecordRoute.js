@@ -7,9 +7,13 @@ router
   .route("/")
   .post(authController.protect, RecordController.createNewRecord)
   .get(authController.protect,RecordController.DisplayVaccinationRecord)
+// routes/vaccinationRecord.js
 router
-  .route("/:id")
-  .patch(authController.protect, RecordController.UpdateRecord)
+  .route("/:recordId/doses/:doseId")  // Now includes doseId
+  .patch(
+    authController.protect,
+    RecordController.UpdateRecord
+  )
   .delete(authController.protect,RecordController.deleteRecord)
 
 module.exports = router;

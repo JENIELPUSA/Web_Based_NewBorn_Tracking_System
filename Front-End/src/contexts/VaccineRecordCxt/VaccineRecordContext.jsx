@@ -6,6 +6,7 @@ import SuccessFailed from "../../ReusableFolder/SuccessandField";
 export const VaccineRecordDisplayContext = createContext();
 
 export const VaccineRecordDisplayProvider = ({ children }) => {
+    const [customError, setCustomError] = useState("");
     const [vaccineRecord, setVaccineRecord] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -23,6 +24,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
             });
             const vaccineData = res?.data.data;
             setVaccineRecord(vaccineData);
+            console.log("Data TRy", vaccineData);
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Failed to fetch data. Please try again later.");
@@ -42,7 +44,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                     email: values.email,
                     administeredBy: values.administeredBy,
                     dateGiven: values.dateGiven,
-                    remarks:values.remarks,
+                    remarks: values.remarks,
                     next_due_date: values.next_due_date,
                     NUmberOfDose: values.NUmberOfDose,
                     status: values.status,
@@ -51,8 +53,9 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                     headers: { Authorization: `Bearer ${authToken}` },
                 },
             );
-            if (res.data.status === "Success") {
-                setUsers((prevUsers) => [...prevUsers, res.data.data]);
+            console.log("RESS", res);
+            if (res.data.status === "success") {
+                setVaccineRecord((prevUsers) => [...prevUsers, res.data.data]);
                 setModalStatus("success");
                 setShowModal(true);
             } else {
@@ -73,6 +76,90 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
         }
     };
 
+    const UpdateContext = async (values, recordId, doseId) => {
+        try {
+            setLoading(true);
+
+            console.log("Values", values);
+            console.log("Record", recordId);
+            console.log("DOse", values.doseId);
+            const requestData = {
+                dateGiven: values.dateGiven,
+                next_due_date: values.next_due_date,
+                remarks: values.remarks,
+                status: values.status,
+            };
+
+            const response = await axios.patch(
+                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/${recordId}/doses/${values.doseId}`,
+                requestData,
+            );
+
+            if (response.data.status === "success") {
+                setVaccineRecord((prevRecords) =>
+                    prevRecords.map((record) => {
+                        if (record._id === response.data.data.recordId) {
+                            return {
+                                ...record,
+                                doses: record.doses.map((dose) => (dose._id === values.doseId ? response.data.data.dose : dose)),
+                            };
+                        }
+                        return record;
+                    }),
+                );
+
+                setModalStatus("success");
+                setShowModal(true);
+            } else {
+                setModalStatus("failed");
+                setShowModal(true);
+                return { success: false, error: "Unexpected response from server." };
+            }
+        } catch (err) {
+            setLoading(false);
+            setError("An error occurred while updating the record");
+            console.error("Error updating vaccination record:", err);
+            return null;
+        }
+    };
+
+    const DeleteContext = async (recordId, doseId) => {
+        try {
+            setLoading(true);
+            const response = await axios.delete(
+                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/${recordId}/doses/${doseId}`,
+            );
+
+            if (response.data.status === "success") {
+                
+                setModalStatus("success");
+                setVaccineRecord((prevRecords) =>
+                    prevRecords.map((record) => {
+                        if (record._id === recordId) {
+                            return {
+                                ...record,
+                                doses: record.doses.filter((dose) => dose._id !== doseId),
+                            };
+                        }
+                        return record;
+                    }),
+                );
+
+                setModalStatus("success");
+                setShowModal(true);
+            } else {
+                setModalStatus("failed");
+                setShowModal(true);
+                return { success: false, error: "Unexpected response from server." };
+            }
+        } catch (err) {
+            setLoading(false);
+            setError("An error occurred while deleting the dose");
+            console.error("Error deleting dose:", err);
+            return null;
+        }
+    };
+
     // Auto-fetch on mount
     useEffect(() => {
         fetchVaccineRecordData();
@@ -81,7 +168,9 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     return (
         <VaccineRecordDisplayContext.Provider
             value={{
-              AssignVaccine,
+                DeleteContext,
+                UpdateContext,
+                AssignVaccine,
                 vaccineRecord,
                 loading,
                 error,

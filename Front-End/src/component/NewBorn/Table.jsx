@@ -30,6 +30,7 @@ function NewBorn() {
 
     const handleCloseModal = () => {
         setAddFormOpen(false);
+        setAssignFormOpen(false);
         setSelectedBorn(null);
     };
 
@@ -47,7 +48,7 @@ function NewBorn() {
     };
 
   const handleAsign = (Data) => {
-    setIDNewborn(Data); // ✅ assign selected ID
+    setIDNewborn(Data); // assign selected ID
     setAssignFormOpen(true);
     console.log("Hello Assign", Data);
 };
