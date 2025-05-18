@@ -2,7 +2,8 @@ import React, { useState, useContext } from "react";
 import { PencilIcon, TrashIcon, Plus } from "lucide-react"; // Lucide icons for clean UI
 import UserFormModal from "../NewBorn/AddNewBorn";
 import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornContext";
-import AddNewBornForm from "../VaccineRecord/AddForm"
+import AddNewBornForm from "../VaccineRecord/AddForm";
+import StatusVerification from "../../ReusableFolder/StatusModal"
 
 function NewBorn() {
     const [selectedBorn, setSelectedBorn] = useState(null); // State for the user to be edited
@@ -10,9 +11,11 @@ function NewBorn() {
     const [currentPage, setCurrentPage] = useState(1);
     const usersPerPage = 5;
     const [isAddFormOpen, setAddFormOpen] = useState(false);
-     const [isAsignFormOpen, setAssignFormOpen] = useState(false);
+    const [isAsignFormOpen, setAssignFormOpen] = useState(false);
     const { newBorn, DeleteNewBorn } = useContext(NewBornDisplayContext);
-     const [IDNewborn, setIDNewborn] = useState("");
+    const [IDNewborn, setIDNewborn] = useState("");
+    const [isVerification, setVerification] = useState(false);
+    const [deleteId,setDeleteID]=useState("")
 
     const filteredUsers = newBorn.filter((user) =>
         `${user.firstName} ${user.lastName} ${user.username} ${user.email}`.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -29,17 +32,24 @@ function NewBorn() {
     };
 
     const handleCloseModal = () => {
+        setVerification(false)
         setAddFormOpen(false);
         setAssignFormOpen(false);
         setSelectedBorn(null);
     };
 
     const handleDeleteNewBorn = async (newbordID) => {
-        await DeleteNewBorn(newbordID);
+         setVerification(true);
+         setDeleteID(newbordID)   
+    };
+        const handleConfirmDelete =async() => {
+         await DeleteNewBorn(deleteId);
         setUsers((prevUsers) => {
-            const updated = prevUsers.filter((user) => user._id !== newbordID);
+            const updated = prevUsers.filter((user) => user._id !== deleteId);
             return updated;
         });
+        // Call your delete API or context method here
+        handleCloseModal();
     };
 
     const onBornSelect = (user) => {
@@ -47,12 +57,11 @@ function NewBorn() {
         setSelectedBorn(user);
     };
 
-  const handleAsign = (Data) => {
-    setIDNewborn(Data); // assign selected ID
-    setAssignFormOpen(true);
-    console.log("Hello Assign", Data);
-};
-
+    const handleAsign = (Data) => {
+        setIDNewborn(Data); // assign selected ID
+        setAssignFormOpen(true);
+        console.log("Hello Assign", Data);
+    };
 
     return (
         <div className="card">
@@ -200,10 +209,15 @@ function NewBorn() {
                     onClose={handleCloseModal}
                     born={selectedBorn}
                 />
-                 <AddNewBornForm
+                <AddNewBornForm
                     isOpen={isAsignFormOpen}
                     onClose={handleCloseModal}
                     newbordID={IDNewborn}
+                />
+                <StatusVerification
+                    isOpen={isVerification}
+                    onConfirmDelete={handleConfirmDelete}
+                    onClose={handleCloseModal}
                 />
             </div>
         </div>
