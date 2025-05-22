@@ -30,10 +30,10 @@ export default function Login() {
 
     if (response.success) {
       console.log("Successfully Login")
-      setTimeout(() => {
- 
-        setIsLoading(false);
-      }, 1000);
+          setTimeout(() => {
+      setIsLoading(false);
+      navigate("/dashboard"); //  Redirect to dashboard
+    }, 1000);
     } else {
       setIsLoading(false);
       toast.error(response.message);
@@ -103,16 +103,9 @@ export default function Login() {
               className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
               disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? "Signing in..." : "LogIn"}
             </button>
           </form>
-
-          <p className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400">
-            Don&apos;t have an account?{" "}
-            <a href="#" className="text-red-500 hover:underline">
-              Register
-            </a>
-          </p>
         </div>
       </div>
     </div>

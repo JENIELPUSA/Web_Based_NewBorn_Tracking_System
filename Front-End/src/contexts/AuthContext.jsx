@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState(localStorage.getItem("email") || null);
   const [fullName, setFullName] = useState(localStorage.getItem("fullName") || null);
   const [userId, setUserID] = useState(localStorage.getItem("userId") || null);
+    const [zone, setzone] = useState(localStorage.getItem("zone") || null);
   // Set the token globally for all axios requests
   useEffect(() => {
     if (authToken) {
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }) => {
       if (res.data.status === "Success") {
         const fullName=res.data.fullName;
         const token = res.data.token;
+        const zone = res.data.zone;
         const role = res.data.role;
         const email = res.data.email;
         const userId = res.data.userId; // Get the user ID from response
@@ -44,6 +46,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("email", email);
         localStorage.setItem("userId", userId); // Save ID
         localStorage.setItem("fullName", fullName);
+        localStorage.setItem("zone", zone);
 
         // Set the token in global axios headers
         axios.defaults.headers["Authorization"] = `Bearer ${token}`;
@@ -54,6 +57,7 @@ export const AuthProvider = ({ children }) => {
         setRole(role);
         setEmail(email);
         setUserID(userId); // Update context (if applicable)
+        setzone(zone)
 
         return { success: true, role, userId }; // Return ID along with role
       }
@@ -70,6 +74,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("fullName");
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+     localStorage.removeItem("zone");
     localStorage.removeItem("email");
     localStorage.removeItem("userId");
     localStorage.removeItem("selectedLab");
@@ -96,7 +101,7 @@ export const AuthProvider = ({ children }) => {
   <ToastContainer />
   return (
     <AuthContext.Provider
-      value={{ email, authToken, role, login, logout, userId,fullName }}
+      value={{ email, authToken, role, login, logout, userId,fullName,zone }}
     >
       {children}
     </AuthContext.Provider>

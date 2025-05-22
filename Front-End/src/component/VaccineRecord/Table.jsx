@@ -38,7 +38,7 @@ const StatusBadge = ({ status }) => {
 };
 
 function UserTable() {
-    const { vaccineRecord,DeleteContext } = useContext(VaccineRecordDisplayContext);
+    const { vaccineRecord, DeleteContext } = useContext(VaccineRecordDisplayContext);
     const [isVerification, setVerification] = useState(false);
     const [isAsignFormOpen, setAssignFormOpen] = useState(false);
     const [assignData, setAssignData] = useState(null);
@@ -75,9 +75,9 @@ function UserTable() {
         setDose(null);
     };
 
-    const handleConfirmDelete =async() => {
+    const handleConfirmDelete = async () => {
         console.log("Deleting:", doseId, dataID);
-        await DeleteContext(dataID,doseId)
+        await DeleteContext(dataID, doseId);
 
         // Call your delete API or context method here
         handleCloseModal();
@@ -163,6 +163,7 @@ function UserTable() {
                                 <th>Mother</th>
                                 <th>Vaccine</th>
                                 <th>Description</th>
+                                <th>Given Dose</th>
                                 <th>Dosage</th>
                                 <th>Status</th>
                                 <th>Remarks</th>
@@ -207,6 +208,7 @@ function UserTable() {
                                             <td>{user.motherName}</td>
                                             <td>{user.vaccineName}</td>
                                             <td>{user.description}</td>
+                                            <td className="capitalize">{dose.doseNumber || "—"}</td>
                                             <td className="capitalize">{user.dosage}</td>
                                             <td>
                                                 <StatusBadge status={dose.status} />
@@ -225,6 +227,7 @@ function UserTable() {
                                                     </div>
                                                 </div>
                                             </td>
+
                                             <td>
                                                 <div className="flex gap-2">
                                                     <button

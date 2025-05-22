@@ -39,7 +39,7 @@ export default function DeleteConfirmationModal({
         <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
           This action cannot be undone. Are you sure you want to delete this item?
         </p>
-
+    
         {/* Buttons */}
         <div className="flex gap-3">
           <button

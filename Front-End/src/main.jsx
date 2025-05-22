@@ -10,21 +10,27 @@ import { AuthProvider } from "./contexts/AuthContext.jsx";
 import { NewBornDisplayProvider } from "./contexts/NewBornContext/NewBornContext.jsx";
 import { VaccineDisplayProvider } from "./contexts/VaccineContext/VaccineContext.jsx";
 import { VaccineRecordDisplayProvider } from "./contexts/VaccineRecordCxt/VaccineRecordContext.jsx";
+import { VaccinePerProvider } from "./contexts/PerBabyVacine/PerBabyVacineContext.jsx";
+import { LogDisplayProvider } from "./contexts/LogAndAuditContext/LogAuditContext.jsx";
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
         <ThemeProvider>
             {" "}
             <AuthProvider>
-                <VaccineRecordDisplayProvider>
-                    <VaccineDisplayProvider>
-                        <NewBornDisplayProvider>
-                            <UserDisplayProvider>
-                                <App />
-                            </UserDisplayProvider>
-                        </NewBornDisplayProvider>
-                    </VaccineDisplayProvider>
-                </VaccineRecordDisplayProvider>
+                <LogDisplayProvider>
+                    <VaccinePerProvider>
+                        <VaccineDisplayProvider>
+                            <VaccineRecordDisplayProvider>
+                                <NewBornDisplayProvider>
+                                    <UserDisplayProvider>
+                                        <App />
+                                    </UserDisplayProvider>
+                                </NewBornDisplayProvider>
+                            </VaccineRecordDisplayProvider>
+                        </VaccineDisplayProvider>
+                    </VaccinePerProvider>
+                </LogDisplayProvider>
             </AuthProvider>
         </ThemeProvider>
     </StrictMode>,

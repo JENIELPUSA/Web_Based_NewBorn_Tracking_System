@@ -25,7 +25,7 @@ export const VaccineDisplayProvider = ({ children }) => {
             return;
         }
 
-        fetchUserData();
+        fetchVaccineContext();
     }, [authToken]); // Dependencies to trigger effect when page or items per page change
 
     useEffect(() => {
@@ -38,7 +38,7 @@ export const VaccineDisplayProvider = ({ children }) => {
         }
     }, [customError]);
 
-    const fetchUserData = async () => {
+    const fetchVaccineContext = async () => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data
         try {
@@ -216,6 +216,7 @@ const UpdateData = async (vaccineId, values) => {
                 vaccine,
                 VaccineAdd,
                 DeleteData,
+                fetchVaccineContext
             }}
         >
             {children}

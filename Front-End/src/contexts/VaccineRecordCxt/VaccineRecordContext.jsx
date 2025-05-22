@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
+import { VaccineDisplayContext } from "../VaccineContext/VaccineContext";
 export const VaccineRecordDisplayContext = createContext();
 
 export const VaccineRecordDisplayProvider = ({ children }) => {
@@ -10,9 +11,11 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const [vaccineRecord, setVaccineRecord] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const { authToken } = useContext(AuthContext);
+    const { authToken, userId, role, zone } = useContext(AuthContext);
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
+    const { fetchVaccineContext } = useContext(VaccineDisplayContext);
+    const [calendardata,setCalendarData]=useState([])
 
     const fetchVaccineRecordData = async () => {
         if (!authToken) return;
@@ -22,13 +25,35 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
-            const vaccineData = res?.data.data;
-            setVaccineRecord(vaccineData);
-            console.log("Data TRy", vaccineData);
+
+            const vaccineData = res?.data?.data || [];
+            console.log("Full vaccine data from API:", vaccineData); // Debug log
+
+            if (role === "Admin") {
+                setVaccineRecord(vaccineData);
+                 setCalendarData(vaccineData)
+            } else if (role === "BHW") {
+                console.log("Current BHW userId:", userId); // Debug log
+
+                // Process records to only include doses administered by this BHW
+                const filteredRecords = vaccineData
+                    .map((record) => {
+                        // Filter doses for this specific BHW
+                        const bhwsDoses = record.doses.filter((dose) => dose.administeredById === userId);
+
+                        // Only include records that have doses administered by this BHW
+                        return bhwsDoses.length > 0 ? { ...record, doses: bhwsDoses } : null;
+                    })
+                    .filter((record) => record !== null); // Remove null entries
+
+                console.log("Filtered records for BHW:", filteredRecords); // Debug log
+                setVaccineRecord(filteredRecords);
+                setCalendarData(vaccineData)
+            }
         } catch (error) {
-            console.error("Error fetching data:", error);
-            toast.error("Failed to fetch data. Please try again later.");
-            setError("Failed to fetch data");
+            console.error("Error fetching vaccine records:", error);
+            toast.error("Failed to fetch vaccine records. Please try again later.");
+            setError(error.response?.data?.message || "Failed to fetch data");
         } finally {
             setLoading(false);
         }
@@ -53,9 +78,9 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                     headers: { Authorization: `Bearer ${authToken}` },
                 },
             );
-            console.log("RESS", res);
             if (res.data.status === "success") {
-                setVaccineRecord((prevUsers) => [...prevUsers, res.data.data]);
+                fetchVaccineRecordData();
+                fetchVaccineContext();
                 setModalStatus("success");
                 setShowModal(true);
             } else {
@@ -131,7 +156,6 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
             );
 
             if (response.data.status === "success") {
-                
                 setModalStatus("success");
                 setVaccineRecord((prevRecords) =>
                     prevRecords.map((record) => {
@@ -168,6 +192,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     return (
         <VaccineRecordDisplayContext.Provider
             value={{
+                calendardata,
                 DeleteContext,
                 UpdateContext,
                 AssignVaccine,

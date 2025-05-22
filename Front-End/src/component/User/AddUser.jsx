@@ -5,6 +5,8 @@ import { AuthContext } from "../../contexts/AuthContext";
 
 const UserFormModal = ({ isOpen, onClose, user }) => {
     const { AddUser, UpdateUser, customError } = useContext(UserDisplayContext);
+    const [dropdownOpenRole, setDropdownOpenRole] = useState(false);
+    const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
 
     const [formData, setFormData] = useState({
         FirstName: "",
@@ -60,18 +62,24 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleSelect = (name, value) => {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        if (name === "role") setDropdownOpenRole(false);
+        if (name === "gender") setDropdownOpenGender(false);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (user) {
             await UpdateUser(user._id, formData);
             setTimeout(() => {
                 onClose();
-            }, 1000); // auto-dismiss after 5s
+            }, 1000);
         } else {
             await AddUser(formData);
             setTimeout(() => {
                 onClose();
-            }, 1000); // auto-dismiss after 5s
+            }, 1000);
         }
     };
 
@@ -87,143 +95,190 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
             >
                 <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">{user ? "Edit User" : "Add New User"}</h2>
 
-                {customError && <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">{customError}</div>}
+                {customError && (
+                    <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700 dark:bg-red-900 dark:text-red-200">
+                        {customError}
+                    </div>
+                )}
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="space-y-4"
-                >
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">First Name</label>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">First Name</label>
                             <input
                                 type="text"
                                 name="FirstName"
                                 value={formData.FirstName}
                                 onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Last Name</label>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Last Name</label>
                             <input
                                 type="text"
                                 name="LastName"
                                 value={formData.LastName}
                                 onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Email</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Role</label>
-                            <select
-                                name="role"
-                                value={formData.role}
-                                onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                        {/* Custom Role Dropdown */}
+                        <div className="relative">
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Role</label>
+                            <div
+                                className="flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                onClick={() => setDropdownOpenRole(!dropdownOpenRole)}
                             >
-                                <option value="">Select Role</option>
-                                <option value="Admin">Admin</option>
-                                <option value="BHW">BHW</option>
-                                <option value="Guest">Guest</option>
-                            </select>
+                                <span>{formData.role || "Select Role"}</span>
+                                <i className={`fas ${dropdownOpenRole ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
+                            </div>
+                            {dropdownOpenRole && (
+                                <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
+                                    <li
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        onClick={() => handleSelect("role", "")}
+                                    >
+                                        Select Role
+                                    </li>
+                                    <li
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        onClick={() => handleSelect("role", "Admin")}
+                                    >
+                                        Admin
+                                    </li>
+                                    <li
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        onClick={() => handleSelect("role", "BHW")}
+                                    >
+                                        BHW
+                                    </li>
+                                    <li
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        onClick={() => handleSelect("role", "Guest")}
+                                    >
+                                        Guest
+                                    </li>
+                                </ul>
+                            )}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Address</label>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Address</label>
                             <input
                                 type="text"
                                 name="address"
                                 value={formData.address}
                                 onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Zone</label>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Zone</label>
                             <input
                                 type="text"
                                 name="zone"
                                 value={formData.zone}
                                 onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Phone Number</label>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Phone Number</label>
                             <input
                                 type="text"
                                 name="phoneNumber"
                                 value={formData.phoneNumber}
                                 onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Password</label>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Password</label>
                             <input
                                 type="password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Date of Birth</label>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Date of Birth</label>
                             <input
                                 type="date"
                                 name="dateOfBirth"
                                 value={formData.dateOfBirth}
                                 onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Gender</label>
-                            <select
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                                className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                        
+                        {/* Custom Gender Dropdown */}
+                        <div className="relative">
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Gender</label>
+                            <div
+                                className="flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                onClick={() => setDropdownOpenGender(!dropdownOpenGender)}
                             >
-                                <option value="">Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
+                                <span>{formData.gender || "Select Gender"}</span>
+                                <i className={`fas ${dropdownOpenGender ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
+                            </div>
+                            {dropdownOpenGender && (
+                                <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
+                                    <li
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        onClick={() => handleSelect("gender", "")}
+                                    >
+                                        Select Gender
+                                    </li>
+                                    <li
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        onClick={() => handleSelect("gender", "Male")}
+                                    >
+                                        Male
+                                    </li>
+                                    <li
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        onClick={() => handleSelect("gender", "Female")}
+                                    >
+                                        Female
+                                    </li>
+                                </ul>
+                            )}
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Avatar URL</label>
+                        <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Avatar URL</label>
                         <input
                             type="text"
                             name="avatar"
                             value={formData.avatar}
                             onChange={handleChange}
-                            className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:outline-none"
+                            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                         />
                     </div>
 
@@ -231,13 +286,13 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400"
+                            className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700"
+                            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
                         >
                             {user ? "Update User" : "Add User"}
                         </button>

@@ -11,9 +11,10 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
 
     const [customError, setCustomError] = useState("");
     const [selectedDosage, setSelectedDosage] = useState("");
+    const [dropdownOpenVaccine, setDropdownOpenVaccine] = useState(false);
+    const [dropdownOpenStatus, setDropdownOpenStatus] = useState(false);
 
     const [formData, setFormData] = useState({
-        
         newborn: newbordID || "",
         vaccine: "",
         administeredBy: userId || "",
@@ -22,7 +23,7 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
         numberOfDose: 1,
         status: "",
         remarks: "",
-        doseId:""
+        doseId: "",
     });
 
     useEffect(() => {
@@ -46,11 +47,29 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                 numberOfDose: 1,
                 status: "",
                 remarks: "",
-                doseId:""
+                doseId: "",
             });
             setSelectedDosage("");
         }
     }, [editDose, newbordID, userId]);
+
+    const handleVaccineSelect = (vaccineId) => {
+        setFormData(prev => ({
+            ...prev,
+            vaccine: vaccineId
+        }));
+        const selectedVaccine = vaccine.find((v) => v._id === vaccineId);
+        setSelectedDosage(selectedVaccine?.dosage || "");
+        setDropdownOpenVaccine(false);
+    };
+
+    const handleStatusSelect = (status) => {
+        setFormData(prev => ({
+            ...prev,
+            status: status
+        }));
+        setDropdownOpenStatus(false);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -58,11 +77,6 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
             ...prevData,
             [name]: value,
         }));
-
-        if (name === "vaccine") {
-            const selectedVaccine = vaccine.find((v) => v._id === value);
-            setSelectedDosage(selectedVaccine?.dosage || "");
-        }
     };
 
     const handleSubmit = async (e) => {
@@ -97,97 +111,145 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Vaccine Field */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Vaccine</label>
-                        {editDose ? (
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Vaccine Field */}
+                        <div className="relative">
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Vaccine</label>
+                            {editDose ? (
+                                <input
+                                    type="text"
+                                    value={record?.vaccineName || vaccine.find((v) => v._id === formData.vaccine)?.name || ""}
+                                    readOnly
+                                    className="w-full cursor-not-allowed rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                                />
+                            ) : (
+                                <>
+                                    <div
+                                        className="flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                        onClick={() => setDropdownOpenVaccine(!dropdownOpenVaccine)}
+                                    >
+                                        <span>
+                                            {formData.vaccine
+                                                ? vaccine.find(v => v._id === formData.vaccine)?.name || "Select Vaccine"
+                                                : "Select Vaccine"}
+                                        </span>
+                                        <i className={`fas ${dropdownOpenVaccine ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
+                                    </div>
+                                    {dropdownOpenVaccine && (
+                                        <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
+                                            <li
+                                                className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                                onClick={() => {
+                                                    handleVaccineSelect("");
+                                                    setDropdownOpenVaccine(false);
+                                                }}
+                                            >
+                                                Select Vaccine
+                                            </li>
+                                            {vaccine.map((v) => (
+                                                <li
+                                                    key={v._id}
+                                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                                    onClick={() => handleVaccineSelect(v._id)}
+                                                >
+                                                    {v.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </>
+                            )}
+                        </div>
+
+                        {/* Dosage Field */}
+                        <div>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Dosage</label>
                             <input
                                 type="text"
-                                value={record?.vaccineName || vaccine.find((v) => v._id === formData.vaccine)?.name || ""}
+                                value={selectedDosage}
                                 readOnly
-                                className="mt-1 w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-gray-700 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-300"
+                                className="w-full cursor-not-allowed rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                                placeholder={editDose ? "Dosage cannot be changed" : "Dosage will appear here..."}
                             />
-                        ) : (
-                            <select
-                                name="vaccine"
-                                value={formData.vaccine}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Date Given */}
+                        <div>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Date Given</label>
+                            <input
+                                type="date"
+                                name="dateGiven"
+                                value={formData.dateGiven}
                                 onChange={handleChange}
                                 required
-                                className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                            >
-                                <option value="">Select Vaccine</option>
-                                {vaccine.map((v) => (
-                                    <option key={v._id} value={v._id}>
-                                        {v.name}
-                                    </option>
-                                ))}
-                            </select>
-                        )}
-                    </div>
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                            />
+                        </div>
 
-                    {/* Dosage Field */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Dosage</label>
-                        <input
-                            type="text"
-                            value={selectedDosage}
-                            readOnly
-                            className="mt-1 w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-gray-700 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-300"
-                            placeholder={editDose ? "Dosage cannot be changed" : "Dosage will appear here..."}
-                        />
-                    </div>
-
-                    {/* Date Given */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Date Given</label>
-                        <input
-                            type="date"
-                            name="dateGiven"
-                            value={formData.dateGiven}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200"
-                        />
-                    </div>
-
-                    {/* Next Due Date */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Next Due Date</label>
-                        <input
-                            type="date"
-                            name="next_due_date"
-                            value={formData.next_due_date}
-                            onChange={handleChange}
-                            className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200"
-                        />
+                        {/* Next Due Date */}
+                        <div>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Next Due Date</label>
+                            <input
+                                type="date"
+                                name="next_due_date"
+                                value={formData.next_due_date}
+                                onChange={handleChange}
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                            />
+                        </div>
                     </div>
 
                     {/* Status Dropdown */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Status</label>
-                        <select
-                            name="status"
-                            value={formData.status}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200"
+                    <div className="relative">
+                        <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Status</label>
+                        <div
+                            className="flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                            onClick={() => setDropdownOpenStatus(!dropdownOpenStatus)}
                         >
-                            <option value="">Select Status</option>
-                            <option value="On-Time">On-Time</option>
-                            <option value="Delayed">Delayed</option>
-                            <option value="Missed">Missed</option>
-                        </select>
+                            <span>{formData.status || "Select Status"}</span>
+                            <i className={`fas ${dropdownOpenStatus ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
+                        </div>
+                        {dropdownOpenStatus && (
+                            <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
+                                <li
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                    onClick={() => handleStatusSelect("")}
+                                >
+                                    Select Status
+                                </li>
+                                <li
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                    onClick={() => handleStatusSelect("On-Time")}
+                                >
+                                    On-Time
+                                </li>
+                                <li
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                    onClick={() => handleStatusSelect("Delayed")}
+                                >
+                                    Delayed
+                                </li>
+                                <li
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                    onClick={() => handleStatusSelect("Missed")}
+                                >
+                                    Missed
+                                </li>
+                            </ul>
+                        )}
                     </div>
 
                     {/* Remarks */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Remarks</label>
+                        <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Remarks</label>
                         <textarea
                             name="remarks"
                             value={formData.remarks}
                             onChange={handleChange}
                             rows="3"
-                            className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200"
+                            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                         ></textarea>
                     </div>
 

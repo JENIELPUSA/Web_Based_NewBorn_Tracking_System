@@ -12,64 +12,70 @@ import RecordOfVaccine from "./component/VaccineRecord/Layout"
 import CalendarLayout from "./component/Calendar/CalendarLayout"
 
 function App() {
-    const router = createBrowserRouter([
+  const router = createBrowserRouter([
+    // Login Route
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    // Redirect root path to /login
+    {
+      path: "/",
+      element: <Login />,
+    },
+    // Dashboard & a    ll children
+    {
+      path: "/dashboard",
+      element: <Layout />,
+      children: [
         {
-            path: "/",
-            element: <Layout />,
-            children: [
-                {
-                    index: true,
-                    element: <DashboardPage />,
-                },
-                {
-                    path: "Calendar",
-                    element:<CalendarLayout/>,
-                },
-                {
-                    path: "reports",
-                    element: <h1 className="title">Reports</h1>,
-                },
-                {
-                    path: "add-user",
-                    element:<AddUser/>
-                },
-                {
-                    path: "new-born",
-                    element:<NewBorn/>,
-                },
-                {
-                    path: "new-vaccine",
-                    element: <Vaccine/>,
-                },
-                {
-                    path: "new-record-vaccine",
-                    element: <RecordOfVaccine/>,
-                },
-                {
-                    path: "/login",
-                    element: <Login/>
-                },
-                {
-                    path: "new-product",
-                    element: <h1 className="title">New Product</h1>,
-                },
-                {
-                    path: "inventory",
-                    element: <h1 className="title">Inventory</h1>,
-                },
-                {
-                    path: "settings",
-                    element: <h1 className="title">Settings</h1>,
-                },
-            ],
+          index: true,
+          element: <DashboardPage />,
         },
-    ]);
+        {
+          path: "/dashboard/calendar",
+          element: <CalendarLayout />,
+        },
+        {
+          path: "/dashboard/reports",
+          element: <h1 className="title">Reports</h1>,
+        },
+        {
+          path: "/dashboard/add-user",
+          element: <AddUser />,
+        },
+        {
+          path: "/dashboard/new-born",
+          element: <NewBorn />,
+        },
+        {
+          path: "/dashboard/new-vaccine",
+          element: <Vaccine />,
+        },
+        {
+          path: "/dashboard/new-record-vaccine",
+          element: <RecordOfVaccine />,
+        },
+        {
+          path: "new-product",
+          element: <h1 className="title">New Product</h1>,
+        },
+        {
+          path: "inventory",
+          element: <h1 className="title">Inventory</h1>,
+        },
+        {
+          path: "settings",
+          element: <h1 className="title">Settings</h1>,
+        },
+      ],
+    },
+  ]);
 
-    return (
-        <ThemeProvider storageKey="theme">
-            <RouterProvider router={router} />
-        </ThemeProvider>
-    );
+  return (
+    <ThemeProvider storageKey="theme">
+      <RouterProvider router={router} />
+    </ThemeProvider>
+  );
 }
-
 export default App;

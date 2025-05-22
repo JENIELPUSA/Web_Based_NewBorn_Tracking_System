@@ -1,9 +1,10 @@
 import React, { useState, useContext } from "react";
-import { PencilIcon, TrashIcon, Plus } from "lucide-react"; // Lucide icons for clean UI
+import { PencilIcon, TrashIcon, Plus, Eye } from "lucide-react"; // Lucide icons for clean UI
 import UserFormModal from "../NewBorn/AddNewBorn";
 import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornContext";
 import AddNewBornForm from "../VaccineRecord/AddForm";
 import StatusVerification from "../../ReusableFolder/StatusModal"
+import DisplayVaccine from "../AssignVaccine/DisplayVaccine";
 
 function NewBorn() {
     const [selectedBorn, setSelectedBorn] = useState(null); // State for the user to be edited
@@ -16,6 +17,8 @@ function NewBorn() {
     const [IDNewborn, setIDNewborn] = useState("");
     const [isVerification, setVerification] = useState(false);
     const [deleteId,setDeleteID]=useState("")
+    const [isDisplayVaccine,setDisplayVaccine]=useState("")
+    const [isNewBordId,setNewBornId]=useState("")
 
     const filteredUsers = newBorn.filter((user) =>
         `${user.firstName} ${user.lastName} ${user.username} ${user.email}`.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -36,6 +39,7 @@ function NewBorn() {
         setAddFormOpen(false);
         setAssignFormOpen(false);
         setSelectedBorn(null);
+        setDisplayVaccine(false);
     };
 
     const handleDeleteNewBorn = async (newbordID) => {
@@ -60,8 +64,11 @@ function NewBorn() {
     const handleAsign = (Data) => {
         setIDNewborn(Data); // assign selected ID
         setAssignFormOpen(true);
-        console.log("Hello Assign", Data);
     };
+    const handleDisplayVaccine=(data)=>{
+           setDisplayVaccine(true)
+           setNewBornId(data)
+    }
 
     return (
         <div className="card">
@@ -165,11 +172,21 @@ function NewBorn() {
                                                 </button>
                                                 <button
                                                     onClick={() => handleAsign(newBorn._id)}
-                                                    className="group relative rounded bg-green-500 px-2 py-1 text-white hover:bg-green-600"
+                                                    className="group relative rounded bg-blue-500 px-2 py-1 text-white hover:bg-orange-600"
                                                 >
                                                     <Plus className="h-4 w-4" />
                                                     <span className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 scale-90 whitespace-nowrap rounded bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-all duration-300 ease-in-out group-hover:scale-100 group-hover:opacity-100">
                                                         Assign Vaccine
+                                                    </span>
+                                                </button>
+
+                                                     <button
+                                                      onClick={() => handleDisplayVaccine(newBorn._id)}
+                                                    className="group relative rounded bg-green-500 px-2 py-1 text-white hover:bg-green-600"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                    <span className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 scale-90 whitespace-nowrap rounded bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-all duration-300 ease-in-out group-hover:scale-100 group-hover:opacity-100">
+                                                        List of Vaccine
                                                     </span>
                                                 </button>
                                             </div>
@@ -218,6 +235,12 @@ function NewBorn() {
                     isOpen={isVerification}
                     onConfirmDelete={handleConfirmDelete}
                     onClose={handleCloseModal}
+                />
+
+                  <DisplayVaccine
+                    isOpen={isDisplayVaccine}
+                    onClose={handleCloseModal}
+                    newbornID={isNewBordId}
                 />
             </div>
         </div>

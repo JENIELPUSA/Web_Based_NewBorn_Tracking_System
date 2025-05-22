@@ -11,12 +11,16 @@ const PDFRoutes = require("./Routes/PDFRoutes");
 const usersroutes = require("./Routes/UserRoutes");
 
 const VaccinationRecord = require("./Routes/VaccinationRecordRoute");
+const AssignedPerBaby = require("./Routes/AssignedPerBabyRoute");
 
 const VaccineRoutes = require("./Routes/VaccineRoutes");
 
 const NewBornBabyRoutes = require("./Routes/NewBornBabyRoutes");
 
 const BrandRoute = require("./Routes/BrandRoute");
+
+const auditLogRoute = require("./Routes/auditLogRoute");
+
 
 const authentic = require("./Routes/authRouter");
 let app = express();
@@ -27,6 +31,8 @@ const logger = function (res, req, next) {
 };
 
 app.use(express.json());
+//para sa IPADDRESS
+app.set("trust proxy", true);
 
 app.use(
   session({
@@ -65,11 +71,14 @@ app.use("/api/v1/users", usersroutes);
 
 app.use("/api/v1/NewBorn", NewBornBabyRoutes);
 app.use("/api/v1/Brand", BrandRoute);
+app.use("/api/v1/LogAudit",auditLogRoute)
 
 app.use("/api/v1/Vaccine", VaccineRoutes);
 app.use("/api/v1/authentication", authentic);
 app.use("/api/v1/GeneratePDF", PDFRoutes);
 app.use("/api/v1/VaccinationRecord", VaccinationRecord);
+
+app.use("/api/v1/AssignedPerBabyVaccine", AssignedPerBaby);
 VaccinationRecord;
 
 app.use(ErrorController);

@@ -143,6 +143,7 @@ exports.login = AsyncErrorHandler(async (req, res, next) => {
     FirstName: user.FirstName,
     LastName: user.LastName,
     role: user.role,
+    zone:user.zone
   };
 
   const fullName = `${user.FirstName} ${user.LastName}`;
@@ -154,6 +155,7 @@ exports.login = AsyncErrorHandler(async (req, res, next) => {
     role: user.role,
     token,
     email,
+    zone:user.zone,
     fullName,
   });
 });

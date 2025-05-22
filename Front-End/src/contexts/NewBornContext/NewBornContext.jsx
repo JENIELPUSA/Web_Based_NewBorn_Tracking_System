@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
 export const NewBornDisplayContext = createContext();
+
 //gagamit tayo nito kung gusto mo ng auto log out agad instead na axios ilagay
 //mo siya sa reausable axiosInstances.jsx
 export const NewBornDisplayProvider = ({ children }) => {
@@ -60,7 +61,6 @@ export const NewBornDisplayProvider = ({ children }) => {
     };
 
     const AddNewBorn = async (values, userId) => {
-        console.log("fhjef", values);
         try {
             const res = await axios.post(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn`,

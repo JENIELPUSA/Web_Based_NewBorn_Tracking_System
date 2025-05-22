@@ -8,7 +8,7 @@ export const UserDisplayContext = createContext();
 //mo siya sa reausable axiosInstances.jsx
 export const UserDisplayProvider = ({ children }) => {
     const [customError, setCustomError] = useState("");
-    const { authToken } = useContext(AuthContext);
+    const { authToken,zone,role } = useContext(AuthContext);
     const [users, setUsers] = useState([]); // Initialize equipment state
     const [loading, setLoading] = useState(true); // Initialize loading state
     const [error, setError] = useState(null); // Initialize error state
@@ -57,6 +57,8 @@ export const UserDisplayProvider = ({ children }) => {
             setLoading(false); // Set loading to false after data fetching is complete
         }
     };
+
+    console.log(zone)
 
     const AddUser = async (values) => {
         console.log("fhjef", values);

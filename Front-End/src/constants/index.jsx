@@ -1,4 +1,4 @@
-import { ChartColumn, Home, NotepadText, Package, PackagePlus, Settings, ShoppingBag, Syringe, UserPlus, Baby } from "lucide-react";
+import { ChartColumn, Home, NotepadText, Package, PackagePlus, Settings, ShoppingBag, Syringe, UserPlus, Baby,CalendarDays } from "lucide-react";
 
 import ProfileImage from "@/assets/profile-image.jpg";
 import ProductImage from "@/assets/product-image.jpg";
@@ -10,17 +10,17 @@ export const navbarLinks = [
             {
                 label: "Dashboard",
                 icon: Home,
-                path: "/",
+                path: "/dashboard",
             },
             {
                 label: "Calendar",
-                icon: ChartColumn,
-                path: "/Calendar",
+                icon: CalendarDays,
+                path: "/dashboard/calendar",
             },
             {
                 label: "Reports",
                 icon: NotepadText,
-                path: "/reports",
+                path: "/dashboard/reports",
             },
         ],
     },
@@ -30,43 +30,39 @@ export const navbarLinks = [
             {
                 label: "User",
                 icon: UserPlus,
-                path: "/add-user",
+               path: "/dashboard/add-user",
             },
             {
-                label: "New Born",
+                 label: "New Born",
                 icon: Baby,
-                path: "/new-born",
+                path: "/dashboard/new-born",
             },
             {
                 label: "Vaccine Inventory",
                 icon: Syringe,
-                path: "/new-vaccine",
+                 path: "/dashboard/new-vaccine",
             },
              {
                 label: "Assign Vaccine",
                 icon: Syringe,
-                path: "/new-record-vaccine",
+                 path: "/dashboard/new-record-vaccine",
             },
         ],
     },
     {
         title: "#",
         links: [
-            {
-                label: "Login",
-                icon: Package,
-                path: "/login",
-            }
+           
         ],
     },
     {
         title: "Settings",
         links: [
             {
-                label: "Settings",
-                icon: Settings,
-                path: "/settings",
-            },
+                label: "LogOut",
+                icon: Package,
+                path: "/login",
+            }
         ],
     },
 ];
