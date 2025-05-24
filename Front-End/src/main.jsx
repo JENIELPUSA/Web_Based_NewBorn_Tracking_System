@@ -14,7 +14,7 @@ import { VaccinePerProvider } from "./contexts/PerBabyVacine/PerBabyVacineContex
 import { LogDisplayProvider } from "./contexts/LogAndAuditContext/LogAuditContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-    <StrictMode>
+    //<StrictMode>
         <ThemeProvider>
             {" "}
             <AuthProvider>
@@ -33,5 +33,5 @@ createRoot(document.getElementById("root")).render(
                 </LogDisplayProvider>
             </AuthProvider>
         </ThemeProvider>
-    </StrictMode>,
+    //</StrictMode>,
 );
