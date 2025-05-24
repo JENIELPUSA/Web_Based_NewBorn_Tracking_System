@@ -36,13 +36,6 @@ export const Header = ({ collapsed, setCollapsed }) => {
                 <button className="btn-ghost size-10">
                     <Bell size={20} />
                 </button>
-                <button className="size-10 overflow-hidden rounded-full">
-                    <img
-                        src={profileImg}
-                        alt="profile image"
-                        className="size-full object-cover"
-                    />
-                </button>
             </div>
         </header>
     );

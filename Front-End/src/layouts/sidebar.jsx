@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { cn } from "@/utils/cn";
@@ -9,6 +9,7 @@ import { LogOut } from "lucide-react"; // Import the logout icon
 export const Sidebar = forwardRef(({ collapsed }, ref) => {
   const { role, logout } = useAuth(); // Get role and logout from context
   const navigate = useNavigate();
+  const [activeLink, setActiveLink] = useState(null); // State to track active link
 
   if (!role) return null;
 
@@ -44,12 +45,13 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
     }))
     .filter((group) => group.links.length > 0);
 
- const handleLogout = () => {
-  logout(); // Clear session data
-  setTimeout(() => {
-     navigate("/login", { replace: true });
-  }, 100); // Delay of 100ms, adjust as needed
-}
+  const handleLogout = () => {
+    logout(); // Clear session data
+    setTimeout(() => {
+      navigate("/login", { replace: true });
+    }, 100); // Delay of 100ms, adjust as needed
+  };
+
   return (
     <aside
       ref={ref}
@@ -78,23 +80,26 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
               </p>
             )}
             {navbarLink.links.map((link) => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                className={({ isActive }) =>
-                  cn(
-                    "sidebar-item",
-                    collapsed && "md:w-[45px]",
-                    "hover:bg-slate-100 hover:dark:bg-slate-800", // Hover state
-                    isActive
-                      ? "bg-red-500 dark:bg-red-500 text-white" // Active state
-                      : "text-slate-700 dark:text-slate-300" // Normal state
-                  )
-                }
-              >
-                <link.icon size={22} className="flex-shrink-0" />
-                {!collapsed && <p className="whitespace-nowrap">{link.label}</p>}
-              </NavLink>
+<NavLink
+  key={link.path}
+  to={link.path}
+  onClick={() => setActiveLink(link.path)} // Set active link on click
+  className={({ isActive }) =>
+    cn(
+      "sidebar-item",
+      collapsed && "md:w-[45px]",
+      "hover:bg-slate-100 hover:dark:bg-slate-800", // Hover state
+      isActive // Check if link is active
+        ? "bg-red-500 dark:bg-red-500 text-white" // Active state
+        : "text-slate-700 dark:text-slate-300" // Normal state
+    )
+  }
+  end // Add this prop for exact matching
+>
+  <link.icon size={22} className="flex-shrink-0" />
+  {!collapsed && <p className="whitespace-nowrap">{link.label}</p>}
+</NavLink>
+
             ))}
           </nav>
         ))}

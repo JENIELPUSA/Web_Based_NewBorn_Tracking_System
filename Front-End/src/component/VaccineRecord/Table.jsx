@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
-import { PencilIcon, TrashIcon, BabyIcon } from "lucide-react";
+import { PencilIcon, TrashIcon, BabyIcon, Plus } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import AddNewBornForm from "../VaccineRecord/AddForm";
@@ -33,27 +33,29 @@ const statusColors = {
 const StatusBadge = ({ status }) => {
     const normalized = status ? status.toLowerCase().replace(/[-\s]/g, "") : "default";
     const color = statusColors[normalized] || statusColors.default;
-
     return <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${color.bg} ${color.text}`}>{color.display}</span>;
 };
 
-function UserTable() {
+function VaccineRecordTable() {
     const { vaccineRecord, DeleteContext } = useContext(VaccineRecordDisplayContext);
     const [isVerification, setVerification] = useState(false);
-    const [isAsignFormOpen, setAssignFormOpen] = useState(false);
+    const [isAssignFormOpen, setAssignFormOpen] = useState(false);
     const [assignData, setAssignData] = useState(null);
-    const [Dose, setDose] = useState(null);
+    const [dose, setDose] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [dateRange, setDateRange] = useState([null, null]);
     const [doseId, setDoseID] = useState("");
     const [dataID, setDataId] = useState("");
-    const [startDate, endDate] = dateRange;
 
     const usersPerPage = 5;
+    const [startDate, endDate] = dateRange;
+
+    const handleAddClick = () => {
+        setAssignFormOpen(true);
+    };
 
     const handleEdit = (doseId, userData) => {
-        console.log(doseId);
         setAssignFormOpen(true);
         setAssignData(userData);
         setDose(doseId);
@@ -63,29 +65,23 @@ function UserTable() {
         setVerification(true);
         setDoseID(doseId);
         setDataId(userId);
-
-        console.log("Delete clicked for dose:", doseId, "user:", userId);
     };
 
     const handleCloseModal = () => {
         setAssignFormOpen(false);
-
         setVerification(false);
         setAssignData(null);
         setDose(null);
     };
 
     const handleConfirmDelete = async () => {
-        console.log("Deleting:", doseId, dataID);
-        await DeleteContext(dataID, doseId);
-
-        // Call your delete API or context method here
-        handleCloseModal();
+        try {
+            await DeleteContext(dataID, doseId);
+            handleCloseModal();
+        } catch (error) {
+            console.error("Error deleting record:", error);
+        }
     };
-
-    useEffect(() => {
-        console.log("Vaccine Records:", vaccineRecord);
-    }, [vaccineRecord]);
 
     const filteredRecord = vaccineRecord.filter((user) => {
         const matchesSearch = `${user.firstName} ${user.lastName} ${user.username} ${user.email} ${user.newbornName} ${user.motherName}`
@@ -112,10 +108,12 @@ function UserTable() {
 
     return (
         <div className="card">
+            {/* Card Header */}
             <div className="card-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="card-title">Vaccination Records</p>
+                <p className="card-title text-gray-900 dark:text-white">Vaccination Records</p>
 
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                    {/* Date Picker */}
                     <div className="flex items-center gap-2">
                         <DatePicker
                             selectsRange
@@ -124,7 +122,7 @@ function UserTable() {
                             onChange={(update) => setDateRange(update)}
                             isClearable
                             placeholderText="Select date range"
-                            className="input input-sm w-48 rounded-md border px-2 py-1 text-sm dark:bg-slate-800"
+                            className="input input-sm w-48 rounded-md border px-2 py-1 text-sm text-gray-900 dark:bg-slate-800 dark:text-white"
                             dateFormat="MMM d, yyyy"
                             withPortal
                         />
@@ -138,10 +136,11 @@ function UserTable() {
                         )}
                     </div>
 
+                    {/* Search Input */}
                     <input
                         type="text"
                         placeholder="Search records..."
-                        className="input input-sm w-56 rounded-md border px-3 py-1 text-sm dark:bg-slate-800"
+                        className="input input-sm w-56 rounded-md border px-3 py-1 text-sm text-gray-900 dark:bg-slate-800 dark:text-white"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -151,25 +150,98 @@ function UserTable() {
                 </div>
             </div>
 
+            {/* Add button on XS screens */}
+            <div className="mt-4 flex justify-center sm:hidden">
+                <button
+                    onClick={handleAddClick}
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                >
+                    <Plus className="h-5 w-5" />
+                    Add New Born
+                </button>
+            </div>
+
+            {/* Card Body */}
             <div className="card-body p-0">
                 <div className="relative h-[500px] w-full overflow-auto">
-                    <table className="table w-full text-sm">
+                    {/* Mobile View */}
+                    <div className="block sm:hidden">
+                        {currentUsers.length === 0 ? (
+                            <div className="p-4 text-center text-gray-900 dark:text-white">No records found.</div>
+                        ) : (
+                            currentUsers.map((user, index) =>
+                                user.doses.map((dose, doseIndex) => (
+                                    <div
+                                        key={`${user._id}-${doseIndex}`}
+                                        className="card mb-4 bg-white p-4 shadow-lg dark:bg-gray-800"
+                                    >
+                                        <div className="flex flex-col">
+                                            <div className="flex items-center gap-2">
+                                                {user.avatar ? (
+                                                    <img
+                                                        src={user.avatar}
+                                                        alt={user.newbornName}
+                                                        className="h-12 w-12 rounded-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900">
+                                                        <BabyIcon className="h-6 w-6 text-pink-500 dark:text-pink-300" />
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">{user.newbornName}</h4>
+                                                    <p className="text-sm text-gray-700 dark:text-gray-300">{user.FullAddress}</p>
+                                                </div>
+                                            </div>
+                                            <p className="text-gray-900 dark:text-white">{user.motherName}</p>
+                                            <p className="text-gray-900 dark:text-white">{user.vaccineName}</p>
+                                            <p className="text-gray-900 dark:text-white">{user.description}</p>
+                                            <p className="capitalize text-gray-900 dark:text-white">{dose.doseNumber || "—"}</p>
+                                            <p className="text-gray-900 dark:text-white">{dose.remarks || "—"}</p>
+                                            <div className="flex gap-2">
+                                                <StatusBadge status={dose.status} />
+                                            </div>
+                                            <div className="mt-2 flex gap-2">
+                                                <button
+                                                    onClick={() => handleEdit(dose, user)}
+                                                    className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                                >
+                                                    <PencilIcon className="h-4 w-4" />
+                                                </button>
+
+                                                <button
+                                                  
+                                                        onClick={() => handleDeleteAssign(dose._id, user._id)}
+                                                    className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )),
+                            )
+                        )}
+                    </div>
+
+                    {/* Desktop View */}
+                    <table className="table hidden w-full text-sm sm:table">
                         <thead className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-800">
                             <tr>
-                                <th>#</th>
-                                <th>Avatar</th>
-                                <th>Baby's Name</th>
-                                <th>Address</th>
-                                <th>Mother</th>
-                                <th>Vaccine</th>
-                                <th>Description</th>
-                                <th>Given Dose</th>
-                                <th>Dosage</th>
-                                <th>Status</th>
-                                <th>Remarks</th>
-                                <th>Administered By</th>
-                                <th>Dose Info</th>
-                                <th>Actions</th>
+                                <th className="text-gray-900 dark:text-white">#</th>
+                                <th className="text-gray-900 dark:text-white">Avatar</th>
+                                <th className="text-gray-900 dark:text-white">Baby's Name</th>
+                                <th className="text-gray-900 dark:text-white">Address</th>
+                                <th className="text-gray-900 dark:text-white">Mother</th>
+                                <th className="text-gray-900 dark:text-white">Vaccine</th>
+                                <th className="text-gray-900 dark:text-white">Description</th>
+                                <th className="text-gray-900 dark:text-white">Given Dose</th>
+                                <th className="text-gray-900 dark:text-white">Dosage</th>
+                                <th className="text-gray-900 dark:text-white">Status</th>
+                                <th className="text-gray-900 dark:text-white">Remarks</th>
+                                <th className="text-gray-900 dark:text-white">Administered By</th>
+                                <th className="text-gray-900 dark:text-white">Dose Info</th>
+                                <th className="text-gray-900 dark:text-white">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -177,7 +249,7 @@ function UserTable() {
                                 <tr>
                                     <td
                                         colSpan="14"
-                                        className="p-4 text-center"
+                                        className="p-4 text-center text-gray-900 dark:text-white"
                                     >
                                         No records found.
                                     </td>
@@ -189,7 +261,7 @@ function UserTable() {
                                             key={`${user._id}-${doseIndex}`}
                                             className="border-b dark:border-gray-700"
                                         >
-                                            <td>{doseIndex === 0 ? indexOfFirstUser + index + 1 : ""}</td>
+                                            <td className="text-gray-900 dark:text-white">{doseIndex === 0 ? indexOfFirstUser + index + 1 : ""}</td>
                                             <td>
                                                 {user.avatar ? (
                                                     <img
@@ -203,31 +275,30 @@ function UserTable() {
                                                     </div>
                                                 )}
                                             </td>
-                                            <td>{user.newbornName}</td>
-                                            <td className="capitalize">{user.FullAddress}</td>
-                                            <td>{user.motherName}</td>
-                                            <td>{user.vaccineName}</td>
-                                            <td>{user.description}</td>
-                                            <td className="capitalize">{dose.doseNumber || "—"}</td>
-                                            <td className="capitalize">{user.dosage}</td>
+                                            <td className="text-gray-900 dark:text-white">{user.newbornName}</td>
+                                            <td className="capitalize text-gray-900 dark:text-white">{user.FullAddress}</td>
+                                            <td className="text-gray-900 dark:text-white">{user.motherName}</td>
+                                            <td className="text-gray-900 dark:text-white">{user.vaccineName}</td>
+                                            <td className="text-gray-900 dark:text-white">{user.description}</td>
+                                            <td className="capitalize text-gray-900 dark:text-white">{dose.doseNumber || "—"}</td>
+                                            <td className="capitalize text-gray-900 dark:text-white">{user.dosage}</td>
                                             <td>
                                                 <StatusBadge status={dose.status} />
                                             </td>
-                                            <td>{dose.remarks || "—"}</td>
-                                            <td className="capitalize">{dose.administeredBy || "—"}</td>
+                                            <td className="text-gray-900 dark:text-white">{dose.remarks || "—"}</td>
+                                            <td className="capitalize text-gray-900 dark:text-white">{dose.administeredBy || "—"}</td>
                                             <td>
                                                 <div className="space-y-1 text-sm">
                                                     <div>
-                                                        <span className="font-medium">Given:</span>{" "}
+                                                        <span className="font-medium text-gray-900 dark:text-white">Given:</span>{" "}
                                                         {dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}
                                                     </div>
                                                     <div>
-                                                        <span className="font-medium">Next Due:</span>{" "}
+                                                        <span className="font-medium text-gray-900 dark:text-white">Next Due:</span>{" "}
                                                         {dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}
                                                     </div>
                                                 </div>
                                             </td>
-
                                             <td>
                                                 <div className="flex gap-2">
                                                     <button
@@ -254,20 +325,21 @@ function UserTable() {
                     </table>
                 </div>
 
+                {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="flex items-center justify-between border-t px-4 py-3 dark:border-gray-700">
                         <button
-                            className="btn btn-sm btn-ghost"
+                            className="btn btn-sm btn-ghost text-gray-900 dark:text-white"
                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
                         >
                             Previous
                         </button>
-                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                        <span className="text-sm text-gray-900 dark:text-white">
                             Page {currentPage} of {totalPages}
                         </span>
                         <button
-                            className="btn btn-sm btn-ghost"
+                            className="btn btn-sm btn-ghost text-gray-900 dark:text-white"
                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}
                         >
@@ -277,10 +349,11 @@ function UserTable() {
                 )}
             </div>
 
+            {/* Modals */}
             <AddNewBornForm
-                isOpen={isAsignFormOpen}
+                isOpen={isAssignFormOpen}
                 onClose={handleCloseModal}
-                editDose={Dose}
+                editDose={dose}
                 dataAssign={assignData}
             />
 
@@ -293,4 +366,4 @@ function UserTable() {
     );
 }
 
-export default UserTable;
+export default VaccineRecordTable;

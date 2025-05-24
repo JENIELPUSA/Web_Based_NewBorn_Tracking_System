@@ -208,12 +208,16 @@ const VaccinationCalendar = () => {
     };
 
     return (
-        <motion.div
-            className="min-h-screen w-full bg-gray-100 p-4 dark:bg-gray-900"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-        >
+<motion.div
+  className="min-h-screen w-full max-w-[1400px] px-4 xs:px-2 sm:px-6 lg:px-8 mx-auto bg-gray-100 dark:bg-gray-900"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3 }}
+>
+
+
+
+
             {renderHeader()}
             {renderDays()}
             {renderCells()}

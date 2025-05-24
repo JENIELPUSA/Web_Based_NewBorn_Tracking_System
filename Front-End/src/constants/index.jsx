@@ -1,4 +1,4 @@
-import { ChartColumn, Home, NotepadText, Package, PackagePlus, Settings, ShoppingBag, Syringe, UserPlus, Baby,CalendarDays } from "lucide-react";
+import { ChartColumn, Home, NotepadText, KeyRound,ShieldCheck, Syringe, UserPlus, Baby,CalendarDays } from "lucide-react";
 
 import ProfileImage from "@/assets/profile-image.jpg";
 import ProductImage from "@/assets/product-image.jpg";
@@ -39,7 +39,7 @@ export const navbarLinks = [
             },
             {
                 label: "Vaccine Inventory",
-                icon: Syringe,
+                icon: ShieldCheck,
                  path: "/dashboard/new-vaccine",
             },
              {
@@ -49,19 +49,14 @@ export const navbarLinks = [
             },
         ],
     },
-    {
-        title: "#",
-        links: [
-           
-        ],
-    },
-    {
+       {
         title: "Settings",
         links: [
             {
                 label: "ForgotPassword",
-                icon: Package,
-            }
+                icon: KeyRound,
+               path: "/",
+            },
         ],
     },
 ];
