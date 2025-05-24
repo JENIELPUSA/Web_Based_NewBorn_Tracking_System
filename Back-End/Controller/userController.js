@@ -48,12 +48,37 @@ exports.DisplayAll = AsyncErrorHandler(async (req, res) => {
     return res.status(404).json({ message: "No users found" });
   }
 
+  // Perform aggregation to count male and female users
+  const result = await user.aggregate([
+    {
+      $match: {} // Match all users (after the query filters are applied)
+    },
+    {
+      $group: {
+        _id: null, // No grouping by any field
+        totalMale: {
+          $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] }
+        },
+        totalFemale: {
+          $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] }
+        }
+      }
+    }
+  ]);
+
+  // Get the count of male and female users
+  const totalMale = result.length > 0 ? result[0].totalMale : 0;
+  const totalFemale = result.length > 0 ? result[0].totalFemale : 0;
+
   res.status(200).json({
     status: "success",
     totalUser: displayuser.length,
+    totalMale: totalMale,
+    totalFemale: totalFemale,
     data: displayuser,
   });
 });
+
 
 exports.deleteUser = AsyncErrorHandler(async (req, res) => {
   await user.findByIdAndDelete(req.params.id);

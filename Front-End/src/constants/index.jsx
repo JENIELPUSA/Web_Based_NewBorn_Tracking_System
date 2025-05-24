@@ -59,9 +59,8 @@ export const navbarLinks = [
         title: "Settings",
         links: [
             {
-                label: "LogOut",
+                label: "ForgotPassword",
                 icon: Package,
-                path: "/login",
             }
         ],
     },

@@ -21,7 +21,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 
 const VaccinationCalendar = () => {
     const { role, zone } = useContext(AuthContext);
-    const { vaccineRecord } = useContext(VaccineRecordDisplayContext);
+    const { vaccineRecord,calendardata } = useContext(VaccineRecordDisplayContext);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [clickedDate, setClickedDate] = useState(null);
     const [tooltipContent, setTooltipContent] = useState([]);
@@ -29,7 +29,7 @@ const VaccinationCalendar = () => {
 
     const latestDueMap = useMemo(() => {
         const map = {};
-        vaccineRecord?.forEach((entry) => {
+        calendardata?.forEach((entry) => {
             const key = `${entry.newbornName}_${entry.vaccineName}`;
             let latestDate = null;
             entry.doses?.forEach((dose) => {
@@ -45,12 +45,12 @@ const VaccinationCalendar = () => {
             }
         });
         return map;
-    }, [vaccineRecord]);
+    }, [calendardata]);
 
     const getDosesByDate = useCallback(
         (date) => {
-            if (!vaccineRecord) return [];
-            return vaccineRecord.flatMap((entry) =>
+            if (!calendardata) return [];
+            return calendardata.flatMap((entry) =>
                 entry.doses
                     ?.filter(
                         (dose) =>
@@ -74,7 +74,7 @@ const VaccinationCalendar = () => {
                     })
             );
         },
-        [vaccineRecord, latestDueMap]
+        [calendardata, latestDueMap]
     );
 
     const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));

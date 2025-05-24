@@ -69,35 +69,37 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    // Clear local storage
-    localStorage.removeItem("fullName");
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-     localStorage.removeItem("zone");
-    localStorage.removeItem("email");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("selectedLab");
-    localStorage.removeItem("laboratory");
-    localStorage.removeItem("selectedLabsData");
-    localStorage.removeItem("assignedEquipments")
-    localStorage.removeItem("maintenanceRequests")
-    localStorage.removeItem("maintenanceData")
-    localStorage.removeItem("maintenanceLabels")
-    // Clear state
-    setAuthToken(null);
-    setRole(null);
-    setUserID(null);
+const logout = () => {
+  // Clear local storage
+  localStorage.removeItem("fullName");
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("zone");
+  localStorage.removeItem("email");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("selectedLab");
+  localStorage.removeItem("laboratory");
+  localStorage.removeItem("selectedLabsData");
+  localStorage.removeItem("assignedEquipments");
+  localStorage.removeItem("maintenanceRequests");
+  localStorage.removeItem("maintenanceData");
+  localStorage.removeItem("maintenanceLabels");
 
-    // Remove token from axios headers
-    delete axios.defaults.headers["Authorization"];
+  // Clear state
+  setAuthToken(null);
+  setRole(null);
+  setUserID(null);
 
-    // Confirm removal
-    console.log("UserID after removal:", localStorage.getItem("userId")); // Should be null
+  // Remove token from axios headers
+  delete axios.defaults.headers["Authorization"];
 
-    // Reload the page after logout
-    window.location.href = "";
-  };
+  // Confirm removal
+  console.log("UserID after removal:", localStorage.getItem("userId")); // Should be null
+
+  // Redirect to login page after logout
+  window.location.href = "/login"; // Redirect to the login page
+};
+
   <ToastContainer />
   return (
     <AuthContext.Provider

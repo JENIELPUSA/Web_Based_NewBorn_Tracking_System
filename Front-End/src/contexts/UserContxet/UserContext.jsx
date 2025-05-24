@@ -17,6 +17,9 @@ export const UserDisplayProvider = ({ children }) => {
     const [modalStatus, setModalStatus] = useState("success");
     // Get token from localStorage
     const [usersPerPage, setusersPerPage] = useState(6);
+    const [isTotal,setTotal]=useState("")
+    const [isMale,setMale]=useState("")
+    const [isFemale,setFemale]=useState("")
 
     useEffect(() => {
         if (!authToken) {
@@ -48,6 +51,12 @@ export const UserDisplayProvider = ({ children }) => {
             });
 
             const userData = res?.data.data;
+            const TotalUser=res?.data.totalUser
+            const TotalMale=res?.data.totalMale
+            const TotalFemale=res?.data.totalFemale
+            setFemale(TotalFemale)
+            setMale(TotalMale)
+            setTotal(TotalUser)
             setUsers(userData);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -58,10 +67,8 @@ export const UserDisplayProvider = ({ children }) => {
         }
     };
 
-    console.log(zone)
 
     const AddUser = async (values) => {
-        console.log("fhjef", values);
         try {
             const res = await axios.post(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/authentication/signup`,
@@ -175,6 +182,9 @@ export const UserDisplayProvider = ({ children }) => {
     return (
         <UserDisplayContext.Provider
             value={{
+                isFemale,
+                isMale,
+                isTotal,
                 customError,
                 users,
                 setUsers,

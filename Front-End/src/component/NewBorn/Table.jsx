@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { PencilIcon, TrashIcon, Plus, Eye } from "lucide-react"; // Lucide icons for clean UI
+import { PencilIcon, TrashIcon, Plus, ShieldCheck } from "lucide-react"; // Lucide icons for clean UI
 import UserFormModal from "../NewBorn/AddNewBorn";
 import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornContext";
 import AddNewBornForm from "../VaccineRecord/AddForm";
@@ -184,7 +184,7 @@ function NewBorn() {
                                                       onClick={() => handleDisplayVaccine(newBorn._id)}
                                                     className="group relative rounded bg-green-500 px-2 py-1 text-white hover:bg-green-600"
                                                 >
-                                                    <Eye className="h-4 w-4" />
+                                                    <ShieldCheck className="h-4 w-4" />
                                                     <span className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 scale-90 whitespace-nowrap rounded bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-all duration-300 ease-in-out group-hover:scale-100 group-hover:opacity-100">
                                                         List of Vaccine
                                                     </span>

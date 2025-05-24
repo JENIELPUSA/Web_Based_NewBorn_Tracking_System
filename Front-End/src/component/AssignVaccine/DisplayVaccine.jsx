@@ -81,7 +81,7 @@ const DisplayVaccine = ({ isOpen, onClose, newbornID }) => {
                     <XCircle className="h-6 w-6" />
                 </button>
 
-                <h2 className="mb-6 text-2xl font-bold text-gray-800 dark:text-slate-100">Vaccine Records</h2>
+                <h2 className="mb-6 text-2xl font-bold text-gray-800 dark:text-slate-100">Vaccine Check List</h2>
 
                 <div className="space-y-4">
                     {filteredData.length > 0 ? (

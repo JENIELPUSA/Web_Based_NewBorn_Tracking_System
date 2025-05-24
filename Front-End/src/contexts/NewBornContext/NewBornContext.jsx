@@ -3,19 +3,24 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
+
 export const NewBornDisplayContext = createContext();
 
 //gagamit tayo nito kung gusto mo ng auto log out agad instead na axios ilagay
 //mo siya sa reausable axiosInstances.jsx
 export const NewBornDisplayProvider = ({ children }) => {
     const [customError, setCustomError] = useState("");
-    const { authToken } = useContext(AuthContext);
+    const { authToken, role, zone } = useContext(AuthContext);
     const [newBorn, setNewBorn] = useState([]); // Initialize equipment state
     const [loading, setLoading] = useState(true); // Initialize loading state
     const [error, setError] = useState(null); // Initialize error state
     const [currentPage, setCurrentPage] = useState(1);
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
+    const [Totalbaby, setTotalBaby] = useState("");
+    const [TotalMale, setTotalMale] = useState("");
+    const [TotalFemale, setTotalFemale] = useState("");
+
     // Get token from localStorage
     const [usersPerPage, setusersPerPage] = useState(6);
 
@@ -49,8 +54,23 @@ export const NewBornDisplayProvider = ({ children }) => {
             });
 
             const NewBornData = res?.data.data;
-            setNewBorn(NewBornData);
-            console.log("NEW BORN", NewBornData);
+            const Totalbaby = res.data.totalRecords;
+            const TotalMale = res.data.totalMale;
+            const TotalFemale = res.data.totalFemale;
+
+            if (role === "Admin") {
+                setTotalMale(TotalMale);
+                setNewBorn(NewBornData);
+                setTotalFemale(TotalFemale);
+                setTotalBaby(Totalbaby);
+                console.log("UserdAta", NewBornData);
+            } else if (role === "BHW") {
+                const filteredUserData = NewBornData.filter((user) => {
+                    return user.zone?.toLowerCase().trim() === zone.toLowerCase().trim();
+                });
+
+                setNewBorn(filteredUserData);
+            }
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Failed to fetch data. Please try again later.");
@@ -171,6 +191,9 @@ export const NewBornDisplayProvider = ({ children }) => {
     return (
         <NewBornDisplayContext.Provider
             value={{
+                TotalFemale,
+                Totalbaby,
+                TotalMale,
                 newBorn,
                 customError,
                 AddNewBorn,

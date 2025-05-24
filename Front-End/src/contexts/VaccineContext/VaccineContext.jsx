@@ -15,6 +15,9 @@ export const VaccineDisplayProvider = ({ children }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
+    const [totalVaccine,setTotalVaccine]=useState("")
+    const [expired,setExpired]=useState("")
+    const [NotExpired,setNotExpired]=useState("")
     // Get token from localStorage
     const [usersPerPage, setusersPerPage] = useState(6);
 
@@ -48,6 +51,12 @@ export const VaccineDisplayProvider = ({ children }) => {
             });
 
             const vaccineDAta = res?.data.data;
+            const TotalVaccine=res?.data.totalVaccine
+            const Expired=res?.data.totals.expired
+            const NotExpiries=res?.data.totals.notExpired
+            setNotExpired(NotExpiries)
+            setExpired(Expired)
+            setTotalVaccine(TotalVaccine)
             setVaccine(vaccineDAta);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -211,6 +220,9 @@ const UpdateData = async (vaccineId, values) => {
     return (
         <VaccineDisplayContext.Provider
             value={{
+                NotExpired,
+                expired,
+                totalVaccine,
                 UpdateData,
                 customError,
                 vaccine,

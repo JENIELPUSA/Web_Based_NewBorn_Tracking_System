@@ -1,12 +1,14 @@
 import { forwardRef } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { cn } from "@/utils/cn";
 import { useAuth } from "../contexts/AuthContext";
 import { navbarLinks } from "@/constants";
+import { LogOut } from "lucide-react"; // Import the logout icon
 
 export const Sidebar = forwardRef(({ collapsed }, ref) => {
-  const { role } = useAuth();
+  const { role, logout } = useAuth(); // Get role and logout from context
+  const navigate = useNavigate();
 
   if (!role) return null;
 
@@ -18,12 +20,12 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
       "/dashboard/reports",
       "/dashboard/new-born",
       "/dashboard/new-record-vaccine",
-      "/login"
+      "/login",
     ],
-    Guest:[
+    Guest: [
       "/dashboard/calendar",
       "/dashboard/new-record-vaccine",
-      "/login"
+      "/login",
     ],
     Admin: [], // Empty array means all links are allowed
   };
@@ -42,6 +44,12 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
     }))
     .filter((group) => group.links.length > 0);
 
+ const handleLogout = () => {
+  logout(); // Clear session data
+  setTimeout(() => {
+     navigate("/login", { replace: true });
+  }, 100); // Delay of 100ms, adjust as needed
+}
   return (
     <aside
       ref={ref}
@@ -79,7 +87,7 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
                     collapsed && "md:w-[45px]",
                     "hover:bg-slate-100 hover:dark:bg-slate-800", // Hover state
                     isActive
-                      ? "bg-red-500 dark:bg-red-500 text-white" // Active state (orange)
+                      ? "bg-red-500 dark:bg-red-500 text-white" // Active state
                       : "text-slate-700 dark:text-slate-300" // Normal state
                   )
                 }
@@ -90,6 +98,20 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
             ))}
           </nav>
         ))}
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          className={cn(
+            "sidebar-item mt-auto",
+            collapsed && "md:w-[45px]",
+            "hover:bg-slate-100 hover:dark:bg-slate-800",
+            "text-slate-700 dark:text-slate-300"
+          )}
+        >
+          <LogOut size={22} className="flex-shrink-0" />
+          {!collapsed && <p className="whitespace-nowrap">Logout</p>}
+        </button>
       </div>
     </aside>
   );

@@ -86,7 +86,7 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
 
   const newbornData = toolWithCategory[0];
 
-  // ✍️ Create Audit Log entry
+  // Create Audit Log entry
   const auditLog = new AuditLog({
     userId: userId,
     action: "Create Newborn Record",
@@ -125,7 +125,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
   const filteredBabies = await features.query;
   const ids = filteredBabies.map((baby) => baby._id);
 
-  // Perform aggregation with $lookup and $project for full name
+  // Perform aggregation with $lookup, $project, and gender counting
   const result = await NewBaby.aggregate([
     {
       $match: { _id: { $in: ids } },
@@ -164,19 +164,21 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
             date: "$dateOfBirth",
           },
         },
-        gender: 1,
+        gender: 1, // Include gender for filtering
         birthWeight: 1,
-        birthHeight:1,
+        birthHeight: 1,
         motherName: {
           $concat: ["$motherName.FirstName", " ", "$motherName.LastName"],
         },
         address: {
           $concat: ["$motherName.zone", " ", "$motherName.address"],
         },
-            phoneNumber: {
+        phoneNumber: {
           $concat: ["$motherName.phoneNumber"],
         },
-        zone: 1,
+        zone: {
+          $concat: ["$motherName.zone"]
+        },
         createdAt: 1,
         addedByName: {
           $cond: {
@@ -195,14 +197,33 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         },
       },
     },
+    {
+      $group: {
+        _id: null,
+        totalMale: {
+          $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] },
+        },
+        totalFemale: {
+          $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] },
+        },
+        totalRecords: { $sum: 1 },
+        data: { $push: "$$ROOT" }, // Include the full list of babies
+      },
+    },
   ]);
+
+  // If no data found, return 0 for male and female counts
+  const resultData = result.length > 0 ? result[0] : { totalMale: 0, totalFemale: 0, totalRecords: 0, data: [] };
 
   res.status(200).json({
     status: "success",
-    totalRecords: result.length,
-    data: result,
+    totalMale: resultData.totalMale,
+    totalFemale: resultData.totalFemale,
+    totalRecords: resultData.totalRecords,
+    data: resultData.data,
   });
 });
+
 
 exports.deletedSpecificData = AsyncErrorHandler(async (req, res, next) => {
   const ipAddress = getClientIp(req); // Get client IP

@@ -15,7 +15,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
     const { fetchVaccineContext } = useContext(VaccineDisplayContext);
-    const [calendardata,setCalendarData]=useState([])
+    const [calendardata, setCalendarData] = useState([]);
 
     const fetchVaccineRecordData = async () => {
         if (!authToken) return;
@@ -31,7 +31,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
 
             if (role === "Admin") {
                 setVaccineRecord(vaccineData);
-                 setCalendarData(vaccineData)
+                setCalendarData(vaccineData);
             } else if (role === "BHW") {
                 console.log("Current BHW userId:", userId); // Debug log
 
@@ -46,9 +46,28 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                     })
                     .filter((record) => record !== null); // Remove null entries
 
+                const filteredZoneRecords = vaccineData
+                    .map((record) => {
+                        // Filter doses that match the selected zone
+                        const filteredDoses = record.doses.filter((dose) => dose.zone === zone);
+
+                        // Return the full record only if it has matching doses
+                        if (filteredDoses.length > 0) {
+                            return {
+                                ...record,
+                                doses: filteredDoses, // only matching doses per record
+                            };
+                        }
+
+                        // Skip if no matching doses
+                        return null;
+                    })
+                    .filter(Boolean); // remove nulls (records with 0 matching doses)
+
                 console.log("Filtered records for BHW:", filteredRecords); // Debug log
                 setVaccineRecord(filteredRecords);
-                setCalendarData(vaccineData)
+                setCalendarData(filteredZoneRecords);
+                console.log("VaccineSpecific",filteredZoneRecords)
             }
         } catch (error) {
             console.error("Error fetching vaccine records:", error);

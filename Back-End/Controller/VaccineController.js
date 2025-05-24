@@ -93,6 +93,7 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
 exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
   const matchStage = {}; // Extend with filters if needed
 
+  // 1. Fetch all vaccines with brand populated
   const displayVacine = await Vaccine.aggregate([
     { $match: matchStage },
     {
@@ -123,11 +124,37 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
     },
   ]);
 
+  // 2. Count expired vs not expired from Vaccine.batches
+  const today = new Date();
+  let expired = 0;
+  let notExpired = 0;
+
+  displayVacine.forEach(vaccine => {
+    vaccine.batches?.forEach(batch => {
+      if (batch.expirationDate) {
+        const expDate = new Date(batch.expirationDate);
+        if (expDate < today) {
+          expired++;
+        } else {
+          notExpired++;
+        }
+      }
+    });
+  });
+
+  // 3. Final response
   res.status(200).json({
     status: "success",
     data: displayVacine,
+    totalVaccine: displayVacine.length,
+    totals: {
+      expired,
+      notExpired,
+    },
   });
 });
+
+
 
 exports.UpdateVaccine = AsyncErrorHandler(async (req, res, next) => {
   const {
