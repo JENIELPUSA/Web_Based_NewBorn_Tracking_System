@@ -10,7 +10,7 @@ export const NewBornDisplayContext = createContext();
 //mo siya sa reausable axiosInstances.jsx
 export const NewBornDisplayProvider = ({ children }) => {
     const [customError, setCustomError] = useState("");
-    const { authToken, role, zone } = useContext(AuthContext);
+    const { authToken, role, Designatedzone } = useContext(AuthContext);
     const [newBorn, setNewBorn] = useState([]); // Initialize equipment state
     const [loading, setLoading] = useState(true); // Initialize loading state
     const [error, setError] = useState(null); // Initialize error state
@@ -44,6 +44,8 @@ export const NewBornDisplayProvider = ({ children }) => {
         }
     }, [customError]);
 
+    console.log(Designatedzone)
+
     const fetchUserData = async () => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data
@@ -66,7 +68,7 @@ export const NewBornDisplayProvider = ({ children }) => {
                 console.log("UserdAta", NewBornData);
             } else if (role === "BHW") {
                 const filteredUserData = NewBornData.filter((user) => {
-                    return user.zone?.toLowerCase().trim() === zone.toLowerCase().trim();
+                    return user.zone?.toLowerCase().trim() === Designatedzone.toLowerCase().trim();
                 });
 
                 setNewBorn(filteredUserData);
@@ -102,7 +104,6 @@ export const NewBornDisplayProvider = ({ children }) => {
                 },
             );
             if (res.data.status === "success") {
-                console.log("HUli pero di kuo", res.data.data);
                 setNewBorn((prevUsers) => [...prevUsers, res.data.data]);
                 setModalStatus("success");
                 setShowModal(true);

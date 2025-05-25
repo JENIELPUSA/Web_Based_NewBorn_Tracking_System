@@ -17,6 +17,16 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const { fetchVaccineContext } = useContext(VaccineDisplayContext);
     const [calendardata, setCalendarData] = useState([]);
 
+    useEffect(() => {
+        if (customError) {
+            const timer = setTimeout(() => {
+                setCustomError(null);
+            }, 5000); // auto-dismiss after 5s
+
+            return () => clearTimeout(timer); // cleanup
+        }
+    }, [customError]);
+
     const fetchVaccineRecordData = async () => {
         if (!authToken) return;
         setLoading(true);
@@ -67,12 +77,11 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 console.log("Filtered records for BHW:", filteredRecords); // Debug log
                 setVaccineRecord(filteredRecords);
                 setCalendarData(filteredZoneRecords);
-                console.log("VaccineSpecific",filteredZoneRecords)
+                console.log("VaccineSpecific", filteredZoneRecords);
             }
         } catch (error) {
             console.error("Error fetching vaccine records:", error);
-            toast.error("Failed to fetch vaccine records. Please try again later.");
-            setError(error.response?.data?.message || "Failed to fetch data");
+            setCustomError(error.response?.data?.message || "Failed to fetch data");
         } finally {
             setLoading(false);
         }
@@ -97,11 +106,13 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                     headers: { Authorization: `Bearer ${authToken}` },
                 },
             );
+
             if (res.data.status === "success") {
                 fetchVaccineRecordData();
                 fetchVaccineContext();
                 setModalStatus("success");
                 setShowModal(true);
+                return { success: true, data: res?.data.data };
             } else {
                 setModalStatus("failed");
                 setShowModal(true);
@@ -117,6 +128,8 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
             } else {
                 setCustomError(error.message || "Unexpected error occurred.");
             }
+
+            return { success: false, error: error.message };
         }
     };
 
@@ -151,9 +164,13 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                         return record;
                     }),
                 );
+               
 
                 setModalStatus("success");
                 setShowModal(true);
+
+                 return { success: true, data: response?.data.data };
+                  
             } else {
                 setModalStatus("failed");
                 setShowModal(true);
@@ -211,6 +228,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     return (
         <VaccineRecordDisplayContext.Provider
             value={{
+                customError,
                 calendardata,
                 DeleteContext,
                 UpdateContext,

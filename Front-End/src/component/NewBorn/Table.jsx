@@ -71,7 +71,21 @@ function NewBorn() {
         setNewBornId(data);
     }
 
- return (
+    const getInitials = (name) => {
+    if (!name) return "NB";
+    const names = name.split(' ');
+    let initials = names[0].substring(0, 1).toUpperCase();
+    if (names.length > 1) {
+        initials += names[names.length - 1].substring(0, 1).toUpperCase();
+    }
+    return initials;
+
+
+};  
+
+console.log("kkkkk",newBorn)
+
+return (
     <div className="card">
         <div className="card-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="card-title">New Born List</p>
@@ -103,11 +117,17 @@ function NewBorn() {
                 currentUsers.map((newBorn, index) => (
                     <div key={newBorn._id} className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800">
                         <div className="flex items-start gap-4">
-                            <img
-                                src={newBorn.avatar}
-                                alt={newBorn.fullName || "Newborn"}
-                                className="h-12 w-12 rounded-full object-cover"
-                            />
+                            {newBorn.avatar ? (
+                                <img
+                                    src={newBorn.avatar}
+                                    alt={newBorn.fullName || "Newborn"}
+                                    className="h-12 w-12 rounded-full object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
+                                    {newBorn.fullName ? getInitials(newBorn.fullName) : "NB"}
+                                </div>
+                            )}
                             <div className="flex-1">
                                 <div className="flex items-start justify-between">
                                     <div>
@@ -223,11 +243,17 @@ function NewBorn() {
                                     >
                                         <td className="p-3 align-top text-gray-800 dark:text-gray-200">{indexOfFirstUser + index + 1}</td>
                                         <td className="p-3 align-top">
-                                            <img
-                                                src={newBorn.avatar}
-                                                alt={newBorn.fullName || "Newborn"}
-                                                className="h-10 w-10 rounded-full object-cover"
-                                            />
+                                            {newBorn.avatar ? (
+                                                <img
+                                                    src={newBorn.avatar}
+                                                    alt={newBorn.fullName || "Newborn"}
+                                                    className="h-10 w-10 rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white">
+                                                    {newBorn.fullName ? getInitials(newBorn.fullName) : "NB"}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.fullName}</td>
                                         <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.gender}</td>

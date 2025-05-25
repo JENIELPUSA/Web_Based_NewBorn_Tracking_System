@@ -13,12 +13,22 @@ export const VaccinePerProvider = ({ children }) => {
     const [customError, setCustomError] = useState("");
     useEffect(() => {
         if (!authToken) {
-            setPerVaccine([]);
+            setPerVaccine({});
             return;
         }
 
         fetchPerVaccine();
     }, [authToken]); // Dependencies to trigger effect when page or items per page change
+
+        useEffect(() => {
+            if (customError) {
+                const timer = setTimeout(() => {
+                    setCustomError(null);
+                }, 5000); // auto-dismiss after 5s
+    
+                return () => clearTimeout(timer); // cleanup
+            }
+        }, [customError]);
 
     const fetchPerVaccine = async () => {
         if (!authToken) return;
@@ -139,6 +149,7 @@ export const VaccinePerProvider = ({ children }) => {
     return (
         <VaccinePerContext.Provider
             value={{
+                customError,
                 isPerVaccine,
                 AddAssignedVaccine,
                 removeAssignedVaccine,

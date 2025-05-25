@@ -6,10 +6,10 @@ exports.createPerAssigned = AsyncErrorHandler(async (req, res) => {
   const { vaccine, totalDoses, completed, newborn } = req.body;
 
   // Step 1: Validate required fields
-  if (!vaccine || !newborn) {
+  if (!vaccine) {
     return res.status(400).json({
       status: "error",
-      message: "Vaccine ID and Newborn ID are required",
+      message: "Please Select a Vaccine",
     });
   }
 

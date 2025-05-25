@@ -52,7 +52,7 @@ const Card = () => {
     ];
 
     const renderCards = (cardList) => (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xs:px-2 lg:px-0 sm:px-0">
             {cardList.map((card, index) => {
                 const Icon = card.icon;
                 return (

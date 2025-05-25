@@ -165,7 +165,7 @@ const VaccinationCalendar = () => {
                 >
                     <div className="text-right text-xs">
                         <span
-                            className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${
+                            className={`inline-flex h-5 w-5 items-center justify-center rounded-full${
                                 isCurrentDay ? "bg-blue-500 text-white" : "text-gray-700 dark:text-white"
                             }`}
                         >
@@ -236,7 +236,7 @@ const VaccinationCalendar = () => {
                         }}
                     >
                         <div className="mb-2 flex justify-between items-center">
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                            <span className="font-semibold text-gray-900 dark:text-white xs:text-xs lg:text-sm sm:text-sm">
                                 Doses on {format(clickedDate, "MMM d, yyyy")}
                             </span>
                             <button
@@ -249,17 +249,17 @@ const VaccinationCalendar = () => {
                         <div className="space-y-2 max-h-60 overflow-y-auto">
                             {tooltipContent.map((item, i) => (
                                 <div key={i} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
-                                    <div className="font-medium text-blue-600 dark:text-blue-300">{item.newbornName}</div>
-                                    <div className="text-sm text-gray-800 dark:text-gray-200">
+                                    <div className="font-medium text-blue-600 dark:text-blue-300 xs:text-xs lg:text-sm sm:text-sm">{item.newbornName}</div>
+                                    <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
                                         <span className="font-medium">Vaccine:</span> {item.vaccineName}
                                     </div>
-                                    <div className="text-sm text-gray-800 dark:text-gray-200">
+                                    <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
                                         <span className="font-medium">Dose:</span> {item.doseNumber}
                                     </div>
-                                    <div className="text-sm text-gray-800 dark:text-gray-200">
+                                    <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
                                         <span className="font-medium">Status:</span>
                                         <span
-                                            className={`ml-1 rounded px-1 py-0.5 text-xs ${
+                                            className={`ml-1 rounded px-1 py-0.5 xs:text-xs lg:text-sm sm:text-sm ${
                                                 item.status === "On-Time"
                                                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                                                     : item.status === "Missed"
@@ -270,7 +270,7 @@ const VaccinationCalendar = () => {
                                             {item.status}
                                         </span>
                                     </div>
-                                    <div className="text-sm text-gray-700 dark:text-gray-300">
+                                    <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-700 dark:text-gray-300">
                                         <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
                                     </div>
                                 </div>

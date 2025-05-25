@@ -83,7 +83,9 @@ export const UserDisplayProvider = ({ children }) => {
                     phoneNumber: values.phoneNumber,
                     dateOfBirth: values.dateOfBirth,
                     gender: values.gender,
-                    avatar: "https://images.app.goo.gl/GXNVGCi3nrrmDkKn6",
+                    Designatedzone: values.Designatedzone
+                    
+
                 },
                 {
                     headers: { Authorization: `Bearer ${authToken}` },
@@ -93,6 +95,8 @@ export const UserDisplayProvider = ({ children }) => {
                 setUsers((prevUsers) => [...prevUsers, res.data.data]);
                 setModalStatus("success");
                 setShowModal(true);
+
+                console.log("DESI",res.data.data)
             } else {
                 setModalStatus("failed");
                 setShowModal(true);

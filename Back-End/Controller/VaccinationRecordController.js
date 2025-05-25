@@ -7,19 +7,18 @@ const mongoose = require("mongoose");
 const AuditLog=require("./../Models/LogAndAudit")
 const getClientIp = require("./../Utils/getClientIp");
 
-
 exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   const {
     newborn,
     vaccine,
     administeredBy,
-    next_due_date,
     remarks,
     dateGiven,
+    next_due_date, // Optional field included
     status,
   } = req.body;
-   const userId = req.user._id;
 
+  const userId = req.user._id;
   const ipAddress = getClientIp(req);
 
   // Step 1: Validate required fields
@@ -57,10 +56,11 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   // Step 3: Create or update VaccineRecord
   let record = await VaccineRecord.findOne({ newborn, vaccine });
 
+  // Construct newDose with optional next_due_date
   const newDose = {
     doseNumber: record ? record.doses.length + 1 : 1,
     dateGiven: new Date(dateGiven),
-    next_due_date,
+    ...(next_due_date && { next_due_date: new Date(next_due_date) }), // Optional
     remarks,
     administeredBy,
     status,
@@ -81,7 +81,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   // Step 4: Aggregate and return populated record
   const populatedRecord = await VaccineRecord.aggregate([
     { $match: { _id: record._id } },
-
     {
       $lookup: {
         from: "newborns",
@@ -91,7 +90,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
       },
     },
     { $unwind: "$newborn" },
-
     {
       $lookup: {
         from: "vaccines",
@@ -101,7 +99,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
       },
     },
     { $unwind: "$vaccine" },
-
     {
       $lookup: {
         from: "users",
@@ -111,9 +108,7 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
       },
     },
     { $unwind: "$mother" },
-
     { $unwind: "$doses" },
-
     {
       $lookup: {
         from: "users",
@@ -128,7 +123,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
         preserveNullAndEmptyArrays: true,
       },
     },
-
     {
       $addFields: {
         "doses.administeredByName": {
@@ -143,7 +137,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
         "doses.administeredById": "$doseAdmin._id",
       },
     },
-
     {
       $group: {
         _id: "$_id",
@@ -163,7 +156,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
         },
       },
     },
-
     {
       $project: {
         recordId: "$_id",
@@ -189,7 +181,7 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
 
   // Step 5: Create audit log
   const auditLog = new AuditLog({
-    userId: userId,
+    userId,
     action: "Assigned Vaccine",
     module: "assigned-vaccine",
     targetId: record._id,
@@ -198,7 +190,7 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
       newbornName: populatedRecord[0].newbornName,
       vaccineName: populatedRecord[0].vaccineName,
       doseNumber: latestDose.doseNumber,
-      administeredBy: latestDose.administeredByName || 'Unknown',
+      administeredBy: latestDose.administeredByName || "Unknown",
     },
     ipAddress,
   });

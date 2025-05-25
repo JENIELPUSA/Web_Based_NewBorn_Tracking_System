@@ -60,8 +60,18 @@ function UserTable() {
         });
     };
 
+    const getInitials = (name) => {
+        if (!name) return "US"; // Default to "US" for User if no name
+        const names = name.split(" ");
+        let initials = names[0].substring(0, 1).toUpperCase();
+        if (names.length > 1) {
+            initials += names[names.length - 1].substring(0, 1).toUpperCase();
+        }
+        return initials;
+    };
+
     return (
-        <div className="xs:p-2 rounded-lg bg-white shadow dark:bg-gray-900 sm:p-6">
+        <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
             {/* Header */}
             <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white">User List</h2>
@@ -97,9 +107,10 @@ function UserTable() {
                         <tr>
                             <th className="p-3 text-left">#</th>
                             <th className="p-3 text-left">Avatar</th>
+                            <th className="p-3 text-left">Full Name</th>
                             <th className="p-3 text-left">Email</th>
                             <th className="p-3 text-left">Role</th>
-                            <th className="p-3 text-left">Full Name</th>
+
                             <th className="p-3 text-left">Address</th>
                             <th className="p-3 text-left">Zone</th>
                             <th className="p-3 text-left">Phone</th>
@@ -137,15 +148,22 @@ function UserTable() {
                                 >
                                     <td className="p-3 align-top">{indexOfFirstUser + index + 1}</td>
                                     <td className="p-3 align-top">
-                                        <img
-                                            src={user.avatar}
-                                            alt={user.username}
-                                            className="h-10 w-10 rounded-full object-cover"
-                                        />
+                                        {user.avatar ? (
+                                            <img
+                                                src={user.avatar}
+                                                alt={user.username}
+                                                className="h-10 w-10 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white">
+                                                {getInitials(`${user.FirstName} ${user.LastName}`)}
+                                            </div>
+                                        )}
                                     </td>
+                                    <td className="p-3 align-top">{`${user.FirstName} ${user.LastName}`}</td>
                                     <td className="p-3 align-top">{user.email}</td>
                                     <td className="p-3 align-top capitalize">{user.role}</td>
-                                    <td className="p-3 align-top">{`${user.FirstName} ${user.LastName}`}</td>
+
                                     <td className="max-w-xs truncate p-3 align-top">{user.address || "N/A"}</td>
                                     <td className="p-3 align-top">{user.zone || "N/A"}</td>
                                     <td className="p-3 align-top">{user.phoneNumber || "N/A"}</td>
@@ -186,11 +204,17 @@ function UserTable() {
                         className="rounded-lg border p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                     >
                         <div className="flex items-center gap-3">
-                            <img
-                                src={user.avatar}
-                                alt="avatar"
-                                className="h-12 w-12 rounded-full object-cover"
-                            />
+                            {user.avatar ? (
+                                <img
+                                    src={user.avatar}
+                                    alt="avatar"
+                                    className="h-12 w-12 rounded-full object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
+                                    {getInitials(`${user.FirstName} ${user.LastName}`)}
+                                </div>
+                            )}
                             <div>
                                 <h4 className="text-base font-semibold text-gray-800 dark:text-white">{`${user.FirstName} ${user.LastName}`}</h4>
                                 <p className="text-sm text-gray-500 dark:text-gray-300">{user.email}</p>

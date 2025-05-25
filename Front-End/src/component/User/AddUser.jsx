@@ -21,7 +21,25 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
         avatar: "",
         zone: "",
         password: "",
+        Designatedzone: ""
     });
+        const resetForm = () => {
+        setFormData({
+           FirstName: "",
+        LastName: "",
+        username: "",
+        email: "",
+        role: "",
+        address: "",
+        phoneNumber: "",
+        dateOfBirth: "",
+        gender: "",
+        avatar: "",
+        zone: "",
+        password: "",
+        Designatedzone: ""
+        });
+    };
 
     useEffect(() => {
         if (user) {
@@ -38,6 +56,7 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
                 avatar: user.avatar || "",
                 zone: user.zone || "",
                 password: "",
+                Designatedzone: user.Designatedzone || "",
             });
         } else {
             setFormData({
@@ -73,11 +92,13 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
         if (user) {
             await UpdateUser(user._id, formData);
             setTimeout(() => {
+                resetForm();
                 onClose();
             }, 1000);
         } else {
             await AddUser(formData);
             setTimeout(() => {
+                resetForm();
                 onClose();
             }, 1000);
         }
@@ -101,7 +122,10 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                >
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">First Name</label>
@@ -235,7 +259,7 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
                                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
-                        
+
                         {/* Custom Gender Dropdown */}
                         <div className="relative">
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Gender</label>
@@ -249,19 +273,19 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
                             {dropdownOpenGender && (
                                 <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600  dark:text-white"
                                         onClick={() => handleSelect("gender", "")}
                                     >
                                         Select Gender
                                     </li>
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600  dark:text-white"
                                         onClick={() => handleSelect("gender", "Male")}
                                     >
                                         Male
                                     </li>
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600  dark:text-white"
                                         onClick={() => handleSelect("gender", "Female")}
                                     >
                                         Female
@@ -269,19 +293,27 @@ const UserFormModal = ({ isOpen, onClose, user }) => {
                                 </ul>
                             )}
                         </div>
+<div>
+  <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">
+    Designated Zone
+  </label>
+  <input
+    type="text"
+    name="Designatedzone"
+    value={formData.Designatedzone || ""}
+    onChange={handleChange}
+    disabled={formData.role !== "BHW"}
+    className={`
+      w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-all focus:outline-none focus:ring-2
+      ${
+        formData.role !== "BHW"
+          ? "cursor-not-allowed border-slate-300 bg-slate-100 text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-500"
+          : "border-slate-300 bg-white text-slate-700 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+      }
+    `}
+  />
+</div>
                     </div>
-
-                    <div>
-                        <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Avatar URL</label>
-                        <input
-                            type="text"
-                            name="avatar"
-                            value={formData.avatar}
-                            onChange={handleChange}
-                            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
-                        />
-                    </div>
-
                     <div className="mt-6 flex justify-end gap-4">
                         <button
                             type="button"

@@ -26,6 +26,7 @@ exports.createUser = AsyncErrorHandler(async (req, res) => {
   
     // Create user
     const newUser = await user.create(req.body);
+    console.log("Text",newUser)
   
     // Respond
     res.status(201).json({

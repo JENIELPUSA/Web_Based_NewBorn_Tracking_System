@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { VaccineDisplayContext } from "../../contexts/VaccineContext/VaccineContext";
 import axios from "axios";
 
-function AddVacine({ isOpen, onClose, vaccine,bybatch }) {
+function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
     const { customError, VaccineAdd, UpdateData } = useContext(VaccineDisplayContext);
 
     const [formData, setFormData] = useState({
@@ -56,25 +56,22 @@ function AddVacine({ isOpen, onClose, vaccine,bybatch }) {
         fetchBrands();
     }, []);
 
-useEffect(() => {
-    if (vaccine && bybatch) {
-        setFormData({
-            name: vaccine?.name || "",
-            description: vaccine?.description || "",
-            dosage: vaccine?.dosage || "",
-            brand: vaccine?.brand?._id || "",
-            stock: bybatch.stock ?? 0, // Use bybatch.stock, fallback to 0
-            expirationDate: bybatch?.expirationDate
-                ? bybatch.expirationDate.split("T")[0]
-                : "",
-            zone: vaccine.zone || "",
-        });
+    useEffect(() => {
+        if (vaccine && bybatch) {
+            setFormData({
+                name: vaccine?.name || "",
+                description: vaccine?.description || "",
+                dosage: vaccine?.dosage || "",
+                brand: vaccine?.brand?._id || "",
+                stock: bybatch.stock ?? 0, // Use bybatch.stock, fallback to 0
+                expirationDate: bybatch?.expirationDate ? bybatch.expirationDate.split("T")[0] : "",
+                zone: vaccine.zone || "",
+            });
 
-        setVaccineId(vaccine._id || "");
-        setBatchId(bybatch.selectedBatch || "");
-    }
-}, [vaccine, bybatch]); // 👈 Don't forget to add bybatch to dependencies
-
+            setVaccineId(vaccine._id || "");
+            setBatchId(bybatch.selectedBatch || "");
+        }
+    }, [vaccine, bybatch]); //   Don't forget to add bybatch to dependencies
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -101,18 +98,21 @@ useEffect(() => {
             batchId,
         };
 
-        console.log("PAYLOAD",fullPayload)
+        console.log("PAYLOAD", fullPayload);
 
         if (vaccine) {
             await UpdateData(vaccine._id, fullPayload);
+            setTimeout(() => {
+                resetForm();
+                onClose();
+            }, 1000);
         } else {
             await VaccineAdd(fullPayload);
+            setTimeout(() => {
+                resetForm();
+                onClose();
+            }, 1000);
         }
-
-        setTimeout(() => {
-            resetForm();
-            onClose();
-        }, 1000);
     };
 
     if (!isOpen) return null;
@@ -125,17 +125,14 @@ useEffect(() => {
                 exit={{ opacity: 0, y: -40 }}
                 className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800"
             >
-                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">
-                    {vaccine ? "Edit Vaccine" : "Add New Vaccine"}
-                </h2>
+                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">{vaccine ? "Edit Vaccine" : "Add New Vaccine"}</h2>
 
-                {customError && (
-                    <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">
-                        {customError}
-                    </div>
-                )}
+                {customError && <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">{customError}</div>}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                >
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Vaccine Name</label>
                         <input
@@ -273,8 +270,12 @@ useEffect(() => {
 
                     {/* Optional Debug Info */}
                     <div className="mt-2 text-xs text-gray-500">
-                        <p><strong>Vaccine ID:</strong> {vaccineId}</p>
-                        <p><strong>Batch ID:</strong> {batchId}</p>
+                        <p>
+                            <strong>Vaccine ID:</strong> {vaccineId}
+                        </p>
+                        <p>
+                            <strong>Batch ID:</strong> {batchId}
+                        </p>
                     </div>
 
                     <div className="mt-6 flex justify-end gap-4">

@@ -24,7 +24,7 @@ function GraphAndLogAction() {
     : [];
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-7">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-7 lg:px-0 xs:px-2 sm:px-0">
       {/* Overview Graph */}
       <div className={`col-span-1 md:col-span-2 lg:col-span-4 
         rounded-2xl p-6 backdrop-blur-lg 

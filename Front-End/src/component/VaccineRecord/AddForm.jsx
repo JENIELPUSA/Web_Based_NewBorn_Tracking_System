@@ -3,13 +3,14 @@ import { motion } from "framer-motion";
 import { VaccineDisplayContext } from "../../contexts/VaccineContext/VaccineContext";
 import { AuthContext } from "../../contexts/AuthContext";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
+import {VaccinePerContext} from "../../contexts/PerBabyVacine/PerBabyVacineContext"
 
 function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataAssign }) {
+    const {isPerVaccine}=useContext(VaccinePerContext)
     const { userId } = useContext(AuthContext);
     const { vaccine } = useContext(VaccineDisplayContext);
-    const { AssignVaccine, UpdateContext } = useContext(VaccineRecordDisplayContext);
+    const { AssignVaccine, UpdateContext, customError } = useContext(VaccineRecordDisplayContext);
 
-    const [customError, setCustomError] = useState("");
     const [selectedDosage, setSelectedDosage] = useState("");
     const [dropdownOpenVaccine, setDropdownOpenVaccine] = useState(false);
     const [dropdownOpenStatus, setDropdownOpenStatus] = useState(false);
@@ -25,6 +26,19 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
         remarks: "",
         doseId: "",
     });
+    const resetForm = () => {
+        setFormData({
+            newborn: newbordID || "",
+            vaccine: "",
+            administeredBy: userId || "",
+            dateGiven: "",
+            next_due_date: "",
+            numberOfDose: 1,
+            status: "",
+            remarks: "",
+            doseId: "",
+        });
+    };
 
     useEffect(() => {
         if (editDose) {
@@ -54,9 +68,9 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
     }, [editDose, newbordID, userId]);
 
     const handleVaccineSelect = (vaccineId) => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
-            vaccine: vaccineId
+            vaccine: vaccineId,
         }));
         const selectedVaccine = vaccine.find((v) => v._id === vaccineId);
         setSelectedDosage(selectedVaccine?.dosage || "");
@@ -64,9 +78,9 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
     };
 
     const handleStatusSelect = (status) => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
-            status: status
+            status: status,
         }));
         setDropdownOpenStatus(false);
     };
@@ -84,9 +98,18 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
         if (editDose) {
             console.log("Updating ID:", formData);
             await UpdateContext(formData, dataAssign._id, formData._id);
+
+            setTimeout(() => {
+                resetForm();
+                onClose();
+            }, 1000);
         } else {
             console.log("Form Data:", formData);
             await AssignVaccine(formData);
+            setTimeout(() => {
+                resetForm();
+                onClose();
+            }, 1000);
         }
     };
 
@@ -110,7 +133,10 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                >
                     <div className="grid grid-cols-2 gap-4">
                         {/* Vaccine Field */}
                         <div className="relative">
@@ -130,7 +156,7 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                                     >
                                         <span>
                                             {formData.vaccine
-                                                ? vaccine.find(v => v._id === formData.vaccine)?.name || "Select Vaccine"
+                                                ? vaccine.find((v) => v._id === formData.vaccine)?.name || "Select Vaccine"
                                                 : "Select Vaccine"}
                                         </span>
                                         <i className={`fas ${dropdownOpenVaccine ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
@@ -138,7 +164,7 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                                     {dropdownOpenVaccine && (
                                         <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
                                             <li
-                                                className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                                className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-slate-200"
                                                 onClick={() => {
                                                     handleVaccineSelect("");
                                                     setDropdownOpenVaccine(false);
@@ -149,7 +175,7 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                                             {vaccine.map((v) => (
                                                 <li
                                                     key={v._id}
-                                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-slate-200"
                                                     onClick={() => handleVaccineSelect(v._id)}
                                                 >
                                                     {v.name}
@@ -214,25 +240,25 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                         {dropdownOpenStatus && (
                             <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
                                 <li
-                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-600"
                                     onClick={() => handleStatusSelect("")}
                                 >
                                     Select Status
                                 </li>
                                 <li
-                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-600"
                                     onClick={() => handleStatusSelect("On-Time")}
                                 >
                                     On-Time
                                 </li>
                                 <li
-                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-600"
                                     onClick={() => handleStatusSelect("Delayed")}
                                 >
                                     Delayed
                                 </li>
                                 <li
-                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-600"
                                     onClick={() => handleStatusSelect("Missed")}
                                 >
                                     Missed

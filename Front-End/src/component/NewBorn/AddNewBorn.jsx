@@ -22,6 +22,19 @@ function AddNewBorn({ isOpen, onClose, born }) {
         birthHeight: "",
     });
 
+    const resetForm = () => {
+        setFormData({
+            firstName: "",
+            lastName: "",
+            middleName: "",
+            dateOfBirth: "",
+            gender: "",
+            birthWeight: "",
+            motherName: "",
+            birthHeight: "",
+        });
+    };
+
     useEffect(() => {
         if (born) {
             setFormData({
@@ -31,7 +44,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 dateOfBirth: born.dateOfBirth ? new Date(born.dateOfBirth).toISOString().slice(0, 10) : "",
                 gender: born.gender || "",
                 birthWeight: born.birthWeight || "",
-                motherName: born.motherName?._id || born.motherName || "",
+                motherName: born.motherID || born.motherName || "",
                 birthHeight: born.birthHeight || "",
             });
         } else {
@@ -57,7 +70,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
     };
 
     const handleSelect = (name, value) => {
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
         if (name === "motherName") setDropdownOpen(false);
         if (name === "gender") setDropdownOpenGender(false);
     };
@@ -67,11 +80,13 @@ function AddNewBorn({ isOpen, onClose, born }) {
         if (born) {
             await UpdateBorn(born._id, formData);
             setTimeout(() => {
+                resetForm();
                 onClose();
             }, 1000);
         } else {
             await AddNewBorn(formData, userId);
             setTimeout(() => {
+                resetForm();
                 onClose();
             }, 1000);
         }
@@ -87,9 +102,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 exit={{ opacity: 0, y: -40 }}
                 className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800"
             >
-                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">
-                    {born ? "Edit Newborn Info" : "Add Newborn"}
-                </h2>
+                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">{born ? "Edit Newborn Info" : "Add Newborn"}</h2>
 
                 {customError && (
                     <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700 dark:bg-red-900 dark:text-red-200">
@@ -97,7 +110,10 @@ function AddNewBorn({ isOpen, onClose, born }) {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                >
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">First Name</label>
@@ -158,19 +174,19 @@ function AddNewBorn({ isOpen, onClose, born }) {
                             {dropdownOpenGender && (
                                 <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700">
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                                         onClick={() => handleSelect("gender", "")}
                                     >
                                         Select Gender
                                     </li>
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                                         onClick={() => handleSelect("gender", "Male")}
                                     >
                                         Male
                                     </li>
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                                         onClick={() => handleSelect("gender", "Female")}
                                     >
                                         Female
@@ -200,8 +216,9 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         >
                             <span>
                                 {formData.motherName
-                                    ? users.find(u => u._id === formData.motherName)?.FirstName + " " + 
-                                      users.find(u => u._id === formData.motherName)?.LastName
+                                    ? users.find((u) => u._id === formData.motherName)?.FirstName +
+                                      " " +
+                                      users.find((u) => u._id === formData.motherName)?.LastName
                                     : "Select Mother"}
                             </span>
                             <i className={`fas ${dropdownOpen ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
@@ -209,7 +226,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         {dropdownOpen && (
                             <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700">
                                 <li
-                                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                                     onClick={() => handleSelect("motherName", "")}
                                 >
                                     Select Mother
@@ -217,7 +234,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                                 {users.map((user) => (
                                     <li
                                         key={user._id}
-                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                                         onClick={() => handleSelect("motherName", user._id)}
                                     >
                                         {user.FirstName} {user.LastName}

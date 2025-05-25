@@ -24,6 +24,7 @@ role: {
   dateOfBirth: { type: Date, required: [true, "Please select a Date of Birth"], }, // Date of birth of the user
   gender: { type: String, enum: ["Male", "Female"], required: [true, "Please select Gender."], }, // Gender of the user
   zone: { type: String },
+  Designatedzone: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

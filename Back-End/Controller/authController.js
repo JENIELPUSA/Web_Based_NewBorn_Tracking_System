@@ -52,6 +52,7 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
     dateOfBirth,
     gender,
     zone,
+    Designatedzone
   } = req.body;
 
   // Create an array to collect missing fields
@@ -98,6 +99,7 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
       dateOfBirth,
       gender,
       zone,
+      Designatedzone
     });
 
     // Send the newly created user as the response
@@ -143,7 +145,7 @@ exports.login = AsyncErrorHandler(async (req, res, next) => {
     FirstName: user.FirstName,
     LastName: user.LastName,
     role: user.role,
-    zone:user.zone
+    Designatedzone:user.Designatedzone
   };
 
   const fullName = `${user.FirstName} ${user.LastName}`;
@@ -155,7 +157,7 @@ exports.login = AsyncErrorHandler(async (req, res, next) => {
     role: user.role,
     token,
     email,
-    zone:user.zone,
+    Designatedzone:user.Designatedzone,
     fullName,
   });
 });
