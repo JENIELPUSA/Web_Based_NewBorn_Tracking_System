@@ -41,7 +41,7 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({
       //mongoUrl: 'mongodb+srv://admin:FV0X2MY5DafZ4kUJ@cluster0.qpiekbv.mongodb.net/ThesisDatabase?retryWrites=true&w=majority&appName=Cluster0',
-      mongoUrl: process.env.CONN_STR,
+      mongoUrl: process.env.LoCAL_CONN_STR,
       ttl: 24 * 60 * 60, // 24 hours in seconds
     }),
     cookie: {
