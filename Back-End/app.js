@@ -25,7 +25,7 @@ const auditLogRoute = require("./Routes/auditLogRoute");
 const authentic = require("./Routes/authRouter");
 let app = express();
 
-const logger = function (res, req, next) {
+const logger = function (req, res, next) {
   console.log("Middleware Called");
   next();
 };
@@ -54,7 +54,6 @@ app.use(
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    //origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
   })
