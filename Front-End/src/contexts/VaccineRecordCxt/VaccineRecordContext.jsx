@@ -11,7 +11,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const [vaccineRecord, setVaccineRecord] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const { authToken, userId, role, zone } = useContext(AuthContext);
+    const { authToken, userId, role, Designatedzone } = useContext(AuthContext);
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
     const { fetchVaccineContext } = useContext(VaccineDisplayContext);
@@ -43,8 +43,6 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 setVaccineRecord(vaccineData);
                 setCalendarData(vaccineData);
             } else if (role === "BHW") {
-                console.log("Current BHW userId:", userId); // Debug log
-
                 // Process records to only include doses administered by this BHW
                 const filteredRecords = vaccineData
                     .map((record) => {
@@ -56,28 +54,13 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                     })
                     .filter((record) => record !== null); // Remove null entries
 
-                const filteredZoneRecords = vaccineData
-                    .map((record) => {
-                        // Filter doses that match the selected zone
-                        const filteredDoses = record.doses.filter((dose) => dose.zone === zone);
+                const filteredByZone = vaccineData.filter(
+                    (record) => record.newbornZone?.toLowerCase().trim() === Designatedzone?.toLowerCase().trim(),
+                );
 
-                        // Return the full record only if it has matching doses
-                        if (filteredDoses.length > 0) {
-                            return {
-                                ...record,
-                                doses: filteredDoses, // only matching doses per record
-                            };
-                        }
-
-                        // Skip if no matching doses
-                        return null;
-                    })
-                    .filter(Boolean); // remove nulls (records with 0 matching doses)
-
-                console.log("Filtered records for BHW:", filteredRecords); // Debug log
+                console.log("VaccineSpecific", filteredByZone);
                 setVaccineRecord(filteredRecords);
-                setCalendarData(filteredZoneRecords);
-                console.log("VaccineSpecific", filteredZoneRecords);
+                setCalendarData(filteredByZone);
             }
         } catch (error) {
             console.error("Error fetching vaccine records:", error);
@@ -164,13 +147,11 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                         return record;
                     }),
                 );
-               
 
                 setModalStatus("success");
                 setShowModal(true);
 
-                 return { success: true, data: response?.data.data };
-                  
+                return { success: true, data: response?.data.data };
             } else {
                 setModalStatus("failed");
                 setShowModal(true);

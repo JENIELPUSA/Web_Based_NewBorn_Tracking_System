@@ -297,6 +297,7 @@ exports.DisplayVaccinationRecord = async (req, res) => {
           description: { $first: "$vaccine.description" },
           motherName: { $first: { $concat: ["$mother.FirstName", " ", "$mother.LastName"] } },
           FullAddress: { $first: { $concat: ["$mother.zone", " ", "$mother.address"] } },
+                    newbornZone: { $first: "$mother.zone" },
   
         },
       },
@@ -314,6 +315,7 @@ exports.DisplayVaccinationRecord = async (req, res) => {
           description: 1,
           motherName: 1,
           FullAddress: 1,
+          newbornZone:1
         },  
       },
     ]);

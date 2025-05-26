@@ -6,9 +6,14 @@ const authController = require("./../Controller/authController");
 router
   .route("/")
   .get(authController.protect, GetbabyController.DisplayAllData)
+  .get(authController.protect, GetbabyController.DisplayGraph)
   .post(authController.protect, GetbabyController.createNewRecord);
 router
 .route("/:id")
   .delete(authController.protect, GetbabyController.deletedSpecificData)
   .patch(authController.protect, GetbabyController.UpdateBabyData)
+
+router
+  .route("/DisplayGraph")
+  .get(authController.protect, GetbabyController.DisplayGraph)
 module.exports = router;

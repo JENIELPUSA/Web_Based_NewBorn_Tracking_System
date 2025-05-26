@@ -8,12 +8,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { overviewData } from "@/constants";
+import { LogContext } from "../../contexts/LogAndAuditContext/LogAuditContext";
 import { CalendarDays, MapPin } from "lucide-react";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
-
+import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornContext";
 function WeeklySchedule() {
   const { theme } = useTheme();
+  const { LogData } = useContext(LogContext);
+    const {isGraphData}=useContext(NewBornDisplayContext)
   const { vaccineRecord } = useContext(VaccineRecordDisplayContext);
 
   // Calculate current week's Monday and Sunday
@@ -46,49 +48,100 @@ function WeeklySchedule() {
         }))
     );
 
+
+
+    
+    const graphDataArray = Array.isArray(isGraphData)
+  ? isGraphData
+  : isGraphData
+    ? [isGraphData]
+    : [];
+
+    const monthlyWeight = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month) => {
+        const total = graphDataArray
+            .filter((baby) => baby.birthMonth === month)
+            .reduce((acc, baby) => acc + parseFloat(baby.totalWeight.replace(" kg", "")), 0); // Add weights
+
+        return { name: month, total };
+    });
+
+    // Example: Resulting overviewData
+    const overviewData = monthlyWeight;
+
+
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
-      {/* Overview Chart */}
-      <div className="card col-span-1 md:col-span-2 lg:col-span-4">
-        <div className="card-header">
-          <p className="card-title text-lg font-semibold text-slate-800 dark:text-white">
-            Overview
-          </p>
-        </div>
-        <div className="card-body p-0">
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={overviewData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <Tooltip cursor={false} formatter={(value) => `$${value}`} />
-              <XAxis
-                dataKey="name"
-                strokeWidth={0}
-                stroke={theme === "light" ? "#475569" : "#94a3b8"}
-                tickMargin={6}
-              />
-              <YAxis
-                dataKey="total"
-                strokeWidth={0}
-                stroke={theme === "light" ? "#475569" : "#94a3b8"}
-                tickFormatter={(value) => `$${value}`}
-                tickMargin={6}
-              />
-              <Area
-                type="monotone"
-                dataKey="total"
-                stroke="#ef4444"
-                fillOpacity={1}
-                fill="url(#colorTotal)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7 xs:px-2 sm:px-0 lg:px-0">
+            {/* Overview Graph */}
+                  <div
+                      className={`col-span-1 rounded-2xl p-6 backdrop-blur-lg md:col-span-2 lg:col-span-4 ${
+                          theme === "light" ? "border border-slate-200 bg-white/70 shadow-lg" : "border border-slate-700 bg-slate-800/50 shadow-lg"
+                      }`}
+                  >
+                      <div className="mb-4">
+                          <p className={`text-xl font-semibold ${theme === "light" ? "text-slate-800" : "text-white"}`}>Overview</p>
+                      </div>
+                      <div className="h-[300px]">
+                          <ResponsiveContainer
+                              width="100%"
+                              height="100%"
+                          >
+                              <AreaChart
+                                  data={overviewData}
+                                  margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
+                              >
+                                  <defs>
+                                      <linearGradient
+                                          id="colorTotal"
+                                          x1="0"
+                                          y1="0"
+                                          x2="0"
+                                          y2="1"
+                                      >
+                                          <stop
+                                              offset="5%"
+                                              stopColor="#ef4444"
+                                              stopOpacity={0.8}
+                                          />
+                                          <stop
+                                              offset="95%"
+                                              stopColor="#ef4444"
+                                              stopOpacity={0.1}
+                                          />
+                                      </linearGradient>
+                                  </defs>
+                                  <Tooltip
+                                      contentStyle={{
+                                          background: theme === "dark" ? "#1e293b" : "#ffffff",
+                                          border: "none",
+                                          borderRadius: "0.5rem",
+                                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                                          backdropFilter: "blur(12px)",
+                                      }}
+                                      formatter={(value) => [`${value} kg`, "Total Weight"]} // Adjusted to show kg
+                                  />
+                                  <XAxis
+                                      dataKey="name"
+                                      strokeWidth={0}
+                                      tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8" }}
+                                  />
+                                  <YAxis
+                                      dataKey="total"
+                                      strokeWidth={0}
+                                      tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8" }}
+                                      tickFormatter={(value) => `${value} kg`} // Adjusted to show kg
+                                  />
+                                  <Area
+                                      type="monotone"
+                                      dataKey="total"
+                                      stroke="#ef4444"
+                                      strokeWidth={2}
+                                      fillOpacity={1}
+                                      fill="url(#colorTotal)"
+                                  />
+                              </AreaChart>
+                          </ResponsiveContainer>
+                      </div>
+                  </div>
 
       {/* Weekly Schedule Panel */}
       <div className="card col-span-1 rounded bg-white shadow dark:bg-slate-800 md:col-span-2 lg:col-span-3">

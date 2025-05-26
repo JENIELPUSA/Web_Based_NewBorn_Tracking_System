@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext"; // Adjust path if needed
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import logo from "@/assets/logo.png";
 import LoadingIntro from "../../ReusableFolder/loadingIntro"; // Updated import path
 
 export default function Login() {
@@ -51,7 +52,7 @@ export default function Login() {
         <div className="w-full max-w-md bg-white dark:bg-slate-800 p-8 rounded-r-lg shadow-md">
           <div className="flex justify-center mb-6">
             <img
-              
+              src={logo}
               alt="App Logo"
               className="h-32 w-32 object-contain"
             />

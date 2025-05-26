@@ -170,6 +170,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         motherName: {
           $concat: ["$motherName.FirstName", " ", "$motherName.LastName"],
         },
+        motherID:"$motherName._id",
         address: {
           $concat: ["$motherName.zone", " ", "$motherName.address"],
         },
@@ -409,4 +410,138 @@ exports.UpdateBabyData = AsyncErrorHandler(async (req, res, next) => {
     data: toolWithCategory[0],
   });
 });
+
+exports.DisplayGraph = AsyncErrorHandler(async(req,res,next)=>{
+
+   const features = new Apifeatures(NewBaby.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  // Get IDs after filtering and pagination
+  const filteredBabies = await features.query;
+  const ids = filteredBabies.map((baby) => baby._id);
+
+  // Perform aggregation with $lookup, $project, and gender counting
+  const result = await NewBaby.aggregate([
+    {
+      $match: { _id: { $in: ids } }, // Match babies by the filtered IDs
+    },
+    {
+      $lookup: {
+        from: "users", // Join with 'users' collection
+        localField: "addedBy", // Reference to the 'addedBy' field in NewBaby schema
+        foreignField: "_id", // Match with '_id' in 'users'
+        as: "addedBy", // Output the matched user data into the 'addedBy' field
+      },
+    },
+    {
+      $unwind: {
+        path: "$addedBy", // Unwind the 'addedBy' array to access user details
+        preserveNullAndEmptyArrays: true, // Preserve documents even if 'addedBy' is missing
+      },
+    },
+    {
+      $lookup: {
+        from: "users", // Join with 'users' collection for motherName
+        localField: "motherName", // Reference to the 'motherName' field in NewBaby schema
+        foreignField: "_id", // Match with '_id' in 'users'
+        as: "motherName",
+      },
+    },
+    { $unwind: "$motherName" },
+    {
+      $project: {
+        firstName: 1,
+        middleName: 1,
+        lastName: 1,
+        dateOfBirth: {
+          $dateToString: {
+            format: "%b %d %Y", // Format date as 'Jan 13 2025'
+            date: "$dateOfBirth",
+          },
+        },
+        gender: 1, // Include gender for filtering
+        birthWeight: 1,
+        birthHeight: 1,
+        motherName: {
+          $concat: ["$motherName.FirstName", " ", "$motherName.LastName"],
+        },
+        motherID: "$motherName._id",
+        address: {
+          $concat: ["$motherName.zone", " ", "$motherName.address"],
+        },
+        phoneNumber: {
+          $concat: ["$motherName.phoneNumber"],
+        },
+        zone: {
+          $concat: ["$motherName.zone"],
+        },
+        createdAt: 1,
+        addedByName: {
+          $cond: {
+            if: { $eq: [{ $type: "$addedBy" }, "object"] }, // Check if addedBy exists and is an object
+            then: {
+              $concat: ["$addedBy.FirstName", " ", "$addedBy.LastName"], // Concatenate first name and last name
+            },
+            else: "Unknown", // If addedBy is missing or invalid, show 'Unknown'
+          },
+        },
+        fullName: {
+          $concat: ["$firstName", " ", "$middleName", " ", "$lastName"], // Concatenate full name
+        },
+        fullAddress: {
+          $concat: ["$zone", ", ", "$address"], // Concatenate zone and address
+        },
+      },
+    },
+    {
+      $sort: { birthWeight: -1 }, // Sort by birth weight in descending order
+    },
+    {
+      $group: {
+        _id: null,
+        totalMale: {
+          $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] },
+        },
+        totalFemale: {
+          $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] },
+        },
+        totalRecords: { $sum: 1 },
+        topBabies: { $push: "$$ROOT" }, // Push top babies data into topBabies field
+      },
+    },
+    { $limit: 10 }, // Limit the output to top 10 babies by weight
+    {
+      $project: {
+        topBabies: 1, // Keep only the top babies in the final result
+        totalMale: 1,
+        totalFemale: 1,
+        totalRecords: 1,
+      },
+    },
+  ]);
+
+  // If no data found, return 0 for male and female counts
+  const resultData = result.length > 0 ? result[0] : { totalMale: 0, totalFemale: 0, totalRecords: 0, topBabies: [] };
+
+  // Prepare formatted result
+  const topBabiesFormatted = resultData.topBabies.map((baby, index) => ({
+    number: index + 1,
+    name: baby.fullName,
+    totalWeight: `${baby.birthWeight} kg`,
+    birthMonth: baby.dateOfBirth.split(" ")[0], // Extract the month from the formatted date
+    zone: baby.zone || "Unknown", 
+  }));
+
+  res.status(200).json({
+    status: "success",
+    totalMale: resultData.totalMale,
+    totalFemale: resultData.totalFemale,
+    totalRecords: resultData.totalRecords,
+    topBabies: topBabiesFormatted,
+  });
+
+})
 

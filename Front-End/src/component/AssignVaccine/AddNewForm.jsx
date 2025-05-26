@@ -26,8 +26,6 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
             vaccine: "",
             totalDoses: "",
         });
-        setSelectedDosage("");
-        setCustomError("");
     };
 
     useEffect(() => {

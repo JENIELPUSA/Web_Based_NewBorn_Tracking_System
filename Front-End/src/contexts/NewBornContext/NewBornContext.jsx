@@ -20,6 +20,7 @@ export const NewBornDisplayProvider = ({ children }) => {
     const [Totalbaby, setTotalBaby] = useState("");
     const [TotalMale, setTotalMale] = useState("");
     const [TotalFemale, setTotalFemale] = useState("");
+    const [isGraphData,setGraphData]=useState("")
 
     // Get token from localStorage
     const [usersPerPage, setusersPerPage] = useState(6);
@@ -30,6 +31,8 @@ export const NewBornDisplayProvider = ({ children }) => {
             setLoading(false); // Stop loading when there is no token
             return;
         }
+
+        fetchGraph();
 
         fetchUserData();
     }, [authToken]); // Dependencies to trigger effect when page or items per page change
@@ -43,8 +46,6 @@ export const NewBornDisplayProvider = ({ children }) => {
             return () => clearTimeout(timer); // cleanup
         }
     }, [customError]);
-
-    console.log(Designatedzone)
 
     const fetchUserData = async () => {
         if (!authToken) return;
@@ -73,6 +74,39 @@ export const NewBornDisplayProvider = ({ children }) => {
 
                 setNewBorn(filteredUserData);
             }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Failed to fetch data. Please try again later.");
+            setError("Failed to fetch data");
+        } finally {
+            setLoading(false); // Set loading to false after data fetching is complete
+        }
+    };
+
+
+      const fetchGraph = async () => {
+        if (!authToken) return;
+        setLoading(true); // Set loading to true before fetching data
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/DisplayGraph`, {
+                withCredentials: true,
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
+
+            const GraphData=res.data.topBabies;
+
+            
+
+
+             if (role === "Admin") {
+                setGraphData(GraphData)      
+            } else if (role === "BHW") {
+                const filteredUserData = GraphData.filter((user) => {
+                    return user.zone?.toLowerCase().trim() === Designatedzone.toLowerCase().trim();
+                });
+                setGraphData(filteredUserData);
+            }
+
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Failed to fetch data. Please try again later.");
@@ -200,6 +234,7 @@ export const NewBornDisplayProvider = ({ children }) => {
                 AddNewBorn,
                 DeleteNewBorn,
                 UpdateBorn,
+                isGraphData
             }}
         >
             {children}

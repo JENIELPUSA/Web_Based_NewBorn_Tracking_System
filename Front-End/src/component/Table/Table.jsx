@@ -113,6 +113,7 @@ function UserTable() {
 
                             <th className="p-3 text-left">Address</th>
                             <th className="p-3 text-left">Zone</th>
+                            <th className="p-3 text-left">Designated Zone</th>
                             <th className="p-3 text-left">Phone</th>
                             <th className="p-3 text-left">DOB</th>
                             <th className="p-3 text-left">Gender</th>
@@ -166,6 +167,7 @@ function UserTable() {
 
                                     <td className="max-w-xs truncate p-3 align-top">{user.address || "N/A"}</td>
                                     <td className="p-3 align-top">{user.zone || "N/A"}</td>
+                                    <td className="p-3 align-top">{user.Designatedzone || "N/A"}</td>
                                     <td className="p-3 align-top">{user.phoneNumber || "N/A"}</td>
                                     <td className="p-3 align-top">{formatDate(user.dateOfBirth)}</td>
                                     <td className="p-3 align-top capitalize">{user.gender || "N/A"}</td>
