@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { BabyIcon } from "lucide-react"; // Still not used, but kept as before
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -85,9 +84,9 @@ function VaccineRecordTable({ dataToDisplay }) {
 
     return (
         <div className="card">
-            <div className="card-header flex flex-col gap-4 rounded-t-lg bg-gray-50 p-4 dark:bg-slate-700 sm:flex-row sm:items-center sm:justify-between">
+            <div className="card-header flex flex-col gap-4 rounded-t-lg bg-gray-50 p-4 dark:bg-slate-700 xm:flex-row xm:items-center xm:justify-between">
                 <p className="card-title text-xl font-semibold text-gray-900 dark:text-white">Vaccination Records</p>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                <div className="flex flex-col gap-2 xm:flex-row xm:items-center xm:gap-4">
                     <div className="flex items-center gap-2">
                         <DatePicker
                             selectsRange
@@ -113,8 +112,9 @@ function VaccineRecordTable({ dataToDisplay }) {
             </div>
 
             <div className="card-body p-0">
-                {/* --- Desktop Table View (visible on sm screens and up) --- */}
-                <div className="relative w-full overflow-x-auto hidden sm:block">
+                {/* --- Desktop Table View (visible on xm screens and up) --- */}
+                {/* Changed `sm:block` to `xm:block` */}
+                <div className="relative w-full overflow-x-auto hidden xm:block">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-800">
                             <tr>
@@ -164,8 +164,9 @@ function VaccineRecordTable({ dataToDisplay }) {
                     </table>
                 </div>
 
-                {/* --- Mobile Card View (visible on screens smaller than sm) --- */}
-                <div className="sm:hidden p-4"> {/* hidden on sm and up, shown on smaller */}
+                {/* --- Mobile Card View (visible on screens smaller than xm) --- */}
+                {/* Changed `sm:hidden` to `xm:hidden` */}
+                <div className="xm:hidden p-4"> {/* hidden on xm and up, shown on smaller */}
                     {currentDoses.length === 0 ? (
                         <div className="text-center text-sm text-gray-700 dark:text-gray-300 py-4">
                             No records found.
