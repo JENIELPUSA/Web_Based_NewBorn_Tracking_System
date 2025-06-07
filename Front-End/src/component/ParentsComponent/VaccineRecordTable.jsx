@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BabyIcon } from "lucide-react"; // Note: BabyIcon is not used in the provided table structure, but kept if it's for other purposes.
+import { BabyIcon } from "lucide-react"; // Still not used, but kept as before
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -57,7 +57,6 @@ function VaccineRecordTable({ dataToDisplay }) {
                       user.doses.some((dose) => {
                           if (!dose.dateGiven) return false;
                           const doseDate = new Date(dose.dateGiven);
-                          // Ensure date comparison accounts for time (set end date to end of day)
                           const adjustedEndDate = new Date(endDate);
                           adjustedEndDate.setHours(23, 59, 59, 999);
                           return doseDate >= startDate && doseDate <= adjustedEndDate;
@@ -67,11 +66,10 @@ function VaccineRecordTable({ dataToDisplay }) {
           })
         : [];
 
-    // Combine all doses from filtered records into a single flat array
     const allDoses = filteredRecord.flatMap(user =>
         user.doses.map(dose => ({
             ...dose,
-            newbornName: user.newbornName, // Add newborn and mother names for context
+            newbornName: user.newbornName,
             motherName: user.motherName,
             vaccineName: user.vaccineName,
             dosage: user.dosage
@@ -90,7 +88,6 @@ function VaccineRecordTable({ dataToDisplay }) {
             <div className="card-header flex flex-col gap-4 rounded-t-lg bg-gray-50 p-4 dark:bg-slate-700 sm:flex-row sm:items-center sm:justify-between">
                 <p className="card-title text-xl font-semibold text-gray-900 dark:text-white">Vaccination Records</p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-
                     <div className="flex items-center gap-2">
                         <DatePicker
                             selectsRange
@@ -116,8 +113,8 @@ function VaccineRecordTable({ dataToDisplay }) {
             </div>
 
             <div className="card-body p-0">
-                {/* Modified: Removed h-[500px] and added overflow-x-auto for responsiveness */}
-                <div className="relative w-full overflow-x-auto">
+                {/* --- Desktop Table View (visible on sm screens and up) --- */}
+                <div className="relative w-full overflow-x-auto hidden sm:block">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-800">
                             <tr>
@@ -143,28 +140,69 @@ function VaccineRecordTable({ dataToDisplay }) {
                             ) : (
                                 currentDoses.map((dose, index) => (
                                     <tr
-                                        key={dose._id ? `${dose._id}-${index}` : `${dose.vaccineName}-${dose.doseNumber}-${index}`} // Fallback key if _id is missing
+                                        key={dose._id ? `${dose._id}-${index}` : `${dose.vaccineName}-${dose.doseNumber}-${index}`}
                                         className="hover:bg-gray-50 dark:hover:bg-gray-700"
                                     >
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{indexOfFirstUser + index + 1}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.newbornName}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.motherName}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.vaccineName}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.doseNumber || "—"}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.dosage}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{indexOfFirstUser + index + 1}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white truncate">{dose.newbornName}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white truncate">{dose.motherName}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white truncate">{dose.vaccineName}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{dose.doseNumber || "—"}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{dose.dosage}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             {dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             {dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap"><StatusBadge status={dose.status} /></td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.administeredBy || "—"}</td>
+                                        <td className="px-4 py-3"><StatusBadge status={dose.status} /></td>
+                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white truncate">{dose.administeredBy || "—"}</td>
                                     </tr>
                                 ))
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* --- Mobile Card View (visible on screens smaller than sm) --- */}
+                <div className="sm:hidden p-4"> {/* hidden on sm and up, shown on smaller */}
+                    {currentDoses.length === 0 ? (
+                        <div className="text-center text-sm text-gray-700 dark:text-gray-300 py-4">
+                            No records found.
+                        </div>
+                    ) : (
+                        <div className="grid gap-4">
+                            {currentDoses.map((dose, index) => (
+                                <div
+                                    key={dose._id ? `${dose._id}-${index}` : `${dose.vaccineName}-${dose.doseNumber}-${index}`}
+                                    className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-700"
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{dose.newbornName}</h3>
+                                        <StatusBadge status={dose.status} />
+                                    </div>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                        <span className="font-medium">Mother:</span> {dose.motherName}
+                                    </p>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                        <span className="font-medium">Vaccine:</span> {dose.vaccineName} ({dose.doseNumber || "—"})
+                                    </p>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                        <span className="font-medium">Dosage:</span> {dose.dosage}
+                                    </p>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                        <span className="font-medium">Date Given:</span> {dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}
+                                    </p>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                        <span className="font-medium">Next Schedule:</span> {dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}
+                                    </p>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                                        <span className="font-medium">Administered By:</span> {dose.administeredBy || "—"}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 

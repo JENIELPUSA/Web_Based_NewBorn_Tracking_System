@@ -99,7 +99,7 @@ function VaccinationTimelineWithArrowDates({ scheduleData }) {
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-red-50 to-white dark:from-gray-900 dark:to-gray-800 p-6">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-red-50 to-white dark:from-gray-900 dark:to-gray-800 p-2">
             <div className="w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-gray-800">
                 <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-6 text-center shadow-lg">
                     <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-wide">Child Immunization Schedule</h1>

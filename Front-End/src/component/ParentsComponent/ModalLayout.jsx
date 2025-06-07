@@ -58,7 +58,7 @@ const filteredData = vaccineRecord.filter((item) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 "
                     onClick={onClose}
                 >
                     <motion.div
@@ -66,7 +66,7 @@ const filteredData = vaccineRecord.filter((item) => {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -40, opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="w-full max-w-full rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800 relative
+                        className="w-full max-w-full rounded-2xl bg-white  shadow-2xl dark:bg-slate-800 relative
                                     max-h-[95vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
