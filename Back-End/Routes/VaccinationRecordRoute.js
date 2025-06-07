@@ -6,7 +6,7 @@ const authController = require("./../Controller/authController");
 router
   .route("/")
   .post(authController.protect, RecordController.createNewRecord)
-  .get(authController.protect,RecordController.DisplayVaccinationRecord)
+  .get(RecordController.DisplayVaccinationRecord)
 // routes/vaccinationRecord.js
 router
   .route("/:recordId/doses/:doseId")  // Now includes doseId

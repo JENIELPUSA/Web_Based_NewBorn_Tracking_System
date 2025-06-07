@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { BabyIcon } from "lucide-react";
+import { BabyIcon } from "lucide-react"; // Note: BabyIcon is not used in the provided table structure, but kept if it's for other purposes.
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+// --- StatusBadge Component (No changes needed here) ---
 const statusColors = {
     ontime: {
         bg: "bg-green-100 dark:bg-green-900",
@@ -32,6 +33,7 @@ const StatusBadge = ({ status }) => {
     return <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${color.bg} ${color.text}`}>{color.display}</span>;
 };
 
+// --- VaccineRecordTable Component ---
 function VaccineRecordTable({ dataToDisplay }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [dateRange, setDateRange] = useState([null, null]);
@@ -55,17 +57,33 @@ function VaccineRecordTable({ dataToDisplay }) {
                       user.doses.some((dose) => {
                           if (!dose.dateGiven) return false;
                           const doseDate = new Date(dose.dateGiven);
-                          return doseDate >= startDate && doseDate <= endDate;
+                          // Ensure date comparison accounts for time (set end date to end of day)
+                          const adjustedEndDate = new Date(endDate);
+                          adjustedEndDate.setHours(23, 59, 59, 999);
+                          return doseDate >= startDate && doseDate <= adjustedEndDate;
                       }));
 
               return matchesSearch && matchesDateRange;
           })
         : [];
 
-    const totalPages = Math.ceil(filteredRecord.length / usersPerPage);
+    // Combine all doses from filtered records into a single flat array
+    const allDoses = filteredRecord.flatMap(user =>
+        user.doses.map(dose => ({
+            ...dose,
+            newbornName: user.newbornName, // Add newborn and mother names for context
+            motherName: user.motherName,
+            vaccineName: user.vaccineName,
+            dosage: user.dosage
+        }))
+    );
+
+    const totalPages = Math.ceil(allDoses.length / usersPerPage);
     const indexOfLastUser = currentPage * usersPerPage;
     const indexOfFirstUser = indexOfLastUser - usersPerPage;
-    const currentUsers = filteredRecord.slice(indexOfFirstUser, indexOfLastUser);
+    const currentDoses = allDoses.slice(indexOfFirstUser, indexOfLastUser);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div className="card">
@@ -115,52 +133,80 @@ function VaccineRecordTable({ dataToDisplay }) {
             </div>
 
             <div className="card-body p-0">
-                <div className="relative h-[500px] w-full overflow-auto">
-                    <table className="table hidden w-full text-sm sm:table">
+                {/* Modified: Removed h-[500px] and added overflow-x-auto for responsiveness */}
+                <div className="relative w-full overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-800">
                             <tr>
-                                <th className="px-4 py-3 text-left">#</th> 
-                                <th className="px-4 py-3 text-left">Vaccine</th>
-                                <th className="px-4 py-3 text-left">Dose</th>
-                                <th className="px-4 py-3 text-left">Dosage</th>
-                                <th className="px-4 py-3 text-left">Date Given</th>
-                                <th className="px-4 py-3 text-left">Next Schedule</th>
-                                <th className="px-4 py-3 text-left">Status</th>
-                                <th className="px-4 py-3 text-left">Administered By</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Newborn Name</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mother's Name</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vaccine</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dose</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dosage</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Given</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Schedule</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Administered By</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {currentUsers.length === 0 ? (
+                        <tbody className="bg-white divide-y divide-gray-200 dark:bg-slate-800 dark:divide-gray-700">
+                            {currentDoses.length === 0 ? (
                                 <tr>
-                                    <td colSpan="10" className="py-4 text-center text-gray-700 dark:text-gray-300">
+                                    <td colSpan="10" className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-700 dark:text-gray-300">
                                         No records found.
                                     </td>
                                 </tr>
                             ) : (
-                                currentUsers.map((user, index) =>
-                                    user.doses.map((dose, doseIndex) => (
-                                        <tr
-                                            key={`${user._id}-${doseIndex}`}
-                                            className="border-b hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
-                                        >
-                                            <td className="px-4 py-3">
-                                                {doseIndex === 0 ? indexOfFirstUser + index + 1 : ""}
-                                            </td>
-                                            <td className="px-4 py-3">{user.vaccineName}</td>
-                                            <td className="px-4 py-3">{dose.doseNumber || "—"}</td>
-                                            <td className="px-4 py-3">{user.dosage}</td>
-                                            <td className="px-4 py-3">{dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}</td>
-                                            <td className="px-4 py-3">{dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}</td>
-                                            <td className="px-4 py-3"><StatusBadge status={dose.status} /></td>
-                                            <td className="px-4 py-3">{dose.administeredBy || "—"}</td>
-                                        </tr>
-                                    ))
-                                )
+                                currentDoses.map((dose, index) => (
+                                    <tr
+                                        key={dose._id ? `${dose._id}-${index}` : `${dose.vaccineName}-${dose.doseNumber}-${index}`} // Fallback key if _id is missing
+                                        className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    >
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{indexOfFirstUser + index + 1}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.newbornName}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.motherName}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.vaccineName}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.doseNumber || "—"}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.dosage}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                            {dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}
+                                        </td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                            {dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}
+                                        </td>
+                                        <td className="px-4 py-3 whitespace-nowrap"><StatusBadge status={dose.status} /></td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{dose.administeredBy || "—"}</td>
+                                    </tr>
+                                ))
                             )}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="card-footer flex items-center justify-between rounded-b-lg bg-gray-50 p-4 dark:bg-slate-700">
+                    <button
+                        onClick={() => paginate(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="btn btn-sm rounded-md bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-300 disabled:opacity-50 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        onClick={() => paginate(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="btn btn-sm rounded-md bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-300 disabled:opacity-50 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

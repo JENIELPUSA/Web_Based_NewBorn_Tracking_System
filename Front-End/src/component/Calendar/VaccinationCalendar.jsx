@@ -18,14 +18,17 @@ import {
 } from "date-fns";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
 import { AuthContext } from "../../contexts/AuthContext";
+import { useIsMobile } from "./useIsMobile"; // Import the new hook
 
 const VaccinationCalendar = () => {
     const { role, zone } = useContext(AuthContext);
-    const { vaccineRecord,calendardata } = useContext(VaccineRecordDisplayContext);
+    const { vaccineRecord, calendardata } = useContext(VaccineRecordDisplayContext);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [clickedDate, setClickedDate] = useState(null);
     const [tooltipContent, setTooltipContent] = useState([]);
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+
+    const isMobile = useIsMobile(); // Use the custom hook
 
     const latestDueMap = useMemo(() => {
         const map = {};
@@ -93,11 +96,15 @@ const VaccinationCalendar = () => {
         }
         setClickedDate(date);
         setTooltipContent(doses);
-        const rect = event.currentTarget.getBoundingClientRect();
-        setTooltipPosition({
-            top: rect.bottom + window.scrollY,
-            left: rect.left + window.scrollX,
-        });
+
+        // Only set tooltip position if not mobile
+        if (!isMobile) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            setTooltipPosition({
+                top: rect.bottom + window.scrollY,
+                left: rect.left + window.scrollX,
+            });
+        }
     };
 
     const renderHeader = () => (
@@ -123,7 +130,7 @@ const VaccinationCalendar = () => {
                 onClick={handleNextMonth}
                 className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
             >
-                    ›
+                ›
             </button>
         </div>
     );
@@ -207,76 +214,141 @@ const VaccinationCalendar = () => {
         return <div className="space-y-1">{rows}</div>;
     };
 
+    // Modal Component for Mobile
+    const MobileModal = ({ date, content, onClose }) => (
+        <motion.div
+            initial={{ opacity: 0, y: "100%" }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: "100%" }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[100] bg-gray-900 bg-opacity-75 flex items-end justify-center"
+        >
+            <motion.div
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ duration: 0.3 }}
+                className="w-full max-w-md bg-white dark:bg-gray-800 rounded-t-lg shadow-lg p-4 pb-8 relative"
+            >
+                <div className="mb-4 flex justify-between items-center">
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                        Doses on {format(date, "MMM d, yyyy")}
+                    </h3>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-red-500 dark:hover:text-red-400 text-xl"
+                    >
+                        ✕
+                    </button>
+                </div>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {content.map((item, i) => (
+                        <div key={i} className="border-b border-gray-200 dark:border-gray-700 pb-3 last:border-0">
+                            <div className="font-medium text-blue-600 dark:text-blue-300 text-base">{item.newbornName}</div>
+                            <div className="text-sm text-gray-800 dark:text-gray-200">
+                                <span className="font-medium">Vaccine:</span> {item.vaccineName}
+                            </div>
+                            <div className="text-sm text-gray-800 dark:text-gray-200">
+                                <span className="font-medium">Dose:</span> {item.doseNumber}
+                            </div>
+                            <div className="text-sm text-gray-800 dark:text-gray-200">
+                                <span className="font-medium">Status:</span>
+                                <span
+                                    className={`ml-1 rounded px-1 py-0.5 text-sm ${
+                                        item.status === "On-Time"
+                                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                            : item.status === "Missed"
+                                            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                    }`}
+                                >
+                                    {item.status}
+                                </span>
+                            </div>
+                            <div className="text-sm text-gray-700 dark:text-gray-300">
+                                <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+
     return (
-<motion.div
-  className="min-h-screen w-full max-w-[1400px] px-4 xs:px-2 sm:px-6 lg:px-8 mx-auto bg-gray-100 dark:bg-gray-900"
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.3 }}
->
-
-
-
-
+        <motion.div
+            className="min-h-screen w-full max-w-[1400px] px-4 xs:px-2 sm:px-6 lg:px-8 mx-auto bg-gray-100 dark:bg-gray-900"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+        >
             {renderHeader()}
             {renderDays()}
             {renderCells()}
 
             <AnimatePresence>
                 {clickedDate && tooltipContent.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed z-50 rounded-md border border-gray-300 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800"
-                        style={{
-                            top: tooltipPosition.top + 10,
-                            left: tooltipPosition.left,
-                            maxWidth: "320px",
-                        }}
-                    >
-                        <div className="mb-2 flex justify-between items-center">
-                            <span className="font-semibold text-gray-900 dark:text-white xs:text-xs lg:text-sm sm:text-sm">
-                                Doses on {format(clickedDate, "MMM d, yyyy")}
-                            </span>
-                            <button
-                                onClick={() => setClickedDate(null)}
-                                className="text-gray-500 hover:text-red-500 dark:hover:text-red-400"
-                            >
-                                ✕
-                            </button>
-                        </div>
-                        <div className="space-y-2 max-h-60 overflow-y-auto">
-                            {tooltipContent.map((item, i) => (
-                                <div key={i} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
-                                    <div className="font-medium text-blue-600 dark:text-blue-300 xs:text-xs lg:text-sm sm:text-sm">{item.newbornName}</div>
-                                    <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
-                                        <span className="font-medium">Vaccine:</span> {item.vaccineName}
+                    isMobile ? (
+                        <MobileModal
+                            date={clickedDate}
+                            content={tooltipContent}
+                            onClose={() => setClickedDate(null)}
+                        />
+                    ) : (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed z-50 rounded-md border border-gray-300 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                            style={{
+                                top: tooltipPosition.top + 10,
+                                left: tooltipPosition.left,
+                                maxWidth: "320px",
+                            }}
+                        >
+                            <div className="mb-2 flex justify-between items-center">
+                                <span className="font-semibold text-gray-900 dark:text-white xs:text-xs lg:text-sm sm:text-sm">
+                                    Doses on {format(clickedDate, "MMM d, yyyy")}
+                                </span>
+                                <button
+                                    onClick={() => setClickedDate(null)}
+                                    className="text-gray-500 hover:text-red-500 dark:hover:text-red-400"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                                {tooltipContent.map((item, i) => (
+                                    <div key={i} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
+                                        <div className="font-medium text-blue-600 dark:text-blue-300 xs:text-xs lg:text-sm sm:text-sm">{item.newbornName}</div>
+                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
+                                            <span className="font-medium">Vaccine:</span> {item.vaccineName}
+                                        </div>
+                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
+                                            <span className="font-medium">Dose:</span> {item.doseNumber}
+                                        </div>
+                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
+                                            <span className="font-medium">Status:</span>
+                                            <span
+                                                className={`ml-1 rounded px-1 py-0.5 xs:text-xs lg:text-sm sm:text-sm ${
+                                                    item.status === "On-Time"
+                                                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                                        : item.status === "Missed"
+                                                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                                }`}
+                                            >
+                                                {item.status}
+                                            </span>
+                                        </div>
+                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-700 dark:text-gray-300">
+                                            <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
+                                        </div>
                                     </div>
-                                    <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
-                                        <span className="font-medium">Dose:</span> {item.doseNumber}
-                                    </div>
-                                    <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
-                                        <span className="font-medium">Status:</span>
-                                        <span
-                                            className={`ml-1 rounded px-1 py-0.5 xs:text-xs lg:text-sm sm:text-sm ${
-                                                item.status === "On-Time"
-                                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                                    : item.status === "Missed"
-                                                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                                    : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                                            }`}
-                                        >
-                                            {item.status}
-                                        </span>
-                                    </div>
-                                    <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-700 dark:text-gray-300">
-                                        <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )
                 )}
             </AnimatePresence>
         </motion.div>

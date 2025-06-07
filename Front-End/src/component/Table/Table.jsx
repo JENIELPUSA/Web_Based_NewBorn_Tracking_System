@@ -73,33 +73,33 @@ function UserTable() {
 
     return (
         <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
-            {/* Header */}
-            <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">User List</h2>
-                <div className="flex items-center gap-2">
-                    <input
-                        type="text"
-                        placeholder="Search users..."
-                        className="input input-sm w-full rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-56"
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                    />
-                </div>
-            </div>
+   <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
+    <h2 className="text-lg font-semibold text-gray-800 dark:text-white">User List</h2>
+    <div className="flex items-center gap-2">
+        {/* This search input is always visible */}
+        <input
+            type="text"
+            placeholder="Search users..."
+            className="input input-sm w-full rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-56"
+            value={searchTerm}
+            onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+            }}
+        />
+    </div>
+</div>
 
-            {/* Add button on XS screens */}
-            <div className="mt-4 flex justify-center sm:hidden">
-                <button
-                    onClick={handleAddClick}
-                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                >
-                    <Plus className="h-5 w-5" />
-                    Add New Born
-                </button>
-            </div>
+{/* This Add button is only visible on small screens (hidden on sm and above) */}
+<div className="mt-4 flex justify-center sm:hidden">
+    <button
+        onClick={handleAddClick}
+        className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+    >
+        <Plus className="h-5 w-5" />
+        Add New Born
+    </button>
+</div>
 
             {/* Table View */}
             <div className="hidden overflow-x-auto sm:block">
