@@ -3,7 +3,7 @@ const VaccinationRecord = require("../Models/VaccinationRecord");
 const Notification = require("../Models/NotificationSchema");
 const User = require("../Models/usermodel");
 const socketIO = require("socket.io-client");
-const checkAllVaccinesAreUnvaccinated = require("../utils/checkAllVaccinesAreUnvaccinated");
+const checkAllVaccinesAreUnvaccinated = require("../utils/checkAllVaccinesAreUnvaccinated.js");
 const Newborn = require("../Models/NewBornmodel");
 const sendEmail = require("../Utils/email");
 //"http://localhost:3000"
