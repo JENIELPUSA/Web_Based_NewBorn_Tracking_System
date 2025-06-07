@@ -103,7 +103,7 @@ exports.displayAssignedVaccines = AsyncErrorHandler(async (req, res) => {
     },
     {
       $project: {
-        _id: 1, // 👈 Include AssignedVaccine _id
+        _id: 1, // Include AssignedVaccine _id
         newborn: 1,
         vaccine: 1,
         vaccineName: "$vaccineDetails.name",

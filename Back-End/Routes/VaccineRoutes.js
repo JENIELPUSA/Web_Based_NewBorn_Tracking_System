@@ -11,5 +11,8 @@ router
 .route("/:id")
 .patch(authController.protect,GetVacineController.UpdateVaccine)
 .delete(authController.protect,GetVacineController.deleteVaccine)
+router
+  .route("/VaccineReports")
+  .get(authController.protect, GetVacineController.getReportsVaccine)
 
 module.exports=router;

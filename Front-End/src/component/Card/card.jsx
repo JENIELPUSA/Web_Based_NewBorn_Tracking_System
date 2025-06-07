@@ -4,20 +4,23 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornContext";
 import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
 import { VaccineDisplayContext } from "../../contexts/VaccineContext/VaccineContext";
+import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
 
 const Card = () => {
     const { role } = useContext(AuthContext);
+    const { isTotalVacinated, isMaleVacinated, isFemaleVacinated } = useContext(VaccineRecordDisplayContext);
     const { Totalbaby, TotalMale, TotalFemale, newBorn } = useContext(NewBornDisplayContext);
     const { isTotal, isFemale, isMale } = useContext(UserDisplayContext);
-    const { totalVaccine, NotExpired, expired } = useContext(VaccineDisplayContext);
+    const { totalVaccine, NotExpired, expired,stocks } = useContext(VaccineDisplayContext);
 
     // Calculate percentages for baby
     const malePercentage = Totalbaby ? ((TotalMale / Totalbaby) * 100).toFixed(1) + "%" : "0%";
     const femalePercentage = Totalbaby ? ((TotalFemale / Totalbaby) * 100).toFixed(1) + "%" : "0%";
 
     // Calculate percentages
-    const TotalExpired = totalVaccine ? ((expired / totalVaccine) * 100).toFixed(1) + "%" : "0%";
-    const TotalNotExpired = totalVaccine ? ((NotExpired / totalVaccine) * 100).toFixed(1) + "%" : "0%";
+const TotalExpired = stocks ? ((expired / stocks) * 100).toFixed(1) + "%" : "0%";
+const TotalNotExpired = stocks ? ((NotExpired / stocks) * 100).toFixed(1) + "%" : "0%";
+
 
     const now = new Date();
     const currentMonth = now.getMonth(); // 0 = January
@@ -34,6 +37,9 @@ const Card = () => {
     const femaleCount = newbornsThisMonth.filter((nb) => nb.gender === "Female").length;
 
     const TotalnewbornsThisMonth = newbornsThisMonth.length;
+
+    const AllMale = isTotalVacinated ? ((isMaleVacinated / isTotalVacinated) * 100).toFixed(1) + "%" : "0%";
+    const AllFemale = isTotalVacinated ? ((isFemaleVacinated / isTotalVacinated) * 100).toFixed(1) + "%" : "0%";
 
     const TotalCurrentMale = TotalnewbornsThisMonth ? ((maleCount / TotalnewbornsThisMonth) * 100).toFixed(1) + "%" : "0%";
     const TotalCurrentFemale = TotalnewbornsThisMonth ? ((femaleCount / TotalnewbornsThisMonth) * 100).toFixed(1) + "%" : "0%";
@@ -59,10 +65,10 @@ const Card = () => {
     ];
 
     const BHWcards = [
-        { title: "Total Completed Vacination", value: "15,400", percentage: "+15%", icon: Syringe },
+        { title: "In-coming Schedule", value: "15,400", percentage: "+15%", icon: Syringe },
         { title: "New Born", value: TotalnewbornsThisMonth, percentage: `${TotalCurrentMale} Male | ${TotalCurrentFemale} Female`, icon: Baby },
-        { title: "Monthly Vaccinated", value: "8,300", percentage: "+10%", icon: Baby },
-        { title: "Total Vaccines Available", value: "18,700", percentage: "+18%", icon: ShieldCheck },
+        { title: "Monthly Vaccinated", value: isTotalVacinated, percentage: `${AllMale} Male | ${AllFemale} Female`, icon: Baby },
+        { title: "Total Stocks Available", value: stocks,icon: ShieldCheck },
     ];
 
     const renderCards = (cardList) => (

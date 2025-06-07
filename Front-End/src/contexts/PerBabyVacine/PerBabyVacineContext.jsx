@@ -41,6 +41,8 @@ export const VaccinePerProvider = ({ children }) => {
 
             const vaccineDAta = res?.data.data;
             setPerVaccine(vaccineDAta);
+
+            console.log("Per Baby",vaccineDAta)
         } catch (error) {
             toast.error("Failed to fetch data. Please try again later.");
             setCustomError("Failed to fetch data");
@@ -155,6 +157,7 @@ export const VaccinePerProvider = ({ children }) => {
                 removeAssignedVaccine,
                 setPerVaccine,
                 UpdateAssign,
+                fetchPerVaccine
             }}
         >
             {children}

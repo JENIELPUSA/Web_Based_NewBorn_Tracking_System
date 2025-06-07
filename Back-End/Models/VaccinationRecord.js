@@ -14,6 +14,10 @@ const doseSchema = new mongoose.Schema({
     type: String,
     enum: ["On-Time", "Delayed", "Missed"],
     required: true,
+  },
+  notified: {
+    type: Boolean,
+    default: false,
   }
 });
 

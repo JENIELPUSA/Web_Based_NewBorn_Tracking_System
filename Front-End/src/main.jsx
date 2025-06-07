@@ -12,26 +12,37 @@ import { VaccineDisplayProvider } from "./contexts/VaccineContext/VaccineContext
 import { VaccineRecordDisplayProvider } from "./contexts/VaccineRecordCxt/VaccineRecordContext.jsx";
 import { VaccinePerProvider } from "./contexts/PerBabyVacine/PerBabyVacineContext.jsx";
 import { LogDisplayProvider } from "./contexts/LogAndAuditContext/LogAuditContext.jsx";
+import { ProfillingDisplayProvider } from "./contexts/ProfillingContext/ProfillingContext.jsx";
+import SocketListener from "./component/SocketListener";
+import { NotificationDisplayProvider } from "./contexts/NotificationContext.jsx";
+import { ReportDisplayProvider } from "./contexts/Report/ReportContext.jsx";
 
 createRoot(document.getElementById("root")).render(
     //<StrictMode>
-        <ThemeProvider>
-            {" "}
-            <AuthProvider>
-                <LogDisplayProvider>
-                    <VaccinePerProvider>
-                        <VaccineDisplayProvider>
-                            <VaccineRecordDisplayProvider>
-                                <NewBornDisplayProvider>
-                                    <UserDisplayProvider>
-                                        <App />
-                                    </UserDisplayProvider>
-                                </NewBornDisplayProvider>
-                            </VaccineRecordDisplayProvider>
-                        </VaccineDisplayProvider>
-                    </VaccinePerProvider>
-                </LogDisplayProvider>
-            </AuthProvider>
-        </ThemeProvider>
+    <ThemeProvider>
+        {" "}
+        <AuthProvider>
+            <ReportDisplayProvider>
+                <NotificationDisplayProvider>
+                    <ProfillingDisplayProvider>
+                        <LogDisplayProvider>
+                            <VaccinePerProvider>
+                                <VaccineDisplayProvider>
+                                    <VaccineRecordDisplayProvider>
+                                        <NewBornDisplayProvider>
+                                            <UserDisplayProvider>
+                                                <App />
+                                                <SocketListener />
+                                            </UserDisplayProvider>
+                                        </NewBornDisplayProvider>
+                                    </VaccineRecordDisplayProvider>
+                                </VaccineDisplayProvider>
+                            </VaccinePerProvider>
+                        </LogDisplayProvider>
+                    </ProfillingDisplayProvider>
+                </NotificationDisplayProvider>
+            </ReportDisplayProvider>
+        </AuthProvider>
+    </ThemeProvider>,
     //</StrictMode>,
 );

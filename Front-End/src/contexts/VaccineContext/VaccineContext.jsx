@@ -15,9 +15,10 @@ export const VaccineDisplayProvider = ({ children }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
-    const [totalVaccine,setTotalVaccine]=useState("")
-    const [expired,setExpired]=useState("")
-    const [NotExpired,setNotExpired]=useState("")
+    const [totalVaccine, setTotalVaccine] = useState("");
+    const [expired, setExpired] = useState("");
+    const [NotExpired, setNotExpired] = useState("");
+    const [stocks, setstocks] = useState("");
     // Get token from localStorage
     const [usersPerPage, setusersPerPage] = useState(6);
 
@@ -41,6 +42,36 @@ export const VaccineDisplayProvider = ({ children }) => {
         }
     }, [customError]);
 
+useEffect(() => {
+  const now = new Date();
+
+  let expired = 0;
+  let notExpired = 0;
+  let totalStocks = 0;
+
+  vaccine.forEach((vax) => {
+    vax.batches?.forEach((batch) => {
+      const expDate = new Date(batch.expirationDate);
+      const stock = Number(batch.stock || 0);
+
+      if (expDate < now) {
+        expired += stock;
+      } else {
+        notExpired += stock;
+      }
+
+      totalStocks += stock;
+    });
+  });
+
+  setExpired(expired);
+  setNotExpired(notExpired);
+  setstocks(totalStocks);
+  setTotalVaccine(vaccine.length); // optional
+}, [vaccine]);
+
+
+
     const fetchVaccineContext = async () => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data
@@ -51,13 +82,17 @@ export const VaccineDisplayProvider = ({ children }) => {
             });
 
             const vaccineDAta = res?.data.data;
-            const TotalVaccine=res?.data.totalVaccine
-            const Expired=res?.data.totals.expired
-            const NotExpiries=res?.data.totals.notExpired
-            setNotExpired(NotExpiries)
-            setExpired(Expired)
-            setTotalVaccine(TotalVaccine)
+            const TotalVaccine = res?.data.totalVaccine;
+            const TotalStocks = res?.data.totals.totalStock;
+            const Expired = res?.data.totals.expired;
+            const NotExpiries = res?.data.totals.notExpired;
+            setNotExpired(NotExpiries);
+            setExpired(Expired);
+            setTotalVaccine(TotalVaccine);
             setVaccine(vaccineDAta);
+            setstocks(TotalStocks);
+
+            console.log("Stocks",TotalStocks)
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Failed to fetch data. Please try again later.");
@@ -76,7 +111,6 @@ export const VaccineDisplayProvider = ({ children }) => {
                     description: values.description,
                     dosage: values.dosage,
                     brand: values.brand,
-                    zone: values.zone,
                     stock: values.stock,
                     expirationDate: values.expirationDate,
                 },
@@ -90,20 +124,18 @@ export const VaccineDisplayProvider = ({ children }) => {
                 const newVaccines = Array.isArray(res.data.data) ? res.data.data : [res.data.data];
 
                 setVaccine((prev) => {
-                    const newVaccine = res.data.data;
+                    const updated = [...prev];
 
-                    // If the vaccine exists, update it
-                    const existingIndex = prev.findIndex((v) => v._id === newVaccine._id);
+                    newVaccines.forEach((newVaccine) => {
+                        const existingIndex = updated.findIndex((v) => v._id === newVaccine._id);
+                        if (existingIndex !== -1) {
+                            updated[existingIndex] = newVaccine;
+                        } else {
+                            updated.push(newVaccine);
+                        }
+                    });
 
-                    if (existingIndex !== -1) {
-                        // Replace the existing vaccine with the updated one (with new batch)
-                        const updated = [...prev];
-                        updated[existingIndex] = newVaccine;
-                        return updated;
-                    } else {
-                        // If it's a new vaccine, add it
-                        return [...prev, newVaccine];
-                    }
+                    return updated;
                 });
 
                 setModalStatus("success");
@@ -124,102 +156,84 @@ export const VaccineDisplayProvider = ({ children }) => {
         }
     };
 
-const DeleteData = async (vaccineId, batchId = null) => {
-    try {
-        const config = {
-            headers: { Authorization: `Bearer ${authToken}` },
-            data: batchId ? { batchId } : undefined, // Only send body if batchId exists
-        };
+    const DeleteData = async (vaccineId, batchId = null) => {
+        try {
+            const config = {
+                headers: { Authorization: `Bearer ${authToken}` },
+                data: batchId ? { batchId } : undefined, // Only send body if batchId exists
+            };
 
-        const response = await axios.delete(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/${vaccineId}`,
-            config
-        );
+            const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/${vaccineId}`, config);
 
-        if (response.data.status === "success") {
-            if (batchId) {
-                // Batch deletion: update vaccine in state or remove if no batches remain
-                const updated = response.data.data;
-                if (updated) {
-                    setVaccine((prev) =>
-                        prev.map((v) => (v._id === updated._id ? updated : v))
-                    );
+            if (response.data.status === "success") {
+                if (batchId) {
+                    // Batch deletion: update vaccine in state or remove if no batches remain
+                    const updated = response.data.data;
+                    if (updated) {
+                        setVaccine((prev) => prev.map((v) => (v._id === updated._id ? updated : v)));
+                    } else {
+                        setVaccine((prev) => prev.filter((v) => v._id !== vaccineId));
+                    }
                 } else {
+                    // Full vaccine deletion
                     setVaccine((prev) => prev.filter((v) => v._id !== vaccineId));
                 }
+
+                setModalStatus("success");
+                setShowModal(true);
             } else {
-                // Full vaccine deletion
-                setVaccine((prev) => prev.filter((v) => v._id !== vaccineId));
+                setModalStatus("failed");
+                setShowModal(true);
+                toast.error("Unexpected response from server.");
             }
-
-            setModalStatus("success");
-            setShowModal(true);
-        } else {
-            setModalStatus("failed");
-            setShowModal(true);
-            toast.error("Unexpected response from server.");
+        } catch (error) {
+            console.error("Error deleting vaccine:", error);
+            toast.error(error.response?.data?.message || "Failed to delete vaccine.");
         }
-    } catch (error) {
-        console.error("Error deleting vaccine:", error);
-        toast.error(error.response?.data?.message || "Failed to delete vaccine.");
-    }
-};
+    };
 
+    const UpdateData = async (vaccineId, values) => {
+        try {
+            const dataToSend = {
+                vaccineId: vaccineId,
+                batchId: values.batchId, // <-- include this to identify which batch to update
+                name: values.name || "",
+                description: values.description || "",
+                dosage: values.dosage || "",
+                brand: values.brand || "",
+                zone: values.zone || "",
+                stock: values.stock, // optional but important for batch update
+                expirationDate: values.expirationDate, // optional
+            };
 
-const UpdateData = async (vaccineId, values) => {
-    try {
-        const dataToSend = {
-            vaccineId: vaccineId,
-            batchId: values.batchId,  // <-- include this to identify which batch to update
-            name: values.name || "",
-            description: values.description || "",
-            dosage: values.dosage || "",
-            brand: values.brand || "",
-            zone: values.zone || "",
-            stock: values.stock,  // optional but important for batch update
-            expirationDate: values.expirationDate, // optional
-        };
-
-        const response = await axios.patch(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/${vaccineId}`,
-            dataToSend,
-            {
+            const response = await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/${vaccineId}`, dataToSend, {
                 headers: { Authorization: `Bearer ${authToken}` },
+            });
+
+            if (response.data?.status === "success") {
+                setVaccine((prevVaccines) => prevVaccines.map((v) => (v._id === response.data.data._id ? response.data.data : v)));
+                setModalStatus("success");
+                setShowModal(true);
+            } else {
+                setModalStatus("failed");
+                setShowModal(true);
             }
-        );
-
-        if (response.data?.status === "success") {
-            setVaccine((prevVaccines) =>
-                prevVaccines.map((v) =>
-                    v._id === response.data.data._id ? response.data.data : v
-                )
-            );
-            setModalStatus("success");
-            setShowModal(true);
-        } else {
-            setModalStatus("failed");
-            setShowModal(true);
+        } catch (error) {
+            if (error.response?.data) {
+                const message = error.response.data.message || error.response.data.error || "Something went wrong.";
+                setCustomError(message);
+            } else if (error.request) {
+                setCustomError("No response from the server.");
+            } else {
+                setCustomError(error.message || "Unexpected error occurred.");
+            }
         }
-    } catch (error) {
-        if (error.response?.data) {
-            const message =
-                error.response.data.message ||
-                error.response.data.error ||
-                "Something went wrong.";
-            setCustomError(message);
-        } else if (error.request) {
-            setCustomError("No response from the server.");
-        } else {
-            setCustomError(error.message || "Unexpected error occurred.");
-        }
-    }
-};
-
-
+    };
 
     return (
         <VaccineDisplayContext.Provider
             value={{
+                stocks,
                 NotExpired,
                 expired,
                 totalVaccine,
@@ -228,7 +242,7 @@ const UpdateData = async (vaccineId, values) => {
                 vaccine,
                 VaccineAdd,
                 DeleteData,
-                fetchVaccineContext
+                fetchVaccineContext,
             }}
         >
             {children}

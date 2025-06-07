@@ -14,6 +14,7 @@ function UserTable() {
     const [isAddFormOpen, setAddFormOpen] = useState(false);
     const [isVerification, setVerification] = useState(false);
     const [isDeleteID, setIsDeleteId] = useState("");
+    console.log("para sa user",users)
 
     const filteredUsers = useMemo(() => {
         return users.filter((user) =>
@@ -271,7 +272,7 @@ function UserTable() {
                         Page {currentPage} of {totalPages} • {filteredUsers.length} users
                     </span>
                     <button
-                        className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
+                        className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white"}`}
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
                     >

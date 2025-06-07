@@ -280,7 +280,7 @@ exports.forgotPassword = AsyncErrorHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Generate the reset URL
-  const resetUrl = `https://myapp-xk0w.onrender.com/reset_password/${resetToken}`;
+  const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
   const message = `We have received a password reset request. Please use the below link to reset your password:\n\n${resetUrl} \n\nThis reset password link will be available for 10 minutes.`;
 
   try {

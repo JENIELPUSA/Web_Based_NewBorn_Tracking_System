@@ -1,11 +1,12 @@
 const AsyncErrorHandler = require("../Utils/AsyncErrorHandler");
 const VaccineRecord = require("../Models/VaccinationRecord");
-const Vaccine = require("./../Models/VaccineModel")
+const Vaccine = require("./../Models/VaccineModel");
 const CustomError = require("./../Utils/CustomError");
 const Apifeatures = require("./../Utils/ApiFeatures");
 const mongoose = require("mongoose");
-const AuditLog=require("./../Models/LogAndAudit")
+const AuditLog = require("./../Models/LogAndAudit");
 const getClientIp = require("./../Utils/getClientIp");
+const checkAllVaccinesCompleted = require("../Utils/checkAllVaccinesCompleted");
 
 exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   const {
@@ -46,7 +47,9 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
     .sort((a, b) => new Date(a.expirationDate) - new Date(b.expirationDate));
 
   if (validBatches.length === 0) {
-    return res.status(400).json({ message: "No available stock in any batch." });
+    return res
+      .status(400)
+      .json({ message: "No available stock in any batch." });
   }
 
   const selectedBatch = validBatches[0];
@@ -177,7 +180,8 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
     });
   }
 
-  const latestDose = populatedRecord[0].doses[populatedRecord[0].doses.length - 1];
+  const latestDose =
+    populatedRecord[0].doses[populatedRecord[0].doses.length - 1];
 
   // Step 5: Create audit log
   const auditLog = new AuditLog({
@@ -197,14 +201,13 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
 
   await auditLog.save();
 
+  await checkAllVaccinesCompleted(newborn, req.app.get("io"));
+
   res.status(201).json({
     status: "success",
     data: populatedRecord[0],
   });
 });
-
-
-
 
 exports.DisplayVaccinationRecord = async (req, res) => {
   try {
@@ -264,7 +267,9 @@ exports.DisplayVaccinationRecord = async (req, res) => {
           "doses.administeredBy": {
             $cond: {
               if: { $ifNull: ["$doseAdmin", false] },
-              then: { $concat: ["$doseAdmin.FirstName", " ", "$doseAdmin.LastName"] },
+              then: {
+                $concat: ["$doseAdmin.FirstName", " ", "$doseAdmin.LastName"],
+              },
               else: null,
             },
           },
@@ -275,7 +280,21 @@ exports.DisplayVaccinationRecord = async (req, res) => {
               else: null,
             },
           },
-           "doses.zone": {
+             "doses.DesignatedZone": {
+            $cond: {
+              if: { $ifNull: ["$doseAdmin", false] },
+              then: "$doseAdmin.DesignatedZone",
+              else: null,
+            },
+          },
+            "doses.email": {
+            $cond: {
+              if: { $ifNull: ["$doseAdmin", false] },
+              then: "$doseAdmin.email",
+              else: null,
+            },
+          },
+          "doses.zone": {
             $cond: {
               if: { $ifNull: ["$doseAdmin", false] },
               then: "$doseAdmin.zone",
@@ -290,15 +309,24 @@ exports.DisplayVaccinationRecord = async (req, res) => {
         $group: {
           _id: "$_id",
           doses: { $push: "$doses" },
-          newbornName: { $first: { $concat: ["$newborn.firstName", " ", "$newborn.lastName"] } },
+          newbornName: {
+            $first: {
+              $concat: ["$newborn.firstName", " ", "$newborn.lastName"],
+            },
+          }, 
+          dateOfBirth: { $first: "$newborn.dateOfBirth" },
           avatar: { $first: "$newborn.avatar" },
+          gender: { $first: "$newborn.gender" },
           vaccineName: { $first: "$vaccine.name" },
           dosage: { $first: "$vaccine.dosage" },
           description: { $first: "$vaccine.description" },
-          motherName: { $first: { $concat: ["$mother.FirstName", " ", "$mother.LastName"] } },
-          FullAddress: { $first: { $concat: ["$mother.zone", " ", "$mother.address"] } },
-                    newbornZone: { $first: "$mother.zone" },
-  
+          motherName: {
+            $first: { $concat: ["$mother.FirstName", " ", "$mother.LastName"] },
+          },
+          FullAddress: {
+            $first: { $concat: ["$mother.zone", " ", "$mother.address"] },
+          },
+          newbornZone: { $first: "$mother.zone" },
         },
       },
 
@@ -309,15 +337,21 @@ exports.DisplayVaccinationRecord = async (req, res) => {
           recordId: "$_id",
           doses: 1, // This will include the dose data with separated full name and ID for administeredBy
           newbornName: 1,
+          gender:1,
           avatar: 1,
           vaccineName: 1,
           dosage: 1,
           description: 1,
           motherName: 1,
           FullAddress: 1,
-          newbornZone:1
-        },  
-      },
+          newbornZone: 1,
+           dateOfBirth: {
+      $dateToString: {
+        format: "%Y-%m-%d",
+        date: "$dateOfBirth"
+      }
+        },
+      }},
     ]);
 
     res.status(200).json({ status: "success", data: records });
@@ -327,17 +361,20 @@ exports.DisplayVaccinationRecord = async (req, res) => {
   }
 };
 
-
 exports.UpdateRecord = AsyncErrorHandler(async (req, res, next) => {
   const { recordId, doseId } = req.params;
   const ipAddress = getClientIp(req);
   const userId = req.user._id;
 
   // Validate ObjectIds
-  if (!mongoose.isValidObjectId(recordId) || !mongoose.isValidObjectId(doseId)) {
+  if (
+    !mongoose.isValidObjectId(recordId) ||
+    !mongoose.isValidObjectId(doseId)
+  ) {
     return res.status(400).json({
       status: "fail",
-      message: "Invalid ID format - both recordId and doseId must be valid MongoDB ObjectIds",
+      message:
+        "Invalid ID format - both recordId and doseId must be valid MongoDB ObjectIds",
     });
   }
 
@@ -358,7 +395,7 @@ exports.UpdateRecord = AsyncErrorHandler(async (req, res, next) => {
 
   // Build update fields (exclude 'administeredBy')
   const updateFields = {};
-  const validFields = ['dateGiven', 'next_due_date', 'remarks', 'status'];
+  const validFields = ["dateGiven", "next_due_date", "remarks", "status"];
 
   for (const field of validFields) {
     if (req.body[field] !== undefined) {
@@ -433,7 +470,9 @@ exports.UpdateRecord = AsyncErrorHandler(async (req, res, next) => {
         "doses.administeredByName": {
           $cond: {
             if: { $ifNull: ["$doseAdmin", false] },
-            then: { $concat: ["$doseAdmin.FirstName", " ", "$doseAdmin.LastName"] },
+            then: {
+              $concat: ["$doseAdmin.FirstName", " ", "$doseAdmin.LastName"],
+            },
             else: null,
           },
         },
@@ -445,7 +484,9 @@ exports.UpdateRecord = AsyncErrorHandler(async (req, res, next) => {
       $project: {
         dose: "$doses",
         recordId: "$_id",
-        newbornName: { $concat: ["$newborn.firstName", " ", "$newborn.lastName"] },
+        newbornName: {
+          $concat: ["$newborn.firstName", " ", "$newborn.lastName"],
+        },
         avatar: "$newborn.avatar",
         vaccineName: "$vaccine.name",
         dosage: "$vaccine.dosage",
@@ -491,37 +532,37 @@ exports.UpdateRecord = AsyncErrorHandler(async (req, res, next) => {
   });
 });
 
-
-
-
-
-
 exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
   const { recordId, doseId } = req.params;
- const userId = req.user._id;
-   const ipAddress = getClientIp(req);
+  const userId = req.user._id;
+  const ipAddress = getClientIp(req);
 
-  if (!mongoose.isValidObjectId(recordId) || !mongoose.isValidObjectId(doseId)) {
+  if (
+    !mongoose.isValidObjectId(recordId) ||
+    !mongoose.isValidObjectId(doseId)
+  ) {
     return res.status(400).json({
       status: "fail",
-      message: "Invalid ID format - both IDs must be 24-character hex strings"
+      message: "Invalid ID format - both IDs must be 24-character hex strings",
     });
   }
 
   const recordExists = await VaccineRecord.findOne({
     _id: recordId,
-    "doses._id": doseId
+    "doses._id": doseId,
   });
 
   if (!recordExists) {
     return res.status(404).json({
       status: "fail",
-      message: "No matching record or dose found"
+      message: "No matching record or dose found",
     });
   }
 
   // Find the dose being deleted (for audit logging)
-  const doseToDelete = recordExists.doses.find(d => d._id.toString() === doseId);
+  const doseToDelete = recordExists.doses.find(
+    (d) => d._id.toString() === doseId
+  );
 
   //Delete the dose
   const updatedRecord = await VaccineRecord.findByIdAndUpdate(
@@ -530,10 +571,13 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
     { new: true }
   );
 
-  if (!updatedRecord || updatedRecord.doses.some(dose => dose._id.toString() === doseId)) {
+  if (
+    !updatedRecord ||
+    updatedRecord.doses.some((dose) => dose._id.toString() === doseId)
+  ) {
     return res.status(500).json({
       status: "error",
-      message: "Failed to delete dose"
+      message: "Failed to delete dose",
     });
   }
 
@@ -550,60 +594,96 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
       description: `Deleted last dose, entire vaccine record removed`,
       details: {
         deletedDose: doseToDelete,
-        after: "No remaining doses"
+        after: "No remaining doses",
       },
-      ipAddress: ipAddress || req.ip
+      ipAddress: ipAddress || req.ip,
     });
 
     await auditLog.save();
 
     return res.status(200).json({
       status: "success",
-      message: "Dose deleted and record removed because no doses remain."
+      message: "Dose deleted and record removed because no doses remain.",
     });
   }
 
   // Aggregate the updated record for return and logging
   const populatedRecord = await VaccineRecord.aggregate([
     { $match: { _id: updatedRecord._id } },
-    { $lookup: { from: "newborns", localField: "newborn", foreignField: "_id", as: "newborn" } },
+    {
+      $lookup: {
+        from: "newborns",
+        localField: "newborn",
+        foreignField: "_id",
+        as: "newborn",
+      },
+    },
     { $unwind: "$newborn" },
-    { $lookup: { from: "vaccines", localField: "vaccine", foreignField: "_id", as: "vaccine" } },
+    {
+      $lookup: {
+        from: "vaccines",
+        localField: "vaccine",
+        foreignField: "_id",
+        as: "vaccine",
+      },
+    },
     { $unwind: "$vaccine" },
-    { $lookup: { from: "users", localField: "newborn.motherName", foreignField: "_id", as: "mother" } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "newborn.motherName",
+        foreignField: "_id",
+        as: "mother",
+      },
+    },
     { $unwind: "$mother" },
     { $unwind: "$doses" },
-    { $lookup: { from: "users", localField: "doses.administeredBy", foreignField: "_id", as: "doseAdmin" } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "doses.administeredBy",
+        foreignField: "_id",
+        as: "doseAdmin",
+      },
+    },
     {
       $unwind: {
         path: "$doseAdmin",
-        preserveNullAndEmptyArrays: true
-      }
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $addFields: {
         "doses.administeredByName": {
           $cond: {
             if: { $ifNull: ["$doseAdmin", false] },
-            then: { $concat: ["$doseAdmin.FirstName", " ", "$doseAdmin.LastName"] },
-            else: null
-          }
+            then: {
+              $concat: ["$doseAdmin.FirstName", " ", "$doseAdmin.LastName"],
+            },
+            else: null,
+          },
         },
-        "doses.administeredById": "$doseAdmin._id"
-      }
+        "doses.administeredById": "$doseAdmin._id",
+      },
     },
     {
       $group: {
         _id: "$_id",
         doses: { $push: "$doses" },
-        newbornName: { $first: { $concat: ["$newborn.firstName", " ", "$newborn.lastName"] } },
+        newbornName: {
+          $first: { $concat: ["$newborn.firstName", " ", "$newborn.lastName"] },
+        },
         avatar: { $first: "$newborn.avatar" },
         vaccineName: { $first: "$vaccine.name" },
         dosage: { $first: "$vaccine.dosage" },
         description: { $first: "$vaccine.description" },
-        motherName: { $first: { $concat: ["$mother.FirstName", " ", "$mother.LastName"] } },
-        FullAddress: { $first: { $concat: ["$mother.zone", " ", "$mother.address"] } }
-      }
+        motherName: {
+          $first: { $concat: ["$mother.FirstName", " ", "$mother.LastName"] },
+        },
+        FullAddress: {
+          $first: { $concat: ["$mother.zone", " ", "$mother.address"] },
+        },
+      },
     },
     {
       $project: {
@@ -615,15 +695,15 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
         dosage: 1,
         description: 1,
         motherName: 1,
-        FullAddress: 1
-      }
-    }
+        FullAddress: 1,
+      },
+    },
   ]);
 
   if (!populatedRecord.length) {
     return res.status(404).json({
       status: "fail",
-      message: "Record or doses not found after deletion"
+      message: "Record or doses not found after deletion",
     });
   }
 
@@ -641,21 +721,19 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
       newbornName: result.newbornName,
       vaccineName: result.vaccineName,
       before: doseToDelete,
-      after: result.doses.map(d => ({
+      after: result.doses.map((d) => ({
         doseNumber: d.doseNumber,
         dateGiven: d.dateGiven,
-        status: d.status
-      }))
+        status: d.status,
+      })),
     },
-    ipAddress: ipAddress 
+    ipAddress: ipAddress,
   });
 
   await auditLog.save();
 
   res.status(200).json({
     status: "success",
-    data: result
+    data: result,
   });
 });
-
-

@@ -3,9 +3,8 @@ const mongoose = require("mongoose");
 const vaccineSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
-  dosage: String, // e.g., "0.5 mL", "10 mcg"
+  dosage: String, 
   brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' }, // <- Reference to Brand
-  zone: String,
   batches: [
     {
       stock: { type: Number, required: true },

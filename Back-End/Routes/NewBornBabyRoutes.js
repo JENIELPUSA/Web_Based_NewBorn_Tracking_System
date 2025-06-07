@@ -16,4 +16,7 @@ router
 router
   .route("/DisplayGraph")
   .get(authController.protect, GetbabyController.DisplayGraph)
+router
+.route("/GetBabyReport")
+.get(authController.protect, GetbabyController.getReportsNewborn)
 module.exports = router;

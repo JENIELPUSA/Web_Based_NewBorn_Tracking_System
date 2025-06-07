@@ -8,7 +8,7 @@ export const UserDisplayContext = createContext();
 //mo siya sa reausable axiosInstances.jsx
 export const UserDisplayProvider = ({ children }) => {
     const [customError, setCustomError] = useState("");
-    const { authToken,zone,role } = useContext(AuthContext);
+    const { authToken, zone, role } = useContext(AuthContext);
     const [users, setUsers] = useState([]); // Initialize equipment state
     const [loading, setLoading] = useState(true); // Initialize loading state
     const [error, setError] = useState(null); // Initialize error state
@@ -17,9 +17,9 @@ export const UserDisplayProvider = ({ children }) => {
     const [modalStatus, setModalStatus] = useState("success");
     // Get token from localStorage
     const [usersPerPage, setusersPerPage] = useState(6);
-    const [isTotal,setTotal]=useState("")
-    const [isMale,setMale]=useState("")
-    const [isFemale,setFemale]=useState("")
+    const [isTotal, setTotal] = useState("");
+    const [isMale, setMale] = useState("");
+    const [isFemale, setFemale] = useState("");
 
     useEffect(() => {
         if (!authToken) {
@@ -30,6 +30,17 @@ export const UserDisplayProvider = ({ children }) => {
 
         fetchUserData();
     }, [authToken]); // Dependencies to trigger effect when page or items per page change
+    //para mag refresh satwing maybagong data
+    useEffect(() => {
+        if (!users || users.length === 0) return;
+
+        const male = users.filter((u) => u.gender === "Male").length;
+        const female = users.filter((u) => u.gender === "Female").length;
+
+        setMale(male);
+        setFemale(female);
+        setTotal(users.length);
+    }, [users]);
 
     useEffect(() => {
         if (customError) {
@@ -49,15 +60,7 @@ export const UserDisplayProvider = ({ children }) => {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
-
-            const userData = res?.data.data;
-            const TotalUser=res?.data.totalUser
-            const TotalMale=res?.data.totalMale
-            const TotalFemale=res?.data.totalFemale
-            setFemale(TotalFemale)
-            setMale(TotalMale)
-            setTotal(TotalUser)
-            setUsers(userData);
+            setUsers(res.data.data)
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Failed to fetch data. Please try again later.");
@@ -83,9 +86,7 @@ export const UserDisplayProvider = ({ children }) => {
                     phoneNumber: values.phoneNumber,
                     dateOfBirth: values.dateOfBirth,
                     gender: values.gender,
-                    Designatedzone: values.Designatedzone
-                    
-
+                    Designatedzone: values.Designatedzone,
                 },
                 {
                     headers: { Authorization: `Bearer ${authToken}` },
@@ -96,7 +97,7 @@ export const UserDisplayProvider = ({ children }) => {
                 setModalStatus("success");
                 setShowModal(true);
 
-                console.log("DESI",res.data.data)
+                console.log("DESI", res.data.data);
             } else {
                 setModalStatus("failed");
                 setShowModal(true);

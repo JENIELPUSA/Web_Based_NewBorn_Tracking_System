@@ -5,6 +5,7 @@ const Apifeatures = require("./../Utils/ApiFeatures");
 const mongoose = require("mongoose");
 const AuditLog=require("./../Models/LogAndAudit")
 const getClientIp = require("./../Utils/getClientIp");
+const PDFDocument = require('pdfkit');
 
 exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   const { firstName, lastName, dateOfBirth, gender, birthWeight, motherName, birthHeight } = req.body;
@@ -375,7 +376,7 @@ exports.UpdateBabyData = AsyncErrorHandler(async (req, res, next) => {
     });
   }
 
-  // 📝 Save audit log
+  // Save audit log
   const auditLog = new AuditLog({
     userId,
     action: "Update Newborn Record",
@@ -422,6 +423,11 @@ exports.DisplayGraph = AsyncErrorHandler(async(req,res,next)=>{
   // Get IDs after filtering and pagination
   const filteredBabies = await features.query;
   const ids = filteredBabies.map((baby) => baby._id);
+  const newborns = aggregationResult.length > 0 ? aggregationResult[0].data : [];
+
+if (!newborns || newborns.length === 0) {
+    return next(new CustomError('No newborn profile data found for the selected date range.', 404));
+}
 
   // Perform aggregation with $lookup, $project, and gender counting
   const result = await NewBaby.aggregate([
@@ -545,3 +551,290 @@ exports.DisplayGraph = AsyncErrorHandler(async(req,res,next)=>{
 
 })
 
+
+
+exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
+    try {
+        const { from, to } = req.query; // Date range mula sa query params (format:YYYY-MM-DD)
+
+        // Siguraduhin na ang `from` at `to` ay valid date strings
+        const fromDate = new Date(from);
+        let toDate = new Date(to);
+
+        // I-validate ang mga petsa
+        if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+            return next(new CustomError('Invalid date format. Please use ISO 8601 format (YYYY-MM-DD).', 400));
+        }
+
+        // Ayusin ang toDate para isama ang buong araw
+        toDate.setHours(23, 59, 59, 999);
+
+        // Kunin ang profile data na may date filtering gamit ang aggregation
+        const aggregationResult = await NewBaby.aggregate([
+            {
+                $match: {
+                    dateOfBirth: { $gte: fromDate, $lte: toDate },
+                },
+            },
+            // Lookup para sa 'addedBy' user
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "addedBy",
+                    foreignField: "_id",
+                    as: "addedBy",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$addedBy",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            // Lookup para sa 'motherDetails' (na galing sa User model)
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "motherName", // <--- Ginamit na ang 'motherName' as per your schema!
+                    foreignField: "_id",
+                    as: "motherDetails", // Gamitin pa rin ang 'motherDetails' para maiwasan ang conflict sa '$project'
+                },
+            },
+            {
+                $unwind: {
+                    path: "$motherDetails",
+                    preserveNullAndEmptyArrays: true, // Mahalaga ito kung optional ang motherName o posibleng hindi makita ang User
+                }
+            },
+            {
+                $project: {
+                    // Newborn's own details
+                    firstName: 1,
+                    middleName: 1,
+                    lastName: 1,
+                    newbornName: {
+                        $concat: ["$firstName", " ", "$middleName", " ", "$lastName"],
+                    },
+                    dateOfBirth: {
+                        $dateToString: {
+                            format: "%b %d, %Y",
+                            date: "$dateOfBirth",
+                        },
+                    },
+                    gender: 1,
+                    birthWeight: { $concat: [ { $toString: "$birthWeight" }, " kg" ] },
+                    birthHeight: { $concat: [ { $toString: "$birthHeight" }, " cm" ] },
+
+                    // Mother's details (galing sa motherDetails lookup)
+                    motherName: {
+                        $cond: {
+                            if: { $eq: [{ $type: "$motherDetails" }, "object"] },
+                            then: { $concat: ["$motherDetails.FirstName", " ", "$motherDetails.LastName"] }, // Assuming 'firstName' and 'lastName' in User model
+                            else: "Unknown",
+                        },
+                    },
+                    motherPhoneNumber: {
+                        $cond: {
+                            if: { $eq: [{ $type: "$motherDetails" }, "object"] },
+                            then: "$motherDetails.phoneNumber",
+                            else: "N/A",
+                        },
+                    },
+                    motherAddressZone: {
+                        $cond: {
+                            if: { $eq: [{ $type: "$motherDetails" }, "object"] },
+                            then: { $concat: ["$motherDetails.address", ", ", "$motherDetails.zone"] },
+                            else: "N/A",
+                        },
+                    },
+                    // addedByName (from addedBy lookup)
+                    addedByName: {
+                        $cond: {
+                            if: { $eq: [{ $type: "$addedBy" }, "object"] },
+                            then: { $concat: ["$addedBy.FirstName", " ", "$addedBy.LastName"] }, // Assuming 'firstName' and 'lastName' in User model
+                            else: "Unknown",
+                        },
+                    },
+                    createdAt: 1,
+                },
+            },
+            { $sort: { newbornName: 1 } },
+            // Grouping for total counts (optional, remove if not needed for the PDF)
+            {
+                $group: {
+                    _id: null,
+                    totalMale: {
+                        $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] },
+                    },
+                    totalFemale: {
+                        $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] },
+                    },
+                    totalRecords: { $sum: 1 },
+                    data: { $push: "$$ROOT" },
+                },
+            },
+        ]);
+
+        const newborns = aggregationResult.length > 0 ? aggregationResult[0].data : [];
+
+        if (!newborns || newborns.length === 0) {
+            return next(new CustomError('No newborn profile data found for the selected date range.', 404));
+        }
+
+        // --- PDF Document Setup ---
+        const doc = new PDFDocument({ layout: 'landscape', margin: 30 });
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=newborn_profile_report_${from}_to_${to}.pdf`);
+
+        doc.pipe(res);
+
+        // --- Helper Function to Draw Table ---
+        function drawTable(doc, data, headers, startY, startX, colWidths, options = {}) {
+            let y = startY;
+            let x = startX;
+            const cellPadding = options.cellPadding || 5;
+            const headerFillColor = options.headerFillColor || '#CCCCCC';
+            const rowFillColor1 = options.rowFillColor1 || '#F0F0F0';
+            const rowFillColor2 = options.rowFillColor2 || '#FFFFFF';
+            const textColor = options.textColor || '#000000';
+            const headerFontSize = options.headerFontSize || 10;
+            const rowFontSize = options.rowFontSize || 9;
+            const borderWidth = options.borderWidth || 0.5;
+
+            doc.lineWidth(borderWidth);
+            doc.strokeColor(textColor);
+
+            // Draw Headers
+            doc.font('Helvetica-Bold').fontSize(headerFontSize);
+            doc.fillColor(headerFillColor).rect(x, y, colWidths.reduce((a, b) => a + b, 0), 25).fill();
+            doc.fillColor(textColor);
+
+            let currentHeaderX = x;
+            headers.forEach((header, i) => {
+                doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
+                    width: colWidths[i] - 2 * cellPadding,
+                    align: 'left',
+                    lineBreak: true
+                });
+                currentHeaderX += colWidths[i];
+            });
+            y += 25;
+
+            doc.font('Helvetica').fontSize(rowFontSize);
+
+            // Draw Data Rows
+            data.forEach((row, rowIndex) => {
+                let maxRowHeight = 0;
+                // Calculate max row height based on content
+                headers.forEach((header, i) => {
+                    const value = row[header] !== undefined && row[header] !== null ? row[header].toString() : 'N/A';
+                    const textHeight = doc.heightOfString(value, {
+                        width: colWidths[i] - 2 * cellPadding,
+                        lineBreak: true
+                    });
+                    maxRowHeight = Math.max(maxRowHeight, textHeight + 2 * cellPadding);
+                });
+
+                // Check for new page before drawing a row
+                if (y + maxRowHeight > doc.page.height - doc.page.margins.bottom) {
+                    doc.addPage();
+                    y = doc.page.margins.top;
+                    currentHeaderX = x;
+                    doc.font('Helvetica-Bold').fontSize(headerFontSize);
+                    doc.fillColor(headerFillColor).rect(x, y, colWidths.reduce((a, b) => a + b, 0), 25).fill();
+                    doc.fillColor(textColor);
+                    headers.forEach((header, i) => {
+                        doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
+                            width: colWidths[i] - 2 * cellPadding,
+                            align: 'left',
+                            lineBreak: true
+                        });
+                        currentHeaderX += colWidths[i];
+                    });
+                    y += 25;
+                    doc.font('Helvetica').fontSize(rowFontSize);
+                }
+
+                const fillColor = rowIndex % 2 === 0 ? rowFillColor1 : rowFillColor2;
+                doc.fillColor(fillColor).rect(x, y, colWidths.reduce((a, b) => a + b, 0), maxRowHeight).fill();
+                doc.fillColor(textColor);
+
+                let currentRowX = x;
+                headers.forEach((header, i) => {
+                    const value = row[header] !== undefined && row[header] !== null ? row[header].toString() : 'N/A';
+                    doc.rect(currentRowX, y, colWidths[i], maxRowHeight).stroke();
+                    doc.text(value, currentRowX + cellPadding, y + cellPadding, {
+                        width: colWidths[i] - 2 * cellPadding,
+                        align: 'left',
+                        valign: 'top',
+                        lineBreak: true
+                    });
+                    currentRowX += colWidths[i];
+                });
+                y += maxRowHeight;
+            });
+            return y;
+        }
+
+        // --- PDF Header Content ---
+        doc.font('Helvetica-Bold').fontSize(18).text('Newborn Profile Report', { align: 'center' });
+        doc.font('Helvetica').fontSize(12).text(`Date Range: ${from} to ${to}`, { align: 'center' });
+        doc.moveDown(1.5);
+
+        // --- Main Profile Data Table (Overview) ---
+        const mainTableHeaders = [
+            'Newborn Name',
+            'DoB',
+            'Gender',
+            'Birth Weight',
+            'Birth Height',
+            'Mother Name',
+            'Mother Phone',
+            'Mother Address'
+        ];
+
+        const totalPageContentWidth = doc.page.width - 2 * doc.page.margins.left;
+        const mainColWidths = [
+            totalPageContentWidth * 0.16, // Newborn Name
+            totalPageContentWidth * 0.08, // DoB
+            totalPageContentWidth * 0.07, // Gender
+            totalPageContentWidth * 0.08, // Birth Weight
+            totalPageContentWidth * 0.14, // Birth Height
+            totalPageContentWidth * 0.15, // Mother Name
+            totalPageContentWidth * 0.10, // Mother Phone
+            totalPageContentWidth * 0.22, // Mother Address
+        ];
+
+        const mainTableData = newborns.map(profile => ({
+            'Newborn Name': profile.newbornName || 'N/A',
+            'DoB': profile.dateOfBirth || 'N/A',
+            'Gender': profile.gender || 'N/A',
+            'Birth Weight': profile.birthWeight || 'N/A',
+            'Birth Height': profile.birthHeight || 'N/A',
+            'Mother Name': profile.motherName || 'N/A',
+            'Mother Phone': profile.motherPhoneNumber || 'N/A',
+            'Mother Address': profile.motherAddressZone || 'N/A'
+        }));
+
+        doc.font('Helvetica-Bold').fontSize(14).text('Newborn Profiles Overview:', { underline: true, align: 'left' });
+        doc.font('Helvetica').moveDown(0.5);
+
+        let currentY = drawTable(doc, mainTableData, mainTableHeaders, doc.y, doc.page.margins.left, mainColWidths, {
+            headerFillColor: '#ADD8E6',
+            rowFillColor1: '#E0FFFF',
+            rowFillColor2: '#F5FFFA',
+            headerFontSize: 11,
+            rowFontSize: 10
+        });
+        doc.moveDown(1.5);
+
+        // Finalize the PDF document
+        doc.end();
+    } catch (error) {
+        console.error('Error generating newborn profile PDF:', error);
+        if (!res.headersSent) {
+            res.status(500).json({ message: 'Failed to generate PDF', error: error.message });
+        }
+    }
+});

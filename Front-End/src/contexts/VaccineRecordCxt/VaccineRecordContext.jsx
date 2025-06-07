@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
 import { VaccineDisplayContext } from "../VaccineContext/VaccineContext";
+
+import { VaccinePerContext } from "../PerBabyVacine/PerBabyVacineContext";
 export const VaccineRecordDisplayContext = createContext();
 
 export const VaccineRecordDisplayProvider = ({ children }) => {
@@ -16,6 +18,10 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const [modalStatus, setModalStatus] = useState("success");
     const { fetchVaccineContext } = useContext(VaccineDisplayContext);
     const [calendardata, setCalendarData] = useState([]);
+    const [isMaleVacinated, setMale] = useState("");
+    const [isFemaleVacinated, setFemale] = useState("");
+    const [isTotalVacinated, setTotalVacinated] = useState("");
+    const { fetchPerVaccine } = useContext(VaccinePerContext);
 
     useEffect(() => {
         if (customError) {
@@ -61,6 +67,38 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 console.log("VaccineSpecific", filteredByZone);
                 setVaccineRecord(filteredRecords);
                 setCalendarData(filteredByZone);
+
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+                // Track unique vaccinated newborns this month
+                const vaccinatedThisMonthMap = new Map(); // Map to store newbornName => gender
+
+                filteredByZone.forEach((record) => {
+                    record.doses.forEach((dose) => {
+                        const doseDate = new Date(dose.dateGiven);
+                        if (doseDate >= startOfMonth && doseDate <= endOfMonth) {
+                            if (!vaccinatedThisMonthMap.has(record.newbornName)) {
+                                vaccinatedThisMonthMap.set(record.newbornName, record.gender); // Save gender for counting
+                            }
+                        }
+                    });
+                });
+
+                // Count total, babae, at lalaki
+                const totalVaccinated = vaccinatedThisMonthMap.size;
+                let totalFemale = 0;
+                let totalMale = 0;
+
+                vaccinatedThisMonthMap.forEach((gender) => {
+                    if (gender?.toLowerCase() === "female") totalFemale++;
+                    else if (gender?.toLowerCase() === "male") totalMale++;
+                });
+
+                setMale(totalMale);
+                setFemale(totalFemale);
+                setTotalVacinated(totalVaccinated);
             }
         } catch (error) {
             console.error("Error fetching vaccine records:", error);
@@ -91,8 +129,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
             );
 
             if (res.data.status === "success") {
-                fetchVaccineRecordData();
-                fetchVaccineContext();
+                await Promise.all([fetchPerVaccine(), fetchVaccineRecordData(), fetchVaccineContext()]);
                 setModalStatus("success");
                 setShowModal(true);
                 return { success: true, data: res?.data.data };
@@ -119,10 +156,6 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const UpdateContext = async (values, recordId, doseId) => {
         try {
             setLoading(true);
-
-            console.log("Values", values);
-            console.log("Record", recordId);
-            console.log("DOse", values.doseId);
             const requestData = {
                 dateGiven: values.dateGiven,
                 next_due_date: values.next_due_date,
@@ -209,6 +242,9 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     return (
         <VaccineRecordDisplayContext.Provider
             value={{
+                isTotalVacinated,
+                isMaleVacinated,
+                isFemaleVacinated,
                 customError,
                 calendardata,
                 DeleteContext,

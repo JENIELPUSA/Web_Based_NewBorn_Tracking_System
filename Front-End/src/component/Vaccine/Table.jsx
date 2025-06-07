@@ -113,7 +113,6 @@ function VaccineTable() {
                                     <th className="p-3 text-left">Name</th>
                                     <th className="p-3 text-left">Description</th>
                                     <th className="p-3 text-left">Stock</th>
-                                    <th className="p-3 text-left">Zone</th>
                                     <th className="p-3 text-left">Dosage</th>
                                     <th className="p-3 text-left">Brand/Expiration</th>
                                     <th className="hidden p-3 text-left sm:table-cell">
@@ -147,7 +146,6 @@ function VaccineTable() {
                                             <td className="p-3 align-top capitalize">{item.name}</td>
                                             <td className="p-3 align-top capitalize">{item.description}</td>
                                             <td className="p-3 align-top">{item.totalStock}</td>
-                                            <td className="p-3 align-top">{item.zone}</td>
                                             <td className="p-3 align-top">{item.dosage}</td>
                                             <td className="p-3 align-top">
                                                 {item.details?.length > 0 ? (

@@ -3,10 +3,10 @@ const Vaccine = require("../Models/VaccineModel");
 const CustomError = require("./../Utils/CustomError");
 const Apifeatures = require("./../Utils/ApiFeatures");
 const mongoose = require("mongoose");
+const PDFDocument = require('pdfkit');
 
 exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
-  const { name, description, stock, expirationDate, zone, dosage, brand } =
-    req.body;
+  const { name, description, stock, expirationDate, dosage, brand } = req.body;
 
   const missingFields = [];
 
@@ -14,7 +14,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   if (!description) missingFields.push("Description");
   if (stock == null) missingFields.push("Stock");
   if (!expirationDate) missingFields.push("Expiration Date");
-  if (!zone) missingFields.push("Zone");
 
   if (missingFields.length > 0) {
     return res.status(400).json({
@@ -23,7 +22,7 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   }
 
   // Find or create vaccine
-  let vaccine = await Vaccine.findOne({ name, brand, dosage, zone });
+  let vaccine = await Vaccine.findOne({ name, brand, dosage });
 
   if (!vaccine) {
     // Create a new vaccine if not found
@@ -32,7 +31,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
       brand,
       dosage,
       description,
-      zone,
       batches: [{ stock, expirationDate }],
     });
   } else {
@@ -66,7 +64,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
         name: 1,
         description: 1,
         dosage: 1,
-        zone: 1,
         "brand._id": 1,
         "brand.name": 1,
         batches: 1,
@@ -128,9 +125,10 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
   const today = new Date();
   let expired = 0;
   let notExpired = 0;
+  let totalStock = 0; // NEW: for counting total stock
 
-  displayVacine.forEach(vaccine => {
-    vaccine.batches?.forEach(batch => {
+  displayVacine.forEach((vaccine) => {
+    vaccine.batches?.forEach((batch) => {
       if (batch.expirationDate) {
         const expDate = new Date(batch.expirationDate);
         if (expDate < today) {
@@ -138,6 +136,11 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         } else {
           notExpired++;
         }
+      }
+
+      // Add stock if it's a valid number
+      if (typeof batch.stock === "number") {
+        totalStock += batch.stock;
       }
     });
   });
@@ -150,11 +153,10 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
     totals: {
       expired,
       notExpired,
+      totalStock, // Include in response
     },
   });
 });
-
-
 
 exports.UpdateVaccine = AsyncErrorHandler(async (req, res, next) => {
   const {
@@ -166,7 +168,6 @@ exports.UpdateVaccine = AsyncErrorHandler(async (req, res, next) => {
     brand,
     stock,
     expirationDate,
-    zone,
   } = req.body;
 
   // Step 1: Find the vaccine by ID
@@ -182,7 +183,6 @@ exports.UpdateVaccine = AsyncErrorHandler(async (req, res, next) => {
   if (description) vaccine.description = description;
   if (dosage) vaccine.dosage = dosage;
   if (brand) vaccine.brand = brand;
-  if (zone) vaccine.zone = zone;
 
   // Step 3: Find and update the batch by batchId
   const batchIndex = vaccine.batches.findIndex(
@@ -216,7 +216,6 @@ exports.UpdateVaccine = AsyncErrorHandler(async (req, res, next) => {
         name: 1,
         description: 1,
         dosage: 1,
-        zone: 1,
         "brand._id": 1,
         "brand.name": 1,
         batches: 1,
@@ -263,3 +262,295 @@ exports.deleteVaccine = AsyncErrorHandler(async (req, res, next) => {
   });
 });
 
+exports.getReportsVaccine = AsyncErrorHandler(async (req, res, next) => {
+    try {
+        const { from, to } = req.query; // Date range mula sa query params (format:YYYY-MM-DD)
+
+        // Siguraduhin na ang `from` at `to` ay valid date strings
+        const fromDate = new Date(from);
+        let toDate = new Date(to);
+
+        // I-validate ang mga petsa
+        if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+            return next(
+                new CustomError(
+                    "Invalid date format. Please use ISO 8601 format (YYYY-MM-DD).",
+                    400
+                )
+            );
+        }
+
+        // Ayusin ang toDate para isama ang buong araw
+        toDate.setHours(23, 59, 59, 999);
+
+        // Kunin ang data na may date filtering gamit ang aggregation
+        const aggregationResult = await Vaccine.aggregate([
+            // Step 1: Unwind the batches array to process each batch individually
+            { $unwind: "$batches" },
+
+            // Step 2: Match on the 'addedAt' field within each batch
+            {
+                $match: {
+                    "batches.addedAt": { $gte: fromDate, $lte: toDate },
+                },
+            },
+
+            // Step 3: Lookup for 'brand' (original vaccine document's brand)
+            {
+                $lookup: {
+                    from: "brands", // Assuming your brands collection is named 'brands'
+                    localField: "brand",
+                    foreignField: "_id",
+                    as: "brandInfo", // Changed 'as' name to avoid conflict
+                },
+            },
+            {
+                $unwind: {
+                    path: "$brandInfo",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+
+            // Step 4: Group back by the original Vaccine _id
+            {
+                $group: {
+                    _id: "$_id", // Group by the Vaccine document's _id
+                    name: { $first: "$name" },
+                    description: { $first: "$description" },
+                    dosage: { $first: "$dosage" },
+                    brand: { $first: "$brandInfo.name" }, // Get the brand name
+                    createdAt: { $first: "$createdAt" }, // Keep original vaccine createdAt
+                    // Push only the matched batches back into an array
+                    batches: { $push: "$batches" },
+                },
+            },
+            // Optional: If you need to sort the final result
+            // { $sort: { createdAt: 1 } }
+        ]);
+
+        const reportData = aggregationResult;
+
+        if (!reportData || reportData.length === 0) {
+            return next(
+                new CustomError(
+                    "No vaccine inventory data found for the selected date range and batch creation dates.",
+                    404
+                )
+            );
+        }
+
+        // --- PDF Document Setup ---
+        const doc = new PDFDocument({ layout: "landscape", margin: 30 });
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=vaccine_inventory_report_${from}_to_${to}_batches.pdf` // More appropriate filename
+        );
+
+        doc.pipe(res);
+
+        // --- Helper Function to Draw Table ---
+        function drawTable(
+            doc,
+            data,
+            headers,
+            startY,
+            startX,
+            colWidths,
+            options = {}
+        ) {
+            let y = startY;
+            let x = startX;
+            const cellPadding = options.cellPadding || 5;
+            const headerFillColor = options.headerFillColor || "#CCCCCC";
+            const rowFillColor1 = options.rowFillColor1 || "#F0F0F0";
+            const rowFillColor2 = options.rowFillColor2 || "#FFFFFF";
+            const textColor = options.textColor || "#000000";
+            const headerFontSize = options.headerFontSize || 10;
+            const rowFontSize = options.rowFontSize || 9;
+            const borderWidth = options.borderWidth || 0.5;
+
+            doc.lineWidth(borderWidth);
+            doc.strokeColor(textColor);
+
+            // Draw Headers
+            doc.font("Helvetica-Bold").fontSize(headerFontSize);
+            doc
+                .fillColor(headerFillColor)
+                .rect(
+                    x,
+                    y,
+                    colWidths.reduce((a, b) => a + b, 0),
+                    25
+                )
+                .fill();
+            doc.fillColor(textColor);
+
+            let currentHeaderX = x;
+            headers.forEach((header, i) => {
+                doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
+                    width: colWidths[i] - 2 * cellPadding,
+                    align: "left",
+                    lineBreak: true,
+                });
+                currentHeaderX += colWidths[i];
+            });
+            y += 25;
+
+            doc.font("Helvetica").fontSize(rowFontSize);
+
+            // Draw Data Rows
+            data.forEach((row, rowIndex) => {
+                let maxRowHeight = 0;
+                // Calculate max row height based on content
+                headers.forEach((header, i) => {
+                    const value =
+                        row[header] !== undefined && row[header] !== null
+                            ? row[header].toString()
+                            : "N/A";
+                    const textHeight = doc.heightOfString(value, {
+                        width: colWidths[i] - 2 * cellPadding,
+                        lineBreak: true,
+                    });
+                    maxRowHeight = Math.max(maxRowHeight, textHeight + 2 * cellPadding);
+                });
+
+                // Check for new page before drawing a row
+                if (y + maxRowHeight > doc.page.height - doc.page.margins.bottom) {
+                    doc.addPage();
+                    y = doc.page.margins.top;
+                    currentHeaderX = x;
+                    doc.font("Helvetica-Bold").fontSize(headerFontSize);
+                    doc
+                        .fillColor(headerFillColor)
+                        .rect(
+                            x,
+                            y,
+                            colWidths.reduce((a, b) => a + b, 0),
+                            25
+                        )
+                        .fill();
+                    doc.fillColor(textColor);
+                    headers.forEach((header, i) => {
+                        doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
+                            width: colWidths[i] - 2 * cellPadding,
+                            align: "left",
+                            lineBreak: true,
+                        });
+                        currentHeaderX += colWidths[i];
+                    });
+                    y += 25;
+                    doc.font("Helvetica").fontSize(rowFontSize);
+                }
+
+                const fillColor = rowIndex % 2 === 0 ? rowFillColor1 : rowFillColor2;
+                doc
+                    .fillColor(fillColor)
+                    .rect(
+                        x,
+                        y,
+                        colWidths.reduce((a, b) => a + b, 0),
+                        maxRowHeight
+                    )
+                    .fill();
+                doc.fillColor(textColor);
+
+                let currentRowX = x;
+                headers.forEach((header, i) => {
+                    const value =
+                        row[header] !== undefined && row[header] !== null
+                            ? row[header].toString()
+                            : "N/A";
+                    doc.rect(currentRowX, y, colWidths[i], maxRowHeight).stroke();
+                    doc.text(value, currentRowX + cellPadding, y + cellPadding, {
+                        width: colWidths[i] - 2 * cellPadding,
+                        align: "left",
+                        valign: "top",
+                        lineBreak: true,
+                    });
+                    currentRowX += colWidths[i];
+                });
+                y += maxRowHeight;
+            });
+            return y;
+        }
+
+        // --- PDF Header Content ---
+        doc
+            .font("Helvetica-Bold")
+            .fontSize(18)
+            .text("Vaccine Inventory Report (Filtered by Batch Added Date)", { align: "center" }); // Updated title
+        doc
+            .font("Helvetica")
+            .fontSize(12)
+            .text(`Batch Added Date Range: ${from} to ${to}`, { align: "center" }); // Updated date range label
+        doc.moveDown(1.5);
+
+        // --- Main Table Headers (Overview) ---
+        const mainTableHeaders = [
+            "Name",
+            "Description",
+            "Dosage",
+            "Brand",
+            "Batches (Stock / Expiration / Added At)", // Updated header for batches
+            "Vaccine Record Created At", // Clarified for vaccine record
+        ];
+
+        const totalPageContentWidth = doc.page.width - 2 * doc.page.margins.left;
+        const mainColWidths = [
+            totalPageContentWidth * 0.12, // Name
+            totalPageContentWidth * 0.18, // Description
+            totalPageContentWidth * 0.08, // Dosage
+            totalPageContentWidth * 0.12, // Brand
+            totalPageContentWidth * 0.35, // Batches (Increased width for details)
+            totalPageContentWidth * 0.15, // Vaccine Record Created At
+        ];
+
+        const mainTableData = reportData.map((item) => ({
+            "Name": item.name || "N/A",
+            "Description": item.description || "N/A",
+            "Dosage": item.dosage || "N/A",
+            "Brand": item.brand || "N/A",
+            "Batches (Stock / Expiration / Added At)": item.batches && item.batches.length > 0
+                ? item.batches.map(batch =>
+                    `Stock: ${batch.stock || 'N/A'}, Exp: ${batch.expirationDate ? new Date(batch.expirationDate).toISOString().split('T')[0] : 'N/A'}, Added: ${batch.addedAt ? new Date(batch.addedAt).toISOString().split('T')[0] : 'N/A'}`
+                ).join('\n')
+                : 'No Batches Matched Date Range', // Updated message for no matched batches
+            "Vaccine Record Created At": item.createdAt ? new Date(item.createdAt).toISOString().split('T')[0] : 'N/A', // Format original vaccine createdAt
+        }));
+
+        doc
+            .font("Helvetica-Bold")
+            .fontSize(14)
+            .text("Vaccine Inventory Overview (Filtered by Batch Added Date):", { underline: true, align: "left" }); // Updated title
+        doc.font("Helvetica").moveDown(0.5);
+
+        let currentY = drawTable(
+            doc,
+            mainTableData,
+            mainTableHeaders,
+            doc.y,
+            doc.page.margins.left,
+            mainColWidths,
+            {
+                headerFillColor: "#ADD8E6",
+                rowFillColor1: "#E0FFFF",
+                rowFillColor2: "#F5FFFA",
+                headerFontSize: 9,
+                rowFontSize: 8,
+            }
+        );
+        doc.moveDown(1.5);
+
+        // Finalize the PDF document
+        doc.end();
+    } catch (error) {
+        console.error("Error generating vaccine inventory PDF:", error);
+        if (!res.headersSent) {
+            res
+                .status(500)
+                .json({ message: "Failed to generate PDF", error: error.message });
+        }
+    }
+});

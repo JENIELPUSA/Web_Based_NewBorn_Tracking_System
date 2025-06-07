@@ -10,6 +10,11 @@ import Login from "./component/Login/login";
 import Vaccine from "./component/Vaccine/Layout"
 import RecordOfVaccine from "./component/VaccineRecord/Layout"
 import CalendarLayout from "./component/Calendar/CalendarLayout"
+import ProfillingLayout from "./component/Profilling/Layout"
+import ForgotPassword from "./component/ForgotPassword/ForgotPassword";
+import ResetPassword from "./component/ResetPassword/ResetPassword";
+import ParentLayout from "./component/ParentsComponent/LayoutParent";
+import PdfReport from "./component/Reports/ReportsLayout"
 
 function App() {
   const router = createBrowserRouter([
@@ -17,6 +22,14 @@ function App() {
     {
       path: "/login",
       element: <Login />,
+    },
+    {
+      path: "/reset-password/:token",
+      element: <ResetPassword />,
+    },
+    {
+      path: "/parent-dashboard",
+      element: <ParentLayout />,
     },
     // Redirect root path to /login
     {
@@ -56,18 +69,17 @@ function App() {
           path: "/dashboard/new-record-vaccine",
           element: <RecordOfVaccine />,
         },
-        {
-          path: "new-product",
-          element: <h1 className="title">New Product</h1>,
+         {
+          path: "/dashboard/Profilling_Dash",
+          element: <ProfillingLayout />,
         },
         {
-          path: "inventory",
-          element: <h1 className="title">Inventory</h1>,
-        },
-        {
-          path: "settings",
-          element: <h1 className="title">Settings</h1>,
-        },
+          path: "/dashboard/forgot-password",
+          element:<ForgotPassword/>,
+        },{
+          path: "/dashboard/PDF-Report",
+          element:<PdfReport/>,
+        }
       ],
     },
   ]);

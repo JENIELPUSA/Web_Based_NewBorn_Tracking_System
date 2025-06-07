@@ -83,6 +83,8 @@ function VaccineRecordTable() {
         }
     };
 
+    console.log("fwef",vaccineRecord)
+
     const filteredRecord = vaccineRecord.filter((user) => {
         const matchesSearch = `${user.firstName} ${user.lastName} ${user.username} ${user.email} ${user.newbornName} ${user.motherName}`
             .toLowerCase()

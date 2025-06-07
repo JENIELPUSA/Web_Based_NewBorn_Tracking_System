@@ -9,6 +9,7 @@ const MongoStore = require("connect-mongo");
 
 const PDFRoutes = require("./Routes/PDFRoutes");
 const usersroutes = require("./Routes/UserRoutes");
+const ProfillingRoutes=require("./Routes/ProfillingRoutes")
 
 const VaccinationRecord = require("./Routes/VaccinationRecordRoute");
 const AssignedPerBaby = require("./Routes/AssignedPerBabyRoute");
@@ -20,6 +21,8 @@ const NewBornBabyRoutes = require("./Routes/NewBornBabyRoutes");
 const BrandRoute = require("./Routes/BrandRoute");
 
 const auditLogRoute = require("./Routes/auditLogRoute");
+
+const NotifyRoute=require("./Routes/NotificationRoutes")
 
 
 const authentic = require("./Routes/authRouter");
@@ -76,9 +79,10 @@ app.use("/api/v1/Vaccine", VaccineRoutes);
 app.use("/api/v1/authentication", authentic);
 app.use("/api/v1/GeneratePDF", PDFRoutes);
 app.use("/api/v1/VaccinationRecord", VaccinationRecord);
-
+app.use("/api/v1/Profilling", ProfillingRoutes);
 app.use("/api/v1/AssignedPerBabyVaccine", AssignedPerBaby);
-VaccinationRecord;
+app.use("/api/v1/Notification", NotifyRoute);
+
 
 app.use(ErrorController);
 

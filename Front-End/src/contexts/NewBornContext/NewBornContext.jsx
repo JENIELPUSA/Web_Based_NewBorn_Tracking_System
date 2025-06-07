@@ -47,6 +47,19 @@ export const NewBornDisplayProvider = ({ children }) => {
         }
     }, [customError]);
 
+      useEffect(() => {
+    if (!newBorn || newBorn.length === 0) {
+      setTotalBaby(0);
+      setTotalMale(0);
+      setTotalFemale(0);
+      return;
+    }
+
+    setTotalBaby(newBorn.length);
+    setTotalMale(newBorn.filter((nb) => nb.gender === "Male").length);
+    setTotalFemale(newBorn.filter((nb) => nb.gender === "Female").length);
+  }, [newBorn]);
+
     const fetchUserData = async () => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data

@@ -1,7 +1,4 @@
-import { ChartColumn, Home, NotepadText, KeyRound,ShieldCheck, Syringe, UserPlus, Baby,CalendarDays } from "lucide-react";
-
-import ProfileImage from "@/assets/profile-image.jpg";
-import ProductImage from "@/assets/product-image.jpg";
+import { CircleUserRound, Home, NotepadText, KeyRound,ShieldCheck, Syringe, UserPlus, Baby,CalendarDays } from "lucide-react";
 
 export const navbarLinks = [
     {
@@ -20,7 +17,7 @@ export const navbarLinks = [
             {
                 label: "Reports",
                 icon: NotepadText,
-                path: "/dashboard/reports",
+                path: "/dashboard/PDF-Report",
             },
         ],
     },
@@ -47,6 +44,11 @@ export const navbarLinks = [
                 icon: Syringe,
                  path: "/dashboard/new-record-vaccine",
             },
+            {
+                label: "Profilling",
+                icon: CircleUserRound,
+                 path: "/dashboard/Profilling_Dash",
+            },
         ],
     },
        {
@@ -55,7 +57,7 @@ export const navbarLinks = [
             {
                 label: "ForgotPassword",
                 icon: KeyRound,
-               path: "/",
+                path: "/dashboard/forgot-password",
             },
         ],
     },

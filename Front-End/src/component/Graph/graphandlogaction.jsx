@@ -22,7 +22,6 @@ function GraphAndLogAction() {
   : isGraphData
     ? [isGraphData]
     : [];
-
     const monthlyWeight = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month) => {
         const total = graphDataArray
             .filter((baby) => baby.birthMonth === month)
