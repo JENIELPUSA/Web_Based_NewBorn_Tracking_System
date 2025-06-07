@@ -27,7 +27,7 @@ function ParentComponent() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         // Conditional trimming: trim whitespace for all fields except 'mothersName'
-        const newValue = name === "mothersName" ? value : value.trim();
+        const newValue = name === "mothersName" || name === "address" ? value : value.trim();
         setFormData((prevData) => ({
             ...prevData,
             [name]: newValue,
@@ -59,7 +59,7 @@ function ParentComponent() {
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4 dark:bg-gray-900">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100  dark:bg-gray-900">
             <div className="relative flex w-full max-w-4xl flex-col rounded-xl bg-white px-6 py-6 shadow-lg dark:bg-gray-800">
                 {/* Header Section */}
                 <div className="mb-8 text-center">
@@ -289,7 +289,7 @@ function ParentComponent() {
                                     type="text"
                                     id="address"
                                     name="address"
-                                    placeholder="e.g. 123 Main St, Brgy. XYZ"
+                                    placeholder="e.g.KAWAYAN BILIRAN"
                                     autoComplete="off"
                                     value={formData.address}
                                     onChange={handleChange}

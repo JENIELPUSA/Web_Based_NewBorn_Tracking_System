@@ -83,7 +83,7 @@ function VaccineRecordTable() {
         }
     };
 
-    console.log("fwef",vaccineRecord)
+    console.log("fwef", vaccineRecord);
 
     const filteredRecord = vaccineRecord.filter((user) => {
         const matchesSearch = `${user.firstName} ${user.lastName} ${user.username} ${user.email} ${user.newbornName} ${user.motherName}`
@@ -212,8 +212,7 @@ function VaccineRecordTable() {
                                                 </button>
 
                                                 <button
-                                                  
-                                                        onClick={() => handleDeleteAssign(dose._id, user._id)}
+                                                    onClick={() => handleDeleteAssign(dose._id, user._id)}
                                                     className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
                                                 >
                                                     <TrashIcon className="h-4 w-4" />
@@ -227,23 +226,23 @@ function VaccineRecordTable() {
                     </div>
 
                     {/* Desktop View */}
-                    <table className="table hidden w-full text-sm sm:table">
-                        <thead className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-800">
+                    <table className="hidden w-full min-w-[1200px] table-auto text-sm sm:table">
+                        <thead className="sticky top-0 bg-gray-100 shadow-sm dark:bg-gray-800">
                             <tr>
-                                <th className="text-gray-900 dark:text-white">#</th>
-                                <th className="text-gray-900 dark:text-white">Avatar</th>
-                                <th className="text-gray-900 dark:text-white">Baby's Name</th>
-                                <th className="text-gray-900 dark:text-white">Address</th>
-                                <th className="text-gray-900 dark:text-white">Mother</th>
-                                <th className="text-gray-900 dark:text-white">Vaccine</th>
-                                <th className="text-gray-900 dark:text-white">Description</th>
-                                <th className="text-gray-900 dark:text-white">Given Dose</th>
-                                <th className="text-gray-900 dark:text-white">Dosage</th>
-                                <th className="text-gray-900 dark:text-white">Status</th>
-                                <th className="text-gray-900 dark:text-white">Remarks</th>
-                                <th className="text-gray-900 dark:text-white">Administered By</th>
-                                <th className="text-gray-900 dark:text-white">Dose Info</th>
-                                <th className="text-gray-900 dark:text-white">Actions</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">#</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Avatar</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Baby's Name</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Address</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Mother</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Vaccine</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Description</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Given Dose</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Dosage</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Status</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Remarks</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Administered By</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Dose Info</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -261,10 +260,12 @@ function VaccineRecordTable() {
                                     user.doses.map((dose, doseIndex) => (
                                         <tr
                                             key={`${user._id}-${doseIndex}`}
-                                            className="border-b dark:border-gray-700"
+                                            className="border-b hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                                         >
-                                            <td className="text-gray-900 dark:text-white">{doseIndex === 0 ? indexOfFirstUser + index + 1 : ""}</td>
-                                            <td>
+                                            <td className="px-2 py-2 text-gray-900 dark:text-white">
+                                                {doseIndex === 0 ? indexOfFirstUser + index + 1 : ""}
+                                            </td>
+                                            <td className="px-2 py-2">
                                                 {user.avatar ? (
                                                     <img
                                                         src={user.avatar}
@@ -277,31 +278,33 @@ function VaccineRecordTable() {
                                                     </div>
                                                 )}
                                             </td>
-                                            <td className="text-gray-900 dark:text-white">{user.newbornName}</td>
-                                            <td className="capitalize text-gray-900 dark:text-white">{user.FullAddress}</td>
-                                            <td className="text-gray-900 dark:text-white">{user.motherName}</td>
-                                            <td className="text-gray-900 dark:text-white">{user.vaccineName}</td>
-                                            <td className="text-gray-900 dark:text-white">{user.description}</td>
-                                            <td className="capitalize text-gray-900 dark:text-white">{dose.doseNumber || "—"}</td>
-                                            <td className="capitalize text-gray-900 dark:text-white">{user.dosage}</td>
-                                            <td>
+                                            <td className="px-2 py-2 text-gray-900 dark:text-white">{user.newbornName}</td>
+                                            <td className="px-2 py-2 capitalize text-gray-900 dark:text-white">{user.FullAddress}</td>
+                                            <td className="px-2 py-2 text-gray-900 dark:text-white">{user.motherName}</td>
+                                            <td className="px-2 py-2 text-gray-900 dark:text-white">{user.vaccineName}</td>
+                                            <td className="px-2 py-2 text-gray-900 dark:text-white">{user.description}</td>
+                                            <td className="px-2 py-2 capitalize text-gray-900 dark:text-white">{dose.doseNumber || "—"}</td>
+                                            <td className="px-2 py-2 capitalize text-gray-900 dark:text-white">{user.dosage}</td>
+                                            <td className="px-2 py-2">
                                                 <StatusBadge status={dose.status} />
                                             </td>
-                                            <td className="text-gray-900 dark:text-white">{dose.remarks || "—"}</td>
-                                            <td className="capitalize text-gray-900 dark:text-white">{dose.administeredBy || "—"}</td>
-                                            <td>
-                                                <div className="space-y-1 text-sm">
+                                            <td className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap px-2 py-2 text-gray-900 dark:text-white">
+                                                {dose.remarks || "—"}
+                                            </td>
+                                            <td className="px-2 py-2 capitalize text-gray-900 dark:text-white">{dose.administeredBy || "—"}</td>
+                                            <td className="px-2 py-2">
+                                                <div className="space-y-1 text-sm text-gray-900 dark:text-white">
                                                     <div>
-                                                        <span className="font-medium text-gray-900 dark:text-white">Given:</span>{" "}
+                                                        <span className="font-medium">Given:</span>{" "}
                                                         {dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}
                                                     </div>
                                                     <div>
-                                                        <span className="font-medium text-gray-900 dark:text-white">Next Due:</span>{" "}
+                                                        <span className="font-medium">Next Due:</span>{" "}
                                                         {dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td className="px-2 py-2">
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => handleEdit(dose, user)}

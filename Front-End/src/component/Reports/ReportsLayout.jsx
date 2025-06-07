@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 // Component for a single PDF card
 function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate = "" }) {
-    const { customError,downloadProfillingReport, downloadNewBornReport, downloadIventoryReport,message } = useContext(ReportDisplayContext);
+    const { customError, downloadProfillingReport, downloadNewBornReport, downloadIventoryReport, message } = useContext(ReportDisplayContext);
     const [fromDate, setFromDate] = useState(defaultFromDate);
     const [toDate, setToDate] = useState(defaultToDate);
 
@@ -46,8 +46,8 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
             <p className="mt-1 text-center text-sm text-gray-600 dark:text-gray-300">{description}</p>
 
             {/* From and To Date Pickers inside the card */}
-            <div className="mt-4 flex w-full flex-col gap-3">
-                <div className="flex flex-col">
+            <div className="mt-4 flex w-full flex-col items-center gap-4">
+                <div className="flex w-full max-w-[220px] flex-col items-center">
                     <label
                         htmlFor={`fromDate-${title.replace(/\s+/g, "-")}`}
                         className="mb-1 text-xs font-medium text-gray-700 dark:text-gray-300"
@@ -56,13 +56,13 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
                     </label>
                     <input
                         type="date"
-                        id={`fromDate-${title.replace(/\s+/g, "-")}`} // Unique ID for each date input
+                        id={`fromDate-${title.replace(/\s+/g, "-")}`}
                         value={fromDate}
                         onChange={(e) => setFromDate(e.target.value)}
-                        className="rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:ring-blue-400"
+                        className="w-full rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:ring-blue-400"
                     />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex w-full max-w-[220px] flex-col items-center">
                     <label
                         htmlFor={`toDate-${title.replace(/\s+/g, "-")}`}
                         className="mb-1 text-xs font-medium text-gray-700 dark:text-gray-300"
@@ -71,10 +71,10 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
                     </label>
                     <input
                         type="date"
-                        id={`toDate-${title.replace(/\s+/g, "-")}`} // Unique ID for each date input
+                        id={`toDate-${title.replace(/\s+/g, "-")}`}
                         value={toDate}
                         onChange={(e) => setToDate(e.target.value)}
-                        className="rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:ring-blue-400"
+                        className="w-full rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:ring-blue-400"
                     />
                 </div>
             </div>
@@ -92,7 +92,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
 
 // Main ReportsLayout component
 function ReportsLayout() {
-      const { customError,downloadProfillingReport, downloadNewBornReport, downloadIventoryReport,message } = useContext(ReportDisplayContext);
+    const { customError, downloadProfillingReport, downloadNewBornReport, downloadIventoryReport, message } = useContext(ReportDisplayContext);
     return (
         // We'll wrap the main content and footer in a flex container
         // to ensure the footer sticks to the bottom.
@@ -103,7 +103,7 @@ function ReportsLayout() {
                 <div className="mb-12 w-full rounded-md bg-red-600 px-4 py-3 text-center text-white shadow-lg dark:bg-red-700">
                     <p className="text-lg font-semibold">Important Announcement: New Reports Available!</p>
                 </div>
-                  {customError && (
+                {customError && (
                     <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700 dark:bg-red-900 dark:text-red-200">
                         {customError}
                     </div>

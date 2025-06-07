@@ -29,10 +29,11 @@ const io = socketIo(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
-  transports: ["websocket"],
+  transports: ["polling", "websocket"], // Allow both
   pingInterval: 25000,
   pingTimeout: 60000,
 });
+
 
 // Attach io to app for use in routes/controllers
 app.set("io", io);

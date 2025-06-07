@@ -46,18 +46,17 @@ function Profille() {
         setVerification(false);
         setAddFormOpen(false);
         setSelectedUser(null);
-    }
+    };
 
     const handleDeleteUser = (userId) => {
-        console.log("ehjgergergje",userId)
+        console.log("ehjgergergje", userId);
         setIdToDelete(userId); // Set the ID to delete
         setVerification(true);
     };
 
     const handleConfirmDelete = async () => {
-      
-         await DeleteProfile(idToDelete); 
-                 setProfilling((prevUsers) => prevUsers.filter((user) => user._id !== idToDelete));
+        await DeleteProfile(idToDelete);
+        setProfilling((prevUsers) => prevUsers.filter((user) => user._id !== idToDelete));
         handleCloseModal();
     };
 
@@ -103,7 +102,7 @@ function Profille() {
             </div>
 
             {/* Desktop Table (hidden on mobile) */}
-            <div className="hidden sm:block overflow-x-auto">
+            <div className="hidden overflow-x-auto sm:block">
                 <table className="table min-w-full text-sm">
                     <thead className="bg-gray-100 dark:bg-gray-800">
                         <tr>
@@ -233,11 +232,9 @@ function Profille() {
             </div>
 
             {/* Mobile Card View (hidden on desktop) */}
-            <div className="block sm:hidden grid grid-cols-1 gap-4">
+            <div className="block grid grid-cols-1 gap-4 sm:hidden">
                 {currentUsers.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                        No users found.
-                    </div>
+                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">No users found.</div>
                 ) : (
                     currentUsers.map((user, index) => (
                         <motion.div
@@ -261,9 +258,7 @@ function Profille() {
                                         </div>
                                     )}
                                     <div>
-                                        <h3 className="font-medium text-gray-800 dark:text-white">
-                                            {user.newbornName}
-                                        </h3>
+                                        <h3 className="font-medium text-gray-800 dark:text-white">{user.newbornName}</h3>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">
                                             {user.gender} • {formatDate(user.dateOfBirth)}
                                         </p>
@@ -290,49 +285,54 @@ function Profille() {
                             <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
                                 <div>
                                     <p className="text-gray-500 dark:text-gray-400">Zone</p>
-                                    <p>{user.motherAddressZone || "N/A"}</p>
+                                    <p className="dark:text-white">{user.motherAddressZone || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 dark:text-gray-400">Blood Type</p>
-                                    <p>{user.blood_type || "N/A"}</p>
+                                    <p className="dark:text-white">{user.blood_type || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 dark:text-gray-400">Weight</p>
-                                    <p>{user.birthWeight || "N/A"}</p>
+                                    <p className="dark:text-white">{user.birthWeight || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 dark:text-gray-400">Height</p>
-                                    <p>{user.birthHeight || "N/A"}</p>
+                                    <p className="dark:text-white">{user.birthHeight || "N/A"}</p>
                                 </div>
                                 <div className="col-span-2">
                                     <p className="text-gray-500 dark:text-gray-400">Condition</p>
-                                    <p>{user.health_condition || "N/A"}</p>
+                                    <p className="dark:text-white">{user.health_condition || "N/A"}</p>
                                 </div>
                                 <div className="col-span-2">
                                     <p className="text-gray-500 dark:text-gray-400">Mother</p>
-                                    <p>{user.motherName || "N/A"}</p>
+                                    <p className="dark:text-white">{user.motherName || "N/A"}</p>
                                 </div>
                                 <div className="col-span-2">
                                     <p className="text-gray-500 dark:text-gray-400">Contact</p>
-                                    <p>{user.motherPhoneNumber || "N/A"}</p>
+                                    <p className="dark:text-white">{user.motherPhoneNumber || "N/A"}</p>
                                 </div>
                             </div>
 
                             {/* Vaccination Records - Collapsible */}
                             <details className="mt-3">
-                                <summary className="cursor-pointer text-sm font-medium text-blue-600 dark:text-blue-400">
-                                    Vaccination Records
-                                </summary>
+                                <summary className="cursor-pointer text-sm font-medium text-blue-600 dark:text-blue-400">Vaccination Records</summary>
                                 <div className="mt-2 space-y-3 pl-2 text-sm">
                                     {user.vaccinationRecords?.length ? (
                                         user.vaccinationRecords.map((record, i) => (
-                                            <div key={i} className="rounded border p-2 dark:border-gray-700">
-                                                <p className="font-medium">{record.vaccineName}</p>
+                                            <div
+                                                key={i}
+                                                className="rounded border p-2 dark:border-gray-700"
+                                            >
+                                                <p className="font-medium dark:text-white">{record.vaccineName}</p>
                                                 {Array.isArray(record.doses) && record.doses.length > 0 ? (
                                                     <ul className="mt-1 space-y-1">
                                                         {record.doses.map((dose, j) => (
-                                                            <li key={j} className="text-xs">
-                                                                <span className="font-medium">Dose {dose.doseNumber}:</span> {formatDate(dose.dateGiven)}
+                                                            <li
+                                                                key={j}
+                                                                className="text-xs"
+                                                            >
+                                                                <span className="font-medium dark:text-white">Dose {dose.doseNumber}:</span>{" "}
+                                                                <span className="dark:text-white">{dose.dateGiven ? formatDate(dose.dateGiven) : "—"}</span>
                                                             </li>
                                                         ))}
                                                     </ul>
