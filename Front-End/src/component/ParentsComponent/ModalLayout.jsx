@@ -1,7 +1,7 @@
 // VaccineScheduleModal.jsx
-import React, { useContext, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Schedule from "./Schedule";
+import React, { useContext, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Schedule from './Schedule';
 import VaccineRecordTable from "../ParentsComponent/VaccineRecordTable";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
 
@@ -13,26 +13,43 @@ function VaccineScheduleModal({ isOpen, onClose, passData }) {
     console.log("passData", passData);
     console.log("Vaccine Data from Context", vaccineRecord);
 
-    const normalize = (str) =>
-        (str || "")
-            .toLowerCase() // lowercase para hindi case-sensitive
-            .replace(/\s+/g, "") // tanggal lahat ng spaces
-            .replace(/[^a-z0-9]/gi, ""); // tanggal special characters
+const filteredData = vaccineRecord.filter((item) => {
+  const fullName = `${passData.firstName} ${passData.lastName}`.toUpperCase();
+  const matchedName = item.newbornName?.toUpperCase() === fullName;
+  const matchedZone = item.newbornZone?.toUpperCase() === passData.zone?.toUpperCase();
+  const matchedMother = item.motherName?.toUpperCase() === passData.mothersName?.toUpperCase();
+  const matchedGender = item.gender === passData.gender;
+  const matchedAddress = item.FullAddress?.toUpperCase().includes(passData.address?.toUpperCase());
+  const matchedDOB = item.dateOfBirth === passData.dateOfBirth;
 
-    const filteredData = vaccineRecord.filter((item) => {
-        const fullName = normalize(`${passData.firstName} ${passData.lastName}`);
-        const matchedName = normalize(item.newbornName) === fullName;
+  console.log("🔍 Checking item:", item);
+  console.log("🟢 Matched Name:", matchedName);
+  console.log("🟢 Matched Zone:", matchedZone);
+  console.log("🟢 Matched Mother:", matchedMother);
+  console.log("🟢 Matched Gender:", matchedGender);
+  console.log("🟢 Matched Address:", matchedAddress);
+  console.log("🟢 Matched DOB:", matchedDOB);
 
-        const matchedZone = normalize(item.newbornZone) === normalize(passData.zone);
-        const matchedMother = normalize(item.motherName) === normalize(passData.mothersName);
-        const matchedGender = normalize(item.gender) === normalize(passData.gender);
-        const matchedAddress = normalize(item.FullAddress).includes(normalize(passData.address));
-        const matchedDOB = item.dateOfBirth === passData.dateOfBirth;
+  const isMatch = matchedName &&
+                  matchedZone &&
+                  matchedMother &&
+                  matchedGender &&
+                  matchedAddress &&
+                  matchedDOB;
 
-        const isMatch = matchedName && matchedZone && matchedMother && matchedGender && matchedAddress && matchedDOB;
+  if (isMatch) {
+    console.log("✅ Match found:", item);
+  } else {
+    console.log("❌ Not a full match for:", item.newbornName);
+  }
 
-        return isMatch;
-    });
+  return isMatch;
+});
+
+
+
+
+
 
     return (
         <AnimatePresence>
@@ -49,25 +66,29 @@ function VaccineScheduleModal({ isOpen, onClose, passData }) {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -40, opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="relative max-h-[95vh] w-full max-w-full overflow-y-auto rounded-2xl bg-white  shadow-2xl dark:bg-slate-800"
+                        className="w-full max-w-full rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800 relative
+                                    max-h-[95vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             onClick={onClose}
-                            className="absolute right-4 top-4 z-10 text-3xl font-bold text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+                            className="absolute top-4 right-4 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 text-3xl font-bold z-10"
                             aria-label="Close modal"
                         >
                             &times;
                         </button>
 
-                        <div className="flex w-full flex-col gap-6 md:flex-row">
-                            <div className="flex w-full flex-col gap-6 md:w-1/2">
+                        <div className="flex flex-col md:flex-row gap-6 w-full">
+                            <div className="flex flex-col gap-6 w-full md:w-1/2">
                                 <VaccineRecordTable dataToDisplay={filteredData} />
                             </div>
 
                             <div className="w-full md:w-1/2">
                                 <Schedule scheduleData={filteredData} />
                             </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end">
                         </div>
                     </motion.div>
                 </motion.div>

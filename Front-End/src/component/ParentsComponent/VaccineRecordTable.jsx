@@ -90,23 +90,6 @@ function VaccineRecordTable({ dataToDisplay }) {
             <div className="card-header flex flex-col gap-4 rounded-t-lg bg-gray-50 p-4 dark:bg-slate-700 sm:flex-row sm:items-center sm:justify-between">
                 <p className="card-title text-xl font-semibold text-gray-900 dark:text-white">Vaccination Records</p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                    <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="Search records..."
-                            className="input input-sm w-48 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-slate-800 dark:text-white"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        {searchTerm && (
-                            <button
-                                onClick={() => setSearchTerm("")}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                            >
-                                ✕
-                            </button>
-                        )}
-                    </div>
 
                     <div className="flex items-center gap-2">
                         <DatePicker
