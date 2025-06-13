@@ -28,7 +28,11 @@ const statusColors = {
 const StatusBadge = ({ status }) => {
   const normalized = status ? status.toLowerCase().replace(/[-\s]/g, "") : "default";
   const color = statusColors[normalized] || statusColors.default;
-  return <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${color.bg} ${color.text}`}>{color.display}</span>;
+  return (
+    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${color.bg} ${color.text}`}>
+      {color.display}
+    </span>
+  );
 };
 
 function VaccineRecordTable({ dataToDisplay }) {
@@ -82,9 +86,9 @@ function VaccineRecordTable({ dataToDisplay }) {
 
   return (
     <div className="card">
-      <div className="card-header flex flex-col gap-4 rounded-t-lg bg-gray-50 p-4 dark:bg-slate-700 xm:flex-row xm:items-center xm:justify-between">
+      <div className="card-header flex flex-col gap-4 rounded-t-lg bg-gray-50 p-4 dark:bg-slate-700 xs:flex-row xs:items-center xs:justify-between">
         <p className="card-title text-xl font-semibold text-gray-900 dark:text-white">Vaccination Records</p>
-        <div className="flex flex-col gap-2 xm:flex-row xm:items-center xm:gap-4">
+        <div className="flex flex-col gap-2 xs:flex-row xs:items-center xs:gap-4">
           <div className="relative w-full xs:w-auto">
             <DatePicker
               selectsRange
@@ -94,7 +98,7 @@ function VaccineRecordTable({ dataToDisplay }) {
               isClearable
               placeholderText="Filter by date"
               className="input input-sm w-full rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-slate-800 dark:text-white"
-              dateFormat="MMM d, BBBB"
+              dateFormat="MMM d, yyyy"
               popperClassName="datepicker-portal-responsive"
             />
             {(startDate || endDate) && (
@@ -110,20 +114,20 @@ function VaccineRecordTable({ dataToDisplay }) {
       </div>
 
       <div className="card-body p-0">
-        <div className="relative w-full overflow-x-auto hidden xm:block">
+        <div className="relative w-full overflow-x-auto hidden xs:block">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-800">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Newborn Name</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mother Name</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vaccine</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dose</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dosage</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Given</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Schedule</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Administered By</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Newborn Name</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mother Name</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vaccine</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dose</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dosage</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Given</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Schedule</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Administered By</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-slate-800 dark:divide-gray-700">
@@ -160,7 +164,7 @@ function VaccineRecordTable({ dataToDisplay }) {
           </table>
         </div>
 
-        <div className="xm:hidden p-4">
+        <div className="xs:hidden p-4">
           {currentDoses.length === 0 ? (
             <div className="text-center text-sm text-gray-700 dark:text-gray-300 py-4">
               No records found.
@@ -176,27 +180,13 @@ function VaccineRecordTable({ dataToDisplay }) {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{dose.newbornName}</h3>
                     <StatusBadge status={dose.status} />
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
-                    <span className="font-medium">Mother:</span> {dose.motherName}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
-                    <span className="font-medium">Vaccine:</span> {dose.vaccineName}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
-                    <span className="font-medium">Dose:</span> {dose.doseNumber || "—"}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
-                    <span className="font-medium">Dosage:</span> {dose.dosage}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
-                    <span className="font-medium">Date Given:</span> {dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
-                    <span className="font-medium">Next Schedule:</span> {dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    <span className="font-medium">Administered By:</span> {dose.administeredBy || "—"}
-                  </p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1"><span className="font-medium">Mother:</span> {dose.motherName}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1"><span className="font-medium">Vaccine:</span> {dose.vaccineName}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1"><span className="font-medium">Dose:</span> {dose.doseNumber || "—"}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1"><span className="font-medium">Dosage:</span> {dose.dosage}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1"><span className="font-medium">Date Given:</span> {dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1"><span className="font-medium">Next Schedule:</span> {dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300"><span className="font-medium">Administered By:</span> {dose.administeredBy || "—"}</p>
                 </div>
               ))}
             </div>

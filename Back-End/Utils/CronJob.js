@@ -6,8 +6,8 @@ const socketIO = require("socket.io-client");
 const checkAllVaccinesAreUnvaccinated = require("../Utils/checkAllVaccinesAreUnvaccinated");
 const Newborn = require("../Models/NewBornmodel");
 const sendEmail = require("../Utils/email");
-//"http://localhost:3000"
 const socket = socketIO("https://web-based-newborn-tracking-system-server.onrender.com", {
+//const socket = socketIO("http://localhost:3000", {
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
   transports: ["websocket"],
@@ -22,7 +22,6 @@ socket.on("connect_error", (err) => {
   socket.connect();
 });
 
-// Schedule cron job to run every 2 minutes for testing purposes
 cron.schedule("0 7 * * *", async () => {
   console.log("Cron job triggered");
 
@@ -34,7 +33,6 @@ cron.schedule("0 7 * * *", async () => {
   oneDayAhead.setHours(23, 59, 59, 999);
 
   try {
-    // Find vaccination records with due doses (next_due_date <= tomorrow)
     const records = await VaccinationRecord.find({
       "doses.next_due_date": { $lte: oneDayAhead },
       "doses.notified": false,
@@ -53,9 +51,7 @@ cron.schedule("0 7 * * *", async () => {
 
     for (const record of records) {
       const zone = record?.newborn?.motherName?.zone;
-    
 
-      // Get matched users from the same zone as the mother's zone
       const matchedUsers = await User.find({ Designatedzone: zone });
 
       if (matchedUsers.length > 0) {
@@ -67,10 +63,10 @@ cron.schedule("0 7 * * *", async () => {
         console.log(` No users found with designatedZone: ${zone}`);
       }
 
-      // Loop through each dose and check if the due date is today or earlier
+
       for (const dose of record.doses) {
         if (dose.next_due_date && new Date(dose.next_due_date) <= oneDayAhead) {
-          // Send socket notification if socket is connected
+
           if (socket.connected) {
             sendSocketNotification(socket, record, dose);
             console.log(` Notification sent for dose ${dose.doseNumber} of "${record.vaccine?.name}"`);
@@ -78,7 +74,6 @@ cron.schedule("0 7 * * *", async () => {
             console.log("Socket not connected, cannot send notification");
           }
 
-          // Create a new notification record in the database
           const newNotification = await Notification.create({
             message: `Reminder: Dose ${dose.doseNumber} of "${record.vaccine?.name}" for ${record.newborn?.firstName} ${record.newborn?.lastName} is due on ${new Date(dose.next_due_date).toLocaleDateString()}.`,
             newborn: record.newborn?._id,
@@ -86,18 +81,16 @@ cron.schedule("0 7 * * *", async () => {
           });
 
           console.log("Notification saved:", newNotification);
-
-          // Send email to all matched users and mother's email
           const emails = [
-            ...matchedUsers.map(user => user.email), // Emails of matched users
-            record?.newborn?.motherName?.email,     // Mother's email
+            ...matchedUsers.map(user => user.email), 
+            record?.newborn?.motherName?.email,    
           ];
 
           const message = newNotification.message;
 
           try {
             await sendEmail({
-              email: emails, // array of emails including mother's email
+              email: emails, 
               subject: 'New Notification',
               text: message,
             });
@@ -106,8 +99,6 @@ cron.schedule("0 7 * * *", async () => {
           } catch (error) {
             console.error("Failed to send email", error);
           }
-
-          // Update the dose as notified
           dose.notified = true;
         }
       }

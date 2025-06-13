@@ -95,13 +95,13 @@ function VaccinationTimelineWithArrowDates({ scheduleData }) {
     <div className="flex flex-col items-center justify-center min-h-[50vh] bg-gradient-to-b from-red-50 to-white dark:from-gray-900 dark:to-gray-800 p-2">
       <div className="w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-gray-800">
         <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-6 text-center shadow-lg">
-          <h1 className="text-2xl xm:text-3xl font-bold mb-1 tracking-wide">Child Immunization Schedule</h1>
-          <p className="text-sm xm:text-base opacity-90">Stay informed about upcoming vaccination dates for your child.</p>
+          <h1 className="text-2xl xs:text-3xl font-bold mb-1 tracking-wide">Child Immunization Schedule</h1>
+          <p className="text-sm xs:text-base opacity-90">Stay informed about upcoming vaccination dates for your child.</p>
         </div>
 
         <div className="p-6 space-y-6 relative">
-          <div className="absolute left-1/4 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-red-300 dark:bg-red-600 hidden xm:block"></div>
-          <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-red-300 dark:bg-red-600 xm:hidden"></div>
+          <div className="absolute left-1/4 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-red-300 dark:bg-red-600 hidden xs:block"></div>
+          <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-red-300 dark:bg-red-600 xs:hidden"></div>
 
           {currentItems.length === 0 ? (
             <div className="text-center text-gray-700 dark:text-gray-300 py-10">
@@ -123,20 +123,20 @@ function VaccinationTimelineWithArrowDates({ scheduleData }) {
               return (
                 <div
                   key={entry.calendarDate + globalIndex}
-                  className="flex flex-col xm:flex-row items-stretch xm:items-center relative group"
+                  className="flex flex-col xs:flex-row items-stretch xs:items-center relative group"
                 >
-                  <div className="w-full xm:w-1/4 pr-4 xm:text-right flex justify-center xm:justify-end mb-2 xm:mb-0">
+                  <div className="w-full xs:w-1/4 pr-4 xs:text-right flex justify-center xs:justify-end mb-2 xs:mb-0">
                     <div className={`inline-block p-3 rounded-xl shadow-md transition-all duration-300 group-hover:scale-105 ${dateBoxBgClass}`}>
-                      <p className="text-lg xm:text-xl font-bold">{entry.calendarDate}</p>
-                      <p className="text-xs xm:text-sm opacity-80">{entry.subText}</p>
+                      <p className="text-lg xs:text-xl font-bold">{entry.calendarDate}</p>
+                      <p className="text-xs xs:text-sm opacity-80">{entry.subText}</p>
                     </div>
                     <div
-                      className="hidden xm:block absolute right-0 top-1/2 -mt-2 w-4 h-4 bg-inherit transform rotate-45 translate-x-1/2"
+                      className="hidden xs:block absolute right-0 top-1/2 -mt-2 w-4 h-4 bg-inherit transform rotate-45 translate-x-1/2"
                       style={{ backgroundColor: isToday ? '#b91c1c' : '#dc2626' }}
                     ></div>
                   </div>
-                  <div className="w-full xm:w-3/4 pl-0 xm:pl-8 mt-2 xm:mt-0 relative">
-                    <div className={`xm:hidden absolute left-1/2 -top-2 transform -translate-x-1/2 w-4 h-4 rounded-sm rotate-45 ${contentBoxBgClass}`}></div>
+                  <div className="w-full xs:w-3/4 pl-0 xs:pl-8 mt-2 xs:mt-0 relative">
+                    <div className={`xs:hidden absolute left-1/2 -top-2 transform -translate-x-1/2 w-4 h-4 rounded-sm rotate-45 ${contentBoxBgClass}`}></div>
                     <div className={`p-4 rounded-lg shadow-md transition-all duration-300 group-hover:shadow-xl ${contentBoxBgClass}`}>
                       <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{entry.title}</h3>
                       <ul className="list-disc list-inside text-sm text-gray-800 dark:text-gray-200 space-y-1">

@@ -71,8 +71,19 @@ function BrandTable() {
 
     return (
         <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
+            {/* Header with title and button */}
             <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Brand List</h2>
+                <div className="flex items-center gap-4">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Brand List</h2>
+                    <button
+                        onClick={handleAddBrand}
+                        className="inline-flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+                        title="Add Brand"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add Brand
+                    </button>
+                </div>
                 <div className="flex items-center gap-2">
                     <input
                         type="text"
@@ -95,15 +106,7 @@ function BrandTable() {
                             <th className="p-3 text-left">#</th>
                             <th className="p-3 text-left">Name</th>
                             <th className="p-3 text-left">Created At</th>
-                            <th className="p-3 text-left">
-                                <button
-                                    onClick={handleAddBrand}
-                                    className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
-                                    title="Add Brand"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                </button>
-                            </th>
+                            <th className="p-3 text-left">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -178,6 +181,17 @@ function BrandTable() {
                         </div>
                     ))
                 )}
+
+                {/* Mobile Add Button */}
+                <div className="flex justify-center">
+                    <button
+                        onClick={handleAddBrand}
+                        className="mt-2 inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add Brand
+                    </button>
+                </div>
             </div>
 
             {/* Pagination */}
