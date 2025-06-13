@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
+import axiosInstance from "../../ReusableFolder/axioxInstance";
 export const VaccinePerContext = createContext();
 
 export const VaccinePerProvider = ({ children }) => {
@@ -34,7 +35,7 @@ export const VaccinePerProvider = ({ children }) => {
         if (!authToken) return;
 
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/AssignedPerBabyVaccine`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/AssignedPerBabyVaccine`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -51,7 +52,7 @@ export const VaccinePerProvider = ({ children }) => {
 
     const AddAssignedVaccine = async (values, userId) => {
         try {
-            const res = await axios.post(
+            const res = await axiosInstance.post(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/AssignedPerBabyVaccine`,
                 {
                     newborn: userId,
@@ -91,7 +92,7 @@ export const VaccinePerProvider = ({ children }) => {
 
     const removeAssignedVaccine = async (AssignedID) => {
         try {
-            const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/AssignedPerBabyVaccine/${AssignedID}`, {
+            const response = await axiosInstance.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/AssignedPerBabyVaccine/${AssignedID}`, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
@@ -116,7 +117,7 @@ export const VaccinePerProvider = ({ children }) => {
                 totalDoses: values.totalDoses || "",
             };
 
-            const response = await axios.patch(
+            const response = await axiosInstance.patch(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/AssignedPerBabyVaccine/${aditdata.assignedVaccineId}`,
                 dataToSend,
                 {

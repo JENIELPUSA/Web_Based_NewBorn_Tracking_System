@@ -74,7 +74,6 @@ app.use("/api/v1/users", usersroutes);
 app.use("/api/v1/NewBorn", NewBornBabyRoutes);
 app.use("/api/v1/Brand", BrandRoute);
 app.use("/api/v1/LogAudit",auditLogRoute)
-
 app.use("/api/v1/Vaccine", VaccineRoutes);
 app.use("/api/v1/authentication", authentic);
 app.use("/api/v1/GeneratePDF", PDFRoutes);

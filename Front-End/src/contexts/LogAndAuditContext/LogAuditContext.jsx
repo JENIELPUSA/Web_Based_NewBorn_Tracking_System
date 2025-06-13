@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
+import axiosInstance from "../../ReusableFolder/axioxInstance";
 
 export const LogContext = createContext();
 
@@ -21,7 +22,7 @@ export const LogDisplayProvider = ({ children }) => {
 
   const fetchLogData = async () => {
     try {
-      const res = await axios.get(
+      const res = await axiosInstance.get(
         `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/LogAudit`,
         {
           headers: { Authorization: `Bearer ${authToken}` },

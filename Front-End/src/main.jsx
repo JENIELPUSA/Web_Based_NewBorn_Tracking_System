@@ -2,8 +2,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
-
-// Import your providers
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { UserDisplayProvider } from "./contexts/UserContxet/UserContext";
 import { ThemeProvider } from "./contexts/theme-context.jsx"; // only if used
 import { AuthProvider } from "./contexts/AuthContext.jsx";
@@ -16,32 +16,48 @@ import { ProfillingDisplayProvider } from "./contexts/ProfillingContext/Profilli
 import SocketListener from "./component/SocketListener";
 import { NotificationDisplayProvider } from "./contexts/NotificationContext.jsx";
 import { ReportDisplayProvider } from "./contexts/Report/ReportContext.jsx";
+import AxiosInterceptor from "./component/AxiosInterceptor.jsx";
+import { BrandDisplayProvider } from "./contexts/BrandContext/BrandContext.jsx";
 
 createRoot(document.getElementById("root")).render(
     //<StrictMode>
     <ThemeProvider>
         {" "}
         <AuthProvider>
-            <ReportDisplayProvider>
-                <NotificationDisplayProvider>
-                    <ProfillingDisplayProvider>
-                        <LogDisplayProvider>
-                            <VaccinePerProvider>
-                                <VaccineDisplayProvider>
-                                    <VaccineRecordDisplayProvider>
-                                        <NewBornDisplayProvider>
-                                            <UserDisplayProvider>
-                                                <App />
-                                                <SocketListener />
-                                            </UserDisplayProvider>
-                                        </NewBornDisplayProvider>
-                                    </VaccineRecordDisplayProvider>
-                                </VaccineDisplayProvider>
-                            </VaccinePerProvider>
-                        </LogDisplayProvider>
-                    </ProfillingDisplayProvider>
-                </NotificationDisplayProvider>
-            </ReportDisplayProvider>
+            <BrandDisplayProvider>
+                <ReportDisplayProvider>
+                    <NotificationDisplayProvider>
+                        <ProfillingDisplayProvider>
+                            <LogDisplayProvider>
+                                <VaccinePerProvider>
+                                    <VaccineDisplayProvider>
+                                        <VaccineRecordDisplayProvider>
+                                            <NewBornDisplayProvider>
+                                                <UserDisplayProvider>
+                                                    <App />
+                                                    <AxiosInterceptor />
+                                                    <SocketListener />
+                                                    <ToastContainer
+                                                        position="top-right"
+                                                        autoClose={3000}
+                                                        hideProgressBar={false}
+                                                        newestOnTop={false}
+                                                        closeOnClick
+                                                        pauseOnFocusLoss
+                                                        draggable
+                                                        pauseOnHover
+                                                        theme="light" // or dark
+                                                    />
+                                                </UserDisplayProvider>
+                                            </NewBornDisplayProvider>
+                                        </VaccineRecordDisplayProvider>
+                                    </VaccineDisplayProvider>
+                                </VaccinePerProvider>
+                            </LogDisplayProvider>
+                        </ProfillingDisplayProvider>
+                    </NotificationDisplayProvider>
+                </ReportDisplayProvider>
+            </BrandDisplayProvider>
         </AuthProvider>
     </ThemeProvider>,
     //</StrictMode>,

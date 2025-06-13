@@ -1,4 +1,4 @@
-import { CircleUserRound, Home, NotepadText, KeyRound,ShieldCheck, Syringe, UserPlus, Baby,CalendarDays } from "lucide-react";
+import { CircleUserRound, Home, NotepadText, KeyRound,ShieldCheck, Syringe, UserPlus, Baby,CalendarDays,FilePlus2  } from "lucide-react";
 
 export const navbarLinks = [
     {
@@ -28,6 +28,16 @@ export const navbarLinks = [
                 label: "User",
                 icon: UserPlus,
                path: "/dashboard/add-user",
+            },
+             {
+                label: "Parent",
+                icon: UserPlus,
+               path: "/dashboard/add-parent",
+            },
+              {
+                label: "Register Brand",
+                icon: FilePlus2 ,
+               path: "/dashboard/brand",
             },
             {
                  label: "New Born",

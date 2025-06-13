@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
+import axiosInstance from "../../ReusableFolder/axioxInstance";
 export const VaccineDisplayContext = createContext();
 //gagamit tayo nito kung gusto mo ng auto log out agad instead na axios ilagay
 //mo siya sa reausable axiosInstances.jsx
@@ -76,7 +77,7 @@ useEffect(() => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -104,7 +105,7 @@ useEffect(() => {
 
     const VaccineAdd = async (values) => {
         try {
-            const res = await axios.post(
+            const res = await axiosInstance.post(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine`,
                 {
                     name: values.name.trim().toLowerCase(),
@@ -163,7 +164,7 @@ useEffect(() => {
                 data: batchId ? { batchId } : undefined, // Only send body if batchId exists
             };
 
-            const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/${vaccineId}`, config);
+            const response = await axiosInstance.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/${vaccineId}`, config);
 
             if (response.data.status === "success") {
                 if (batchId) {
@@ -206,7 +207,7 @@ useEffect(() => {
                 expirationDate: values.expirationDate, // optional
             };
 
-            const response = await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/${vaccineId}`, dataToSend, {
+            const response = await axiosInstance.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/${vaccineId}`, dataToSend, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 

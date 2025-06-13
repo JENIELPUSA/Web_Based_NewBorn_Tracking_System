@@ -4,17 +4,25 @@ const user = require("../Models/usermodel");
 const Apifeatures = require("./../Utils/ApiFeatures");
 
 exports.createUser = AsyncErrorHandler(async (req, res) => {
-    const { FirstName,LastName, email, password} = req.body;
-  
-    // Check for required fields (except Middle if optional)
-    if (!FirstName || !LastName || !email || !password ) {
+  const { FirstName, LastName, email, password, role } = req.body;
+
+  // Laging required ang FirstName at LastName
+  if (!FirstName || !LastName) {
+    return res.status(400).json({
+      status: "fail",
+      message: "First Name and Last Name are required.",
+    });
+  }
+
+  // Kapag hindi Guest, kailangan ng email at password
+  if (role !== "Guest") {
+    if (!email || !password) {
       return res.status(400).json({
         status: "fail",
-        message: "Please fill in all required fields.",
+        message: "Email and password are required for non-Guest roles.",
       });
     }
-  
-  
+
     // Optional: validate email format
     const isValidEmail = /\S+@\S+\.\S+/.test(email);
     if (!isValidEmail) {
@@ -23,17 +31,18 @@ exports.createUser = AsyncErrorHandler(async (req, res) => {
         message: "Please provide a valid email address.",
       });
     }
-  
-    // Create user
-    const newUser = await user.create(req.body);
-    console.log("Text",newUser)
-  
-    // Respond
-    res.status(201).json({
-      status: "success",
-      data: newUser,
-    });
+  }
+
+  // Create user
+  const newUser = await user.create(req.body);
+  console.log("User created:", newUser);
+
+  res.status(201).json({
+    status: "success",
+    data: newUser,
   });
+});
+
   
 
 exports.DisplayAll = AsyncErrorHandler(async (req, res) => {
@@ -91,27 +100,30 @@ exports.deleteUser = AsyncErrorHandler(async (req, res) => {
 });
 
 exports.Updateuser = AsyncErrorHandler(async (req, res, next) => {
-    const { FirstName, LastName, email,role} =
-    req.body;
+  const { FirstName, LastName, email, role } = req.body;
+
   if (
     !FirstName ||
     !LastName ||
-    !email||
-    !role
+    !email ||
+    (role !== "Guest" && !role)
   ) {
     return res.status(400).json({
       status: "fail",
       message: "Please fill in all required fields.",
     });
   }
+
   const updateuser = await user.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
+
   res.status(200).json({
     status: "success",
     data: updateuser,
   });
 });
+
 
 exports.Getiduser = AsyncErrorHandler(async (req, res, next) => {
   const users = await user.findById(req.params.id);

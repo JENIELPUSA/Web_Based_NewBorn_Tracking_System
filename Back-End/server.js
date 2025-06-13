@@ -102,21 +102,15 @@ io.on("connection", (socket) => {
     io.emit("refreshRequests"); // all users get the update
   });
 
-  // --- CLEAR NOTIFICATIONS ---
   socket.on("clearNotifications", () => {
     console.log("Notifications cleared");
     io.emit("notificationCountReset", { count: 0 }); // broadcast reset
   });
-
-  // --- DISCONNECT LOGGING ---
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
   });
 });
 
-
-
-// MONGOOSE CONNECTION
 mongoose
   .connect(process.env.CONN_STR, {
     useNewUrlParser: true,
@@ -128,19 +122,16 @@ mongoose
     process.exit(1);
   });
 
-// START SERVER
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-// Handle unhandled promise rejections (async errors)
 process.on("unhandledRejection", (err) => {
   console.error("Unhandled Rejection! Shutting down...");
   console.error(err.name, err.message, err.stack);
   server.close(() => process.exit(1));
 });
 
-
-// Include your cron job if applicable
 require("./Utils/CronJob");
+require("./Utils/CronJobforAccounts");

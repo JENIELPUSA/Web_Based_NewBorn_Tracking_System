@@ -159,6 +159,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         firstName: 1,
         middleName: 1,
         lastName: 1,
+        extensionName:1,
         dateOfBirth: {
           $dateToString: {
             format: "%b %d %Y", // Format date as 'Jan 13 2025'
@@ -412,51 +413,56 @@ exports.UpdateBabyData = AsyncErrorHandler(async (req, res, next) => {
   });
 });
 
-exports.DisplayGraph = AsyncErrorHandler(async(req,res,next)=>{
-
-   const features = new Apifeatures(NewBaby.find(), req.query)
+exports.DisplayGraph = AsyncErrorHandler(async (req, res, next) => {
+  const features = new Apifeatures(NewBaby.find(), req.query)
     .filter()
     .sort()
     .limitFields()
     .paginate();
 
-  // Get IDs after filtering and pagination
   const filteredBabies = await features.query;
   const ids = filteredBabies.map((baby) => baby._id);
-  const newborns = aggregationResult.length > 0 ? aggregationResult[0].data : [];
 
-if (!newborns || newborns.length === 0) {
-    return next(new CustomError('No newborn profile data found for the selected date range.', 404));
-}
+  if (ids.length === 0) {
+    return res.status(200).json({
+      status: "success",
+      totalMale: 0,
+      totalFemale: 0,
+      totalRecords: 0,
+      topBabies: [],
+      message: 'No newborn profile data found for the selected criteria.'
+    });
+  }
 
-  // Perform aggregation with $lookup, $project, and gender counting
   const result = await NewBaby.aggregate([
     {
-      $match: { _id: { $in: ids } }, // Match babies by the filtered IDs
+      $match: { _id: { $in: ids } },
     },
     {
       $lookup: {
-        from: "users", // Join with 'users' collection
-        localField: "addedBy", // Reference to the 'addedBy' field in NewBaby schema
-        foreignField: "_id", // Match with '_id' in 'users'
-        as: "addedBy", // Output the matched user data into the 'addedBy' field
+        from: "users",
+        localField: "addedBy",
+        foreignField: "_id",
+        as: "addedBy",
       },
     },
     {
       $unwind: {
-        path: "$addedBy", // Unwind the 'addedBy' array to access user details
-        preserveNullAndEmptyArrays: true, // Preserve documents even if 'addedBy' is missing
+        path: "$addedBy",
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
       $lookup: {
-        from: "users", // Join with 'users' collection for motherName
-        localField: "motherName", // Reference to the 'motherName' field in NewBaby schema
-        foreignField: "_id", // Match with '_id' in 'users'
+        from: "users",
+        localField: "motherName",
+        foreignField: "_id",
         as: "motherName",
       },
     },
-    { $unwind: "$motherName" },
+    {
+      $unwind: "$motherName",
+    },
     {
       $project: {
         firstName: 1,
@@ -464,11 +470,11 @@ if (!newborns || newborns.length === 0) {
         lastName: 1,
         dateOfBirth: {
           $dateToString: {
-            format: "%b %d %Y", // Format date as 'Jan 13 2025'
+            format: "%b %d %Y",
             date: "$dateOfBirth",
           },
         },
-        gender: 1, // Include gender for filtering
+        gender: 1,
         birthWeight: 1,
         birthHeight: 1,
         motherName: {
@@ -487,23 +493,23 @@ if (!newborns || newborns.length === 0) {
         createdAt: 1,
         addedByName: {
           $cond: {
-            if: { $eq: [{ $type: "$addedBy" }, "object"] }, // Check if addedBy exists and is an object
+            if: { $eq: [{ $type: "$addedBy" }, "object"] },
             then: {
-              $concat: ["$addedBy.FirstName", " ", "$addedBy.LastName"], // Concatenate first name and last name
+              $concat: ["$addedBy.FirstName", " ", "$addedBy.LastName"],
             },
-            else: "Unknown", // If addedBy is missing or invalid, show 'Unknown'
+            else: "Unknown",
           },
         },
         fullName: {
-          $concat: ["$firstName", " ", "$middleName", " ", "$lastName"], // Concatenate full name
+          $concat: ["$firstName", " ", "$middleName", " ", "$lastName"],
         },
         fullAddress: {
-          $concat: ["$zone", ", ", "$address"], // Concatenate zone and address
+          $concat: ["$zone", ", ", "$address"],
         },
       },
     },
     {
-      $sort: { birthWeight: -1 }, // Sort by birth weight in descending order
+      $sort: { birthWeight: -1 },
     },
     {
       $group: {
@@ -515,30 +521,27 @@ if (!newborns || newborns.length === 0) {
           $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] },
         },
         totalRecords: { $sum: 1 },
-        topBabies: { $push: "$$ROOT" }, // Push top babies data into topBabies field
+        topBabies: { $push: "$$ROOT" },
       },
     },
-    { $limit: 10 }, // Limit the output to top 10 babies by weight
     {
-      $project: {
-        topBabies: 1, // Keep only the top babies in the final result
-        totalMale: 1,
-        totalFemale: 1,
-        totalRecords: 1,
-      },
+        $project: {
+            totalMale: 1,
+            totalFemale: 1,
+            totalRecords: 1,
+            topBabies: { $slice: ["$topBabies", 10] },
+        },
     },
   ]);
 
-  // If no data found, return 0 for male and female counts
   const resultData = result.length > 0 ? result[0] : { totalMale: 0, totalFemale: 0, totalRecords: 0, topBabies: [] };
 
-  // Prepare formatted result
   const topBabiesFormatted = resultData.topBabies.map((baby, index) => ({
     number: index + 1,
     name: baby.fullName,
     totalWeight: `${baby.birthWeight} kg`,
-    birthMonth: baby.dateOfBirth.split(" ")[0], // Extract the month from the formatted date
-    zone: baby.zone || "Unknown", 
+    birthMonth: baby.dateOfBirth.split(" ")[0],
+    zone: baby.zone || "Unknown",
   }));
 
   res.status(200).json({
@@ -548,8 +551,7 @@ if (!newborns || newborns.length === 0) {
     totalRecords: resultData.totalRecords,
     topBabies: topBabiesFormatted,
   });
-
-})
+});
 
 
 

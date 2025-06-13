@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
+import axiosInstance from "../../ReusableFolder/axioxInstance";
 
 export const NewBornDisplayContext = createContext();
 
@@ -64,7 +65,7 @@ export const NewBornDisplayProvider = ({ children }) => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -101,7 +102,7 @@ export const NewBornDisplayProvider = ({ children }) => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/DisplayGraph`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/DisplayGraph`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -131,12 +132,13 @@ export const NewBornDisplayProvider = ({ children }) => {
 
     const AddNewBorn = async (values, userId) => {
         try {
-            const res = await axios.post(
+            const res = await axiosInstance.post(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn`,
                 {
                     firstName: values.firstName,
                     lastName: values.lastName,
                     middleName: values.middleName,
+                    extensionName:values.extensionName,
                     dateOfBirth: values.dateOfBirth,
                     gender: values.gender,
                     birthWeight: values.birthWeight,
@@ -174,7 +176,7 @@ export const NewBornDisplayProvider = ({ children }) => {
 
     const DeleteNewBorn = async (newbordID) => {
         try {
-            const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/${newbordID}`, {
+            const response = await axiosInstance.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/${newbordID}`, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
@@ -198,6 +200,7 @@ export const NewBornDisplayProvider = ({ children }) => {
             const dataToSend = {
                 firstName: values.firstName || "",
                 lastName: values.lastName || "",
+                extensionName:values.extensionName  || "",
                 middleName: values.middleName || "",
                 dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth).toISOString().slice(0, 10) : "",
                 gender: values.gender || "",
@@ -206,7 +209,7 @@ export const NewBornDisplayProvider = ({ children }) => {
                 motherName: values.motherName || "",
             };
 
-            const response = await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/${bornID}`, dataToSend, {
+            const response = await axiosInstance.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/${bornID}`, dataToSend, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 

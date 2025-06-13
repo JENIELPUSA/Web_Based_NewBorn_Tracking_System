@@ -153,10 +153,10 @@ function VaccineRecordTable() {
             </div>
 
             {/* Add button on XS screens */}
-            <div className="mt-4 flex justify-center sm:hidden">
+            <div className=" flex justify-center sm:hidden">
                 <button
                     onClick={handleAddClick}
-                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-red-500 px-4 py-2 text-white hover:bg-pink-600"
                 >
                     <Plus className="h-5 w-5" />
                     Add New Born

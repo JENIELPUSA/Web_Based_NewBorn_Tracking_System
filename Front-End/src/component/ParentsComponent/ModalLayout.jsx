@@ -9,40 +9,25 @@ function VaccineScheduleModal({ isOpen, onClose, passData }) {
 
     if (!isOpen) return null;
 
-    console.log("passData", passData);
-    console.log("Vaccine Data from Context", vaccineRecord);
-
     const filteredData = vaccineRecord.filter((item) => {
-        const fullName = `${passData.firstName} ${passData.lastName}`.toUpperCase();
-        const matchedName = item.newbornName?.toUpperCase() === fullName;
-        const matchedZone = item.newbornZone?.toUpperCase() === passData.zone?.toUpperCase();
-        const matchedMother = item.motherName?.toUpperCase() === passData.mothersName?.toUpperCase();
+        const fullName = `${passData.firstName || ''} ${passData.lastName || ''}`.toUpperCase();
+        const itemFullName = `${item.newbornName || ''}`.toUpperCase();
+
+        const matchedName = itemFullName === fullName;
+        const matchedZone = (item.newbornZone || '').toUpperCase() === (passData.zone || '').toUpperCase();
+        const matchedMother = (item.motherName || '').toUpperCase() === (passData.mothersName || '').toUpperCase();
         const matchedGender = item.gender === passData.gender;
-        const matchedAddress = item.FullAddress?.toUpperCase().includes(passData.address?.toUpperCase());
+        const matchedAddress = (item.FullAddress || '').toUpperCase().includes((passData.address || '').toUpperCase());
         const matchedDOB = item.dateOfBirth === passData.dateOfBirth;
+        const matchextensionName = item.extensionName === passData.extensionName;
 
-        console.log("🔍 Checking item:", item);
-        console.log("🟢 Matched Name:", matchedName);
-        console.log("🟢 Matched Zone:", matchedZone);
-        console.log("🟢 Matched Mother:", matchedMother);
-        console.log("🟢 Matched Gender:", matchedGender);
-        console.log("🟢 Matched Address:", matchedAddress);
-        console.log("🟢 Matched DOB:", matchedDOB);
-
-        const isMatch = matchedName &&
-                        matchedZone &&
-                        matchedMother &&
-                        matchedGender &&
-                        matchedAddress &&
-                        matchedDOB;
-
-        if (isMatch) {
-            console.log("✅ Match found:", item);
-        } else {
-            console.log("❌ Not a full match for:", item.newbornName);
-        }
-
-        return isMatch;
+        return matchedName &&
+            matchedZone &&
+            matchedMother &&
+            matchedGender &&
+            matchedAddress &&
+            matchextensionName &&
+            matchedDOB;
     });
 
     return (
@@ -52,7 +37,7 @@ function VaccineScheduleModal({ isOpen, onClose, passData }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4"
                     onClick={onClose}
                 >
                     <motion.div
@@ -60,8 +45,7 @@ function VaccineScheduleModal({ isOpen, onClose, passData }) {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -40, opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        // Max width and height for modal content
-                        className="w-full mx-2 sm:mx-4 xm:mx-auto rounded-2xl bg-white shadow-2xl dark:bg-slate-800 relative
+                        className="w-full max-w-sm sm:max-w-xl md:max-w-3xl lg:max-w-6xl xl:max-w-7xl mx-auto rounded-2xl bg-white shadow-2xl dark:bg-slate-800 relative
                                    max-h-[95vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
@@ -73,21 +57,15 @@ function VaccineScheduleModal({ isOpen, onClose, passData }) {
                             &times;
                         </button>
 
-                        {/* Changed md:flex-row to xm:flex-row for layout */}
-                        <div className="flex flex-col xm:flex-row gap-6 w-full p-4"> {/* Added padding for overall modal content */}
-                            {/* Changed md:w-1/2 to xm:w-1/2 for width */}
+                        <div className="flex flex-col xm:flex-row gap-6 p-4 sm:p-6 lg:p-8">
                             <div className="flex flex-col gap-6 w-full xm:w-1/2">
                                 <VaccineRecordTable dataToDisplay={filteredData} />
                             </div>
 
-                            {/* Changed md:w-1/2 to xm:w-1/2 for width */}
                             <div className="w-full xm:w-1/2">
                                 <Schedule scheduleData={filteredData} />
                             </div>
                         </div>
-
-                        {/* This div seems empty, you can remove it if not needed */}
-                        {/* <div className="mt-6 flex justify-end"></div> */}
                     </motion.div>
                 </motion.div>
             )}

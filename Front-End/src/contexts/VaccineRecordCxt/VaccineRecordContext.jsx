@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
 import { VaccineDisplayContext } from "../VaccineContext/VaccineContext";
+import axiosInstance from "../../ReusableFolder/axioxInstance";
 
 import { VaccinePerContext } from "../PerBabyVacine/PerBabyVacineContext";
 export const VaccineRecordDisplayContext = createContext();
@@ -37,7 +38,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
         if (!authToken) return;
         setLoading(true);
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -110,7 +111,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
 
     const AssignVaccine = async (values) => {
         try {
-            const res = await axios.post(
+            const res = await axiosInstance.post(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord`,
                 {
                     newborn: values.newborn,
@@ -163,7 +164,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 status: values.status,
             };
 
-            const response = await axios.patch(
+            const response = await axiosInstance.patch(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/${recordId}/doses/${values.doseId}`,
                 requestData,
             );
@@ -201,7 +202,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const DeleteContext = async (recordId, doseId) => {
         try {
             setLoading(true);
-            const response = await axios.delete(
+            const response = await axiosInstance.delete(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/${recordId}/doses/${doseId}`,
             );
 

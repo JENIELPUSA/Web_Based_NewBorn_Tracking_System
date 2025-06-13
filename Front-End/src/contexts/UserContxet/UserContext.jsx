@@ -3,6 +3,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
+import OtpForm from "../../component/OTPform/OtpForm ";
+import axiosInstance from "../../ReusableFolder/axioxInstance";
 export const UserDisplayContext = createContext();
 //gagamit tayo nito kung gusto mo ng auto log out agad instead na axios ilagay
 //mo siya sa reausable axiosInstances.jsx
@@ -20,6 +22,9 @@ export const UserDisplayProvider = ({ children }) => {
     const [isTotal, setTotal] = useState("");
     const [isMale, setMale] = useState("");
     const [isFemale, setFemale] = useState("");
+    const [isOTPModal, setOTPModal] = useState(false);
+    const [userId, setUserId] = useState("");
+    const [isParent, setParent] = useState("");
 
     useEffect(() => {
         if (!authToken) {
@@ -56,11 +61,27 @@ export const UserDisplayProvider = ({ children }) => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
-            setUsers(res.data.data)
+            setUsers(res.data.data);
+            const guestUsers = res.data.data
+                .filter((user) => user.role === "Guest")
+                .map((user) => ({
+                    _id: user._id,
+                    FirstName: user.FirstName,
+                    LastName: user.LastName,
+                    email: user.email,
+                    address: `${user.zone} ${user.address}`,
+                    phoneNumber: user.phoneNumber,
+                    dateOfBirth: user.dateOfBirth,
+                    gender: user.gender,
+                }));
+
+            const selectedUsers = res.data.data.filter((user) => user.role === "Admin" || user.role === "BHW");
+            setParent(guestUsers);
+            setUsers(selectedUsers);
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Failed to fetch data. Please try again later.");
@@ -70,10 +91,14 @@ export const UserDisplayProvider = ({ children }) => {
         }
     };
 
+    const handleOTP = (userId) => {
+        setOTPModal(true);
+        setUserId(userId);
+    };
 
     const AddUser = async (values) => {
         try {
-            const res = await axios.post(
+            const res = await axiosInstance.post(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/authentication/signup`,
                 {
                     FirstName: values.FirstName,
@@ -93,11 +118,11 @@ export const UserDisplayProvider = ({ children }) => {
                 },
             );
             if (res.data.status === "Success") {
-                setUsers((prevUsers) => [...prevUsers, res.data.data]);
-                setModalStatus("success");
-                setShowModal(true);
-
-                console.log("DESI", res.data.data);
+                const data = res.data.data;
+                fetchUserData();
+                if (["BHW", "Admin"].includes(values.role)) {
+                    handleOTP(data._id);
+                }
             } else {
                 setModalStatus("failed");
                 setShowModal(true);
@@ -118,12 +143,12 @@ export const UserDisplayProvider = ({ children }) => {
 
     const DeleteUser = async (userId) => {
         try {
-            const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/${userId}`, {
+            const response = await axiosInstance.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/${userId}`, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
             if (response.data.status === "success") {
-                setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
+                fetchUserData();
                 setModalStatus("success");
                 setShowModal(true);
             } else {
@@ -157,11 +182,11 @@ export const UserDisplayProvider = ({ children }) => {
                 dataToSend.password = values.password;
             }
 
-            const response = await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/${user}`, dataToSend, {
+            const response = await axiosInstance.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/${user}`, dataToSend, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
             if (response.data && response.data.status === "success") {
-                setUsers((prevUsers) => prevUsers.map((u) => (u._id === response.data.data._id ? response.data.data : u)));
+                fetchUserData();
                 setModalStatus("success");
                 setShowModal(true);
             } else {
@@ -196,11 +221,16 @@ export const UserDisplayProvider = ({ children }) => {
                 AddUser,
                 DeleteUser,
                 UpdateUser,
+                isParent,
             }}
         >
             {children}
 
-            {/* Modal should be rendered here */}
+            <OtpForm
+                isOpen={isOTPModal}
+                onClose={() => setOTPModal(false)}
+                userId={userId}
+            />
             <SuccessFailed
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}

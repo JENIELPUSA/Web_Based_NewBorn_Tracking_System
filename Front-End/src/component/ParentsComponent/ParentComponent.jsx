@@ -1,31 +1,31 @@
 import React, { useState } from "react";
-import ModalLayout from "./ModalLayout"; // Assuming ModalLayout exists and is correctly imported
+import ModalLayout from "./ModalLayout";
 
 function ParentComponent() {
   const [formData, setFormData] = useState({
     lastName: "",
     firstName: "",
-    extName: "", // For Jr., Sr. etc.
+    extName: "", 
     middleName: "",
     dateOfBirth: "",
-    gender: "", // Using this for the dropdown
-    mothersName: "", // Now a text input
-    zone: "", // New field for zone dropdown
-    address: "", // New field for address textbox
+    gender: "", 
+    mothersName: "",
+    zone: "", 
+    address: "",
   });
 
   const [isPassFormOpen, setPassFormOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null);
 
   const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
-  const [dropdownOpenZone, setDropdownOpenZone] = useState(false); // New state for Zone dropdown
+  const [dropdownOpenZone, setDropdownOpenZone] = useState(false);
   const [selectedGender, setSelectedGender] = useState("");
-  const [selectedZone, setSelectedZone] = useState(""); // New state for selected Zone
-  const [isData, setData] = useState(""); // Dummy data for zones (ideally fetched from an API)
+  const [selectedZone, setSelectedZone] = useState("");
   const zones = ["Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5", "Zone 6", "Zone 7", "Zone 8", "Zone 9", "Zone 10"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Conditional trimming: trim whitespace for all fields except 'mothersName' and 'address'
     const newValue = name === "mothersName" || name === "address" ? value : value.trim();
     setFormData((prevData) => ({
       ...prevData,
@@ -47,24 +47,42 @@ function ParentComponent() {
 
   const handleCloseModal = () => {
     setPassFormOpen(false);
+    setSubmittedData(null);
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Here you would typically send formData to your backend
-    console.log("Form Submitted:", formData);
-    setData(formData);
-    setPassFormOpen(true);
+    e.preventDefault();
+
+    const requiredFields = [
+      "lastName",
+      "firstName",
+      "dateOfBirth",
+      "gender",
+      "mothersName",
+      "zone",
+      "address",
+    ];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        alert(`Mangyaring punan ang lahat ng kinakailangang impormasyon. Ang '${field}' ay kailangan.`);
+        return;
+      }
+    }
+
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setSubmittedData(formData);
+      setPassFormOpen(true);
+      setIsLoading(false);
+    }, 1500);
   };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">
       <div className="relative flex w-full max-w-4xl flex-col rounded-xl bg-white px-6 py-10 shadow-lg dark:bg-gray-800">
-        {/* Header Section */}
         <div className="mb-8 text-center">
-          {/* Placeholder for a logo, if any */}
           <div className="mb-4">
-            {/* You can replace this with an actual image if you have one */}
-            {/* <img src="/path/to/your/logo.png" alt="Newborn Tracking Logo" className="mx-auto h-16" /> */}
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-xl font-bold text-white">
               NT
             </div>
@@ -76,13 +94,12 @@ function ParentComponent() {
         <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white xs:text-lg sm:text-3xl">Newborn's Information</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* BABY'S DETAILS SECTION */}
           <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
             <h3 className="mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Baby's Details</h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div className="col-span-1">
                 <label htmlFor="lastName" className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Last Name
+                  Last Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -93,12 +110,13 @@ function ParentComponent() {
                   value={formData.lastName}
                   onChange={handleChange}
                   className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  required
                 />
               </div>
 
               <div className="col-span-1">
                 <label htmlFor="firstName" className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  First Name
+                  First Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -109,6 +127,7 @@ function ParentComponent() {
                   value={formData.firstName}
                   onChange={handleChange}
                   className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  required
                 />
               </div>
 
@@ -149,7 +168,7 @@ function ParentComponent() {
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-4">
               <div className="col-span-1">
                 <label htmlFor="dateOfBirth" className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Date of Birth
+                  Date of Birth <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -158,17 +177,23 @@ function ParentComponent() {
                   value={formData.dateOfBirth}
                   onChange={handleChange}
                   className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  required
                 />
               </div>
 
-              {/* Gender Dropdown */}
               <div className="relative col-span-1">
                 <label htmlFor="gender" className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Gender
+                  Gender <span className="text-red-500">*</span>
                 </label>
                 <div
                   className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
                   onClick={() => setDropdownOpenGender(!dropdownOpenGender)}
+                  tabIndex="0"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setDropdownOpenGender(!dropdownOpenGender);
+                    }
+                  }}
                 >
                   <span>{selectedGender || "Select Gender"}</span>
                   <i className={`fas ${dropdownOpenGender ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`}></i>
@@ -202,14 +227,12 @@ function ParentComponent() {
             </div>
           </div>
 
-          {/* PARENTAL & BIRTH INFORMATION SECTION */}
           <div className="mt-6 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
             <h3 className="mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Parental & Birth Information</h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-4"> {/* Changed to md:grid-cols-4 for consistency */}
-              {/* Mother's Name */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div className="col-span-1">
                 <label htmlFor="mothersName" className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Mother's Name
+                  Mother's Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -220,17 +243,23 @@ function ParentComponent() {
                   value={formData.mothersName}
                   onChange={handleChange}
                   className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  required
                 />
               </div>
 
-              {/* Zone Dropdown */}
               <div className="relative col-span-1">
                 <label htmlFor="zone" className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Zone
+                  Zone <span className="text-red-500">*</span>
                 </label>
                 <div
                   className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
                   onClick={() => setDropdownOpenZone(!dropdownOpenZone)}
+                  tabIndex="0"
+                   onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setDropdownOpenZone(!dropdownOpenZone);
+                    }
+                  }}
                 >
                   <span>{selectedZone || "Select Zone"}</span>
                   <i className={`fas ${dropdownOpenZone ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`}></i>
@@ -256,10 +285,9 @@ function ParentComponent() {
                 )}
               </div>
 
-              {/* Address Textbox */}
-              <div className="col-span-2"> {/* Changed to col-span-2 to occupy the remaining two columns */}
+              <div className="col-span-2">
                 <label htmlFor="address" className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Address
+                  Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -270,6 +298,7 @@ function ParentComponent() {
                   value={formData.address}
                   onChange={handleChange}
                   className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  required
                 />
               </div>
             </div>
@@ -278,8 +307,19 @@ function ParentComponent() {
           <button
             type="submit"
             className="dark:red-blue-700 w-full rounded-lg bg-red-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-blue-700 dark:hover:bg-pink-600"
+            disabled={isLoading}
           >
-            Submit Newborn Details
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </div>
+            ) : (
+              "Submit Newborn Details"
+            )}
           </button>
         </form>
 
@@ -289,7 +329,7 @@ function ParentComponent() {
       <ModalLayout
         isOpen={isPassFormOpen}
         onClose={handleCloseModal}
-        passData={isData}
+        passData={submittedData}
       />
     </div>
   );

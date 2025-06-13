@@ -5,7 +5,7 @@ import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornCont
 import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
 
 function AddNewBorn({ isOpen, onClose, born }) {
-    const { users } = useContext(UserDisplayContext);
+    const { users, isParent } = useContext(UserDisplayContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
     const { userId } = useContext(AuthContext);
@@ -16,6 +16,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
         firstName: "",
         lastName: "",
         middleName: "",
+        extensionName: "",
         dateOfBirth: "",
         gender: "",
         birthWeight: "",
@@ -29,6 +30,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
             lastName: "",
             middleName: "",
             dateOfBirth: "",
+            extensionName: "",
             gender: "",
             birthWeight: "",
             motherName: "",
@@ -42,6 +44,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 firstName: born.firstName || "",
                 middleName: born.middleName || "",
                 lastName: born.lastName || "",
+                extensionName: born.extensionName || "",
                 dateOfBirth: born.dateOfBirth ? new Date(born.dateOfBirth).toISOString().slice(0, 10) : "",
                 gender: born.gender || "",
                 birthWeight: born.birthWeight || "",
@@ -58,6 +61,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 birthWeight: "",
                 motherName: "",
                 birthHeight: "",
+                extensionName: "",
             });
         }
     }, [born]);
@@ -163,6 +167,18 @@ function AddNewBorn({ isOpen, onClose, born }) {
                             />
                         </div>
                     </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Extension Name</label>
+                            <input
+                                type="text"
+                                name="extensionName"
+                                value={formData.extensionName}
+                                onChange={handleChange}
+                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                            />
+                        </div>
+                    </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         {/* Gender Dropdown */}
@@ -211,37 +227,38 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         </div>
                     </div>
 
-                    {/* Mother's Name Dropdown */}
                     <div className="relative">
-                        <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Mother's Name</label>
+                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Mother's Name</label>   {" "}
                         <div
                             className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
                             onClick={() => setDropdownOpen(!dropdownOpen)}
                         >
                             <span>
+                    
                                 {formData.motherName
-                                    ? users.find((u) => u._id === formData.motherName)?.FirstName +
+                                    ? isParent.find((parent) => parent._id === formData.motherName)?.FirstName +
                                       " " +
-                                      users.find((u) => u._id === formData.motherName)?.LastName
+                                      isParent.find((parent) => parent._id === formData.motherName)?.LastName
                                     : "Select Mother"}
                             </span>
                             <i className={`fas ${dropdownOpen ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
                         </div>
                         {dropdownOpen && (
                             <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700">
+        
                                 <li
-                                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                    className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                                     onClick={() => handleSelect("motherName", "")}
                                 >
-                                    Select Mother
+                                    Select Mother 
                                 </li>
-                                {users.map((user) => (
+
+                                {isParent.map((parent) => (
                                     <li
-                                        key={user._id}
-                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
-                                        onClick={() => handleSelect("motherName", user._id)}
-                                    >
-                                        {user.FirstName} {user.LastName}
+                                        key={parent._id}
+                                        className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                        onClick={() => handleSelect("motherName", parent._id)}
+                                    >{parent.FirstName} {parent.LastName}
                                     </li>
                                 ))}
                             </ul>

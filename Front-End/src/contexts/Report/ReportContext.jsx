@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import "react-toastify/dist/ReactToastify.css";
+import axiosInstance from "../../ReusableFolder/axioxInstance";
 
 export const ReportDisplayContext = createContext();
 
@@ -58,7 +59,7 @@ export const ReportDisplayProvider = ({ children }) => {
         setCustomError(""); // Clear previous error
         setmessage(""); // Clear previous message
         try {
-            const res = await axios.get(
+            const res = await axiosInstance.get(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/SpecificProfilling?from=${from}&to=${to}`,
                 {
                     withCredentials: true,
@@ -89,7 +90,7 @@ export const ReportDisplayProvider = ({ children }) => {
         setCustomError(""); // Clear previous error
         setmessage(""); // Clear previous message
         try {
-            const res = await axios.get(
+            const res = await axiosInstance.get(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/SpecificProfilling?from=${from}&to=${to}`,
                 {
                     withCredentials: true,
@@ -143,7 +144,7 @@ export const ReportDisplayProvider = ({ children }) => {
         setCustomError(""); // Clear previous error
         setmessage(""); // Clear previous message
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/GetBabyReport?from=${from}&to=${to}`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/GetBabyReport?from=${from}&to=${to}`, {
                 withCredentials: true,
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -194,7 +195,7 @@ export const ReportDisplayProvider = ({ children }) => {
         setCustomError(""); // Clear previous error
         setmessage(""); // Clear previous message
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/VaccineReports?from=${from}&to=${to}`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Vaccine/VaccineReports?from=${from}&to=${to}`, {
                 withCredentials: true,
                 headers: {
                     Authorization: `Bearer ${authToken}`,

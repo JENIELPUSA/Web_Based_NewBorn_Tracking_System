@@ -3,11 +3,11 @@ import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
 import { motion } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext";
 
-const UserFormModal = ({ isOpen, onClose, user }) => {
+const UserFormModal = ({ isOpen, onClose, user, role }) => {
     const { AddUser, UpdateUser, customError } = useContext(UserDisplayContext);
     const [dropdownOpenRole, setDropdownOpenRole] = useState(false);
     const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
-const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         FirstName: "",
         LastName: "",
@@ -21,26 +21,25 @@ const [isSubmitting, setIsSubmitting] = useState(false);
         avatar: "",
         zone: "",
         password: "",
-        Designatedzone: ""
+        Designatedzone: "",
     });
-        const resetForm = () => {
+    const resetForm = () => {
         setFormData({
-           FirstName: "",
-        LastName: "",
-        username: "",
-        email: "",
-        role: "",
-        address: "",
-        phoneNumber: "",
-        dateOfBirth: "",
-        gender: "",
-        avatar: "",
-        zone: "",
-        password: "",
-        Designatedzone: ""
+            FirstName: "",
+            LastName: "",
+            username: "",
+            email: "",
+            role: "",
+            address: "",
+            phoneNumber: "",
+            dateOfBirth: "",
+            gender: "",
+            avatar: "",
+            zone: "",
+            password: "",
+            Designatedzone: "",
         });
     };
-
     useEffect(() => {
         if (user) {
             setFormData({
@@ -72,6 +71,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                 avatar: "",
                 zone: "",
                 password: "",
+                Designatedzone: "",
             });
         }
     }, [user]);
@@ -90,20 +90,45 @@ const [isSubmitting, setIsSubmitting] = useState(false);
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+
         if (user) {
-            await UpdateUser(user._id, formData);
-            setTimeout(() => {
-                resetForm();    
-                setIsSubmitting(false);
-                onClose();
-            }, 1000);
-        } else {
-            await AddUser(formData);
+            if (role == "Guest") {
+                const updatedata = {
+                    ...formData,
+                    role: formData.role?.trim() === "" ? "Guest" : formData.role,
+                };
+                 console.log("IDD",user._id)
+                await UpdateUser(user._id, updatedata);
+               
+            } else {
+                await UpdateUser(user._id, formData);
+            }
+
             setTimeout(() => {
                 resetForm();
                 setIsSubmitting(false);
                 onClose();
             }, 1000);
+        } else {
+            if (role == "Guest") {
+                const newUserData = {
+                    ...formData,
+                    role: formData.role?.trim() === "" ? "Guest" : formData.role,
+                };
+                await AddUser(newUserData);
+                setTimeout(() => {
+                    resetForm();
+                    setIsSubmitting(false);
+                    onClose();
+                }, 1000);
+            } else {
+                await AddUser(formData);
+                setTimeout(() => {
+                    resetForm();
+                    setIsSubmitting(false);
+                    onClose();
+                }, 1000);
+            }
         }
     };
 
@@ -129,6 +154,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                     onSubmit={handleSubmit}
                     className="space-y-4"
                 >
+                    {/* First and Last Name */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">First Name</label>
@@ -152,7 +178,8 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Email and Role (conditionally rendered) */}
+                    <div className={`grid gap-4 ${role ? "grid-cols-1" : "grid-cols-2"}`}>
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Email</label>
                             <input
@@ -164,48 +191,45 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                             />
                         </div>
 
-                        {/* Custom Role Dropdown */}
-                        <div className="relative">
-                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Role</label>
-                            <div
-                                className="flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
-                                onClick={() => setDropdownOpenRole(!dropdownOpenRole)}
-                            >
-                                <span>{formData.role || "Select Role"}</span>
-                                <i className={`fas ${dropdownOpenRole ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
+                        {/* Custom Role Dropdown - Hidden for Guest role */}
+                        {!role && (
+                            <div className="relative">
+                                <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Role</label>
+                                <div
+                                    className="flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                    onClick={() => setDropdownOpenRole(!dropdownOpenRole)}
+                                >
+                                    <span>{formData.role || "Select Role"}</span>
+                                    <i className={`fas ${dropdownOpenRole ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
+                                </div>
+                                {dropdownOpenRole && (
+                                    <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
+                                        <li
+                                            className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                            onClick={() => handleSelect("role", "")}
+                                        >
+                                            Select Role
+                                        </li>
+                                        <li
+                                            className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                            onClick={() => handleSelect("role", "Admin")}
+                                        >
+                                            Admin
+                                        </li>
+                                        <li
+                                            className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                            onClick={() => handleSelect("role", "BHW")}
+                                        >
+                                            BHW
+                                        </li>
+                                    </ul>
+                                )}
                             </div>
-                            {dropdownOpenRole && (
-                                <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
-                                    <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
-                                        onClick={() => handleSelect("role", "")}
-                                    >
-                                        Select Role
-                                    </li>
-                                    <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
-                                        onClick={() => handleSelect("role", "Admin")}
-                                    >
-                                        Admin
-                                    </li>
-                                    <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
-                                        onClick={() => handleSelect("role", "BHW")}
-                                    >
-                                        BHW
-                                    </li>
-                                    <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
-                                        onClick={() => handleSelect("role", "Guest")}
-                                    >
-                                        Guest
-                                    </li>
-                                </ul>
-                            )}
-                        </div>
+                        )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Address and Zone (conditionally rendered) */}
+                    <div className={`grid gap-4 ${role ? "grid-cols-1" : "grid-cols-2"}`}>
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Address</label>
                             <input
@@ -216,19 +240,22 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
-                        <div>
-                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Zone</label>
-                            <input
-                                type="text"
-                                name="zone"
-                                value={formData.zone}
-                                onChange={handleChange}
-                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
-                            />
-                        </div>
+                        {/* Conditionally render Zone */}
+                    
+                            <div>
+                                <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Zone</label>
+                                <input
+                                    type="text"
+                                    name="zone"
+                                    value={formData.zone}
+                                    onChange={handleChange}
+                                    className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                />
+                            </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Phone Number and Password (conditionally rendered) */}
+                    <div className={`grid gap-4 ${role ? "grid-cols-1" : "grid-cols-2"}`}>
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Phone Number</label>
                             <input
@@ -239,19 +266,23 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
-                        <div>
-                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
-                            />
-                        </div>
+                        {/* Conditionally render Password */}
+                        {!role && (
+                            <div>
+                                <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Password</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                />
+                            </div>
+                        )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Date of Birth, Gender, and Designated Zone (conditionally rendered) */}
+                    <div className={`grid gap-4 ${role ? "grid-cols-1" : "grid-cols-2"}`}>
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Date of Birth</label>
                             <input
@@ -263,7 +294,6 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                             />
                         </div>
 
-                        {/* Custom Gender Dropdown */}
                         <div className="relative">
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Gender</label>
                             <div
@@ -276,19 +306,19 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                             {dropdownOpenGender && (
                                 <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600  dark:text-white"
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-600"
                                         onClick={() => handleSelect("gender", "")}
                                     >
                                         Select Gender
                                     </li>
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600  dark:text-white"
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-600"
                                         onClick={() => handleSelect("gender", "Male")}
                                     >
                                         Male
                                     </li>
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600  dark:text-white"
+                                        className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-600"
                                         onClick={() => handleSelect("gender", "Female")}
                                     >
                                         Female
@@ -296,26 +326,24 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                                 </ul>
                             )}
                         </div>
-<div>
-  <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">
-    Designated Zone
-  </label>
-  <input
-    type="text"
-    name="Designatedzone"
-    value={formData.Designatedzone || ""}
-    onChange={handleChange}
-    disabled={formData.role !== "BHW"}
-    className={`
-      w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-all focus:outline-none focus:ring-2
-      ${
-        formData.role !== "BHW"
-          ? "cursor-not-allowed border-slate-300 bg-slate-100 text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-500"
-          : "border-slate-300 bg-white text-slate-700 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
-      }
-    `}
-  />
-</div>
+                        {/* Conditionally render Designated Zone */}
+                        {!role && (
+                            <div>
+                                <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Designated Zone</label>
+                                <input
+                                    type="text"
+                                    name="Designatedzone"
+                                    value={formData.Designatedzone || ""}
+                                    onChange={handleChange}
+                                    disabled={formData.role !== "BHW"}
+                                    className={`w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 ${
+                                        formData.role !== "BHW"
+                                            ? "cursor-not-allowed border-slate-300 bg-slate-100 text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-500"
+                                            : "border-slate-300 bg-white text-slate-700 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                                    } `}
+                                />
+                            </div>
+                        )}
                     </div>
                     <div className="mt-6 flex justify-end gap-4">
                         <button

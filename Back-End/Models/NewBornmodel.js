@@ -4,6 +4,7 @@ const newbornSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   middleName: String,
+  extensionName:String,
   dateOfBirth: Date,
   gender: String,
   birthWeight: Number,

@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
+import axiosInstance from "../../ReusableFolder/axioxInstance";
 
 export const ProfillingContexts = createContext();
 
@@ -27,7 +28,7 @@ export const ProfillingDisplayProvider = ({ children }) => {
         if (!authToken) return;
 
         try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling`, {
+            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -58,7 +59,7 @@ export const ProfillingDisplayProvider = ({ children }) => {
 
         const AddProf = async (values, userId) => {
             try {
-                const res = await axios.post(
+                const res = await axiosInstance.post(
                     `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling`,
                     {
                         newborn_id: values.newborn_id,
@@ -94,7 +95,7 @@ export const ProfillingDisplayProvider = ({ children }) => {
 
     const DeleteProfile = async (newbordID) => {
         try {
-            const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/${newbordID}`, {
+            const response = await axiosInstance.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/${newbordID}`, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
@@ -117,7 +118,7 @@ export const ProfillingDisplayProvider = ({ children }) => {
        const UpdateProf = async (values) => {
             try {
                
-                const response = await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/${values._id}`, {
+                const response = await axiosInstance.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/${values._id}`, {
                         blood_type: values.blood_type,
                         health_condition: values.health_condition,
                         notes: values.notes

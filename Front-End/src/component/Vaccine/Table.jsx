@@ -76,35 +76,39 @@ function VaccineTable() {
 
     return (
         <div className="card m-4">
-            <div className="card-header mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="card-title text-xl font-semibold dark:text-white">Vaccine List</p>
-                <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-                    <input
-                        type="text"
-                        placeholder="Search vaccines..."
-                        className="input input-sm w-full rounded-md border px-3 py-1 text-sm dark:bg-slate-800 dark:text-white sm:w-56"
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                    />
-                   {/* Add button on XS screens */}
-                            <div className="mt-4 flex justify-center sm:hidden">
-                                <button
-                                    onClick={openAddModal}
-                                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                                >
-                                    <Plus className="h-5 w-5" />
-                                    Add New Born
-                                </button>
-                            </div>
-                </div>
-            </div>
+            <div className="card-header mb-2 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <p className="card-title text-xl font-semibold dark:text-white text-center sm:text-left">
+        Vaccine List
+    </p>
+        <div className="flex w-full justify-center sm:hidden">
+            <button
+                onClick={openAddModal}
+                className=" flex w-full max-w-[200px] items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            >
+                <Plus className="h-5 w-5" />
+                Add New Born
+            </button>
+        </div>
+
+    <div className="flex w-full flex-col items-center gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+        <input
+            type="text"
+            placeholder="Search vaccines..."
+            className="input input-sm w-full rounded-md border px-3 py-1 text-sm dark:bg-slate-800 dark:text-white sm:w-56"
+            value={searchTerm}
+            onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+            }}
+        />
+
+
+    </div>
+</div>
+
 
             <div className="card-body p-0">
                 <div className="relative w-full overflow-auto">
-                    {/* Table for larger screens */}
                     <div className="hidden sm:block">
                         <table className="table w-full text-sm">
                             <thead className="bg-gray-100 dark:bg-gray-800 dark:text-gray-300">
@@ -242,8 +246,6 @@ function VaccineTable() {
                         </button>
                     </div>
                 )}
-
-                {/* Modals */}
                 <UserFormModal
                     isOpen={isAddFormOpen}
                     isAddStock={true}

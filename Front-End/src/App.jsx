@@ -15,6 +15,8 @@ import ForgotPassword from "./component/ForgotPassword/ForgotPassword";
 import ResetPassword from "./component/ResetPassword/ResetPassword";
 import ParentLayout from "./component/ParentsComponent/LayoutParent";
 import PdfReport from "./component/Reports/ReportsLayout"
+import ParentLayoutTable from "./component/ParentsComponent/ParentLayoutTable";
+import Brand from "./component/Brand/LayoutTable"
 
 function App() {
   const router = createBrowserRouter([
@@ -49,17 +51,22 @@ function App() {
           path: "/dashboard/calendar",
           element: <CalendarLayout />,
         },
-        {
-          path: "/dashboard/reports",
-          element: <h1 className="title">Reports</h1>,
-        },
+        
         {
           path: "/dashboard/add-user",
           element: <AddUser />,
         },
+         {
+          path: "/dashboard/add-parent",
+          element: <ParentLayoutTable />,
+        },
         {
           path: "/dashboard/new-born",
           element: <NewBorn />,
+        },
+          {
+          path: "/dashboard/brand",
+          element: <Brand/>,
         },
         {
           path: "/dashboard/new-vaccine",

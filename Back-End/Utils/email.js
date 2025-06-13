@@ -16,8 +16,6 @@ const sendEmail = async (options) => {
         from: `NEW BORN TRACKING SYSTEM <${process.env.EMAIL_USER}>`,
         to: options.email,
         subject: options.subject,
-        // Optional: remove text if you're using html
-        // text: options.text,
         html: `
             <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
                 <div style="background-color: #b3e0ff; padding: 25px; text-align: center;">
