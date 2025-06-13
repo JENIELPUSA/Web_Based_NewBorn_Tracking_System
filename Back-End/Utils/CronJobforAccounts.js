@@ -4,7 +4,7 @@ const User = require("./../Models/usermodel"); // Siguraduhin na tama ang path n
 cron.schedule("*/5 * * * *", async () => {
   console.log("Running cron job to delete old unverified users...");
   try {
-    // Kalkulahin ang oras 5 minuto ang nakalipas
+
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
     const result = await User.deleteMany({
