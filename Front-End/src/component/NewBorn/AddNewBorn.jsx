@@ -8,7 +8,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
     const { users, isParent } = useContext(UserDisplayContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
-    const { userId } = useContext(AuthContext);
+    const { userId, DesignatedZone ,role} = useContext(AuthContext);
     const { AddNewBorn, UpdateBorn, customError } = useContext(NewBornDisplayContext);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,6 +38,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
         });
     };
 
+    console.log("Para sa Parents", isParent);
     useEffect(() => {
         if (born) {
             setFormData({
@@ -234,7 +235,6 @@ function AddNewBorn({ isOpen, onClose, born }) {
                             onClick={() => setDropdownOpen(!dropdownOpen)}
                         >
                             <span>
-                    
                                 {formData.motherName
                                     ? isParent.find((parent) => parent._id === formData.motherName)?.FirstName +
                                       " " +
@@ -245,22 +245,29 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         </div>
                         {dropdownOpen && (
                             <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700">
-        
                                 <li
-                                    className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                                     onClick={() => handleSelect("motherName", "")}
                                 >
-                                    Select Mother 
+                                    Select Mother
                                 </li>
 
-                                {isParent.map((parent) => (
-                                    <li
-                                        key={parent._id}
-                                        className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
-                                        onClick={() => handleSelect("motherName", parent._id)}
-                                    >{parent.FirstName} {parent.LastName}
-                                    </li>
-                                ))}
+                                {isParent
+                                    .filter((parent) => {
+                                        if (role === DesignatedZone) {
+                                            return parent.address?.includes(zone);
+                                        }
+                                        return true; 
+                                    })
+                                    .map((parent) => (
+                                        <li
+                                            key={parent._id}
+                                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                            onClick={() => handleSelect("motherName", parent._id)}
+                                        >
+                                            {parent.FirstName} {parent.LastName}
+                                        </li>
+                                    ))}
                             </ul>
                         )}
                     </div>

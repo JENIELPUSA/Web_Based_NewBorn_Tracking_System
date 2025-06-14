@@ -24,9 +24,9 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
             "/dashboard/new-record-vaccine",
             "/login",
             "/dashboard/Profilling_Dash",
-            "/dashboard/forgot-password"
+            "/dashboard/forgot-password",
+            "/dashboard/add-parent"
         ],
-        Guest: ["/dashboard/calendar", "/dashboard/new-record-vaccine", "/login"],
         Admin: [], // Empty array means all links are allowed
     };
 

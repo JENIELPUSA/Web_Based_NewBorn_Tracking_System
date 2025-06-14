@@ -138,10 +138,7 @@ exports.Getiduser = AsyncErrorHandler(async (req, res, next) => {
 });
 
 exports.updatePassword = AsyncErrorHandler(async (req, res, next) => {
-  //GET CURRENT USER DATA FROM DATABASE
   const user = await user.findById(req.user._id).select("+password");
-
-  //CHECK IF THE SUPPLIED CURRENT PASSWORD IS CORRECT
   if (
     !(await user.comparePasswordInDb(req.body.currentPassword, user.password))
   ) {
@@ -150,7 +147,6 @@ exports.updatePassword = AsyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  //IF SUPPLIED PASSWORD IS CORRECT, UPDATE USER PASSWORD WITH NEW VALUE
   user.password = req.body.password;
   user.confirmPassword = req.body.confirmPassword;
   await user.save();

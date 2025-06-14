@@ -39,11 +39,13 @@ useEffect(() => {
 
 
 
-console.log("CountBadge",pendingCount)
 
     const fetchNotification = async () => {
-        if (!authToken) return;
-        setLoading(true); // Set loading to true before fetching data
+        if (!authToken) {
+        setNotification(null); 
+        return;
+    }
+        setLoading(true); 
         try {
             const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Notification`, {
                 withCredentials: true,
@@ -65,7 +67,6 @@ console.log("CountBadge",pendingCount)
                 }
         } catch (error) {
             console.error("Error fetching data:", error);
-            toast.error("Failed to fetch data. Please try again later.");
             setError("Failed to fetch data");
         } finally {
             setLoading(false); // Set loading to false after data fetching is complete

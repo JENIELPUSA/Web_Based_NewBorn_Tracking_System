@@ -12,7 +12,7 @@ useEffect(() => {
   // Always register on every connection
   const handleConnect = () => {
     socket.emit("register-user", { userId, role });
-    console.log(`✅ User ${role} (${userId}) registered on socket connect.`);
+    console.log(`User ${role} (${userId}) registered on socket connect.`);
   };
 
   socket.on("connect", handleConnect);

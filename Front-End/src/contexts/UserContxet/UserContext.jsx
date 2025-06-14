@@ -77,6 +77,7 @@ export const UserDisplayProvider = ({ children }) => {
                     phoneNumber: user.phoneNumber,
                     dateOfBirth: user.dateOfBirth,
                     gender: user.gender,
+                    zone:`${user.zone}`
                 }));
 
             const selectedUsers = res.data.data.filter((user) => user.role === "Admin" || user.role === "BHW");
@@ -84,7 +85,6 @@ export const UserDisplayProvider = ({ children }) => {
             setUsers(selectedUsers);
         } catch (error) {
             console.error("Error fetching data:", error);
-            toast.error("Failed to fetch data. Please try again later.");
             setError("Failed to fetch data");
         } finally {
             setLoading(false); // Set loading to false after data fetching is complete

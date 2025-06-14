@@ -61,7 +61,6 @@ const checkAllVaccinesAreUnvaccinated = async (newbornId, io) => {
     const userEmails = usersInSameZone.map((u) => u.email);
     if (motherEmail) userEmails.push(motherEmail);
 
-    // 8. Gumawa ng notification
     await Notification.create({
       message: notificationMessage,
       newborn: newbornId,
@@ -69,13 +68,11 @@ const checkAllVaccinesAreUnvaccinated = async (newbornId, io) => {
       type: "unvaccinated_alert",
     });
 
-    // 9. I-update lahat ng assigned vaccine na notified na
     await AssignedVaccine.updateMany(
       { newborn: newbornId, notified: false },
       { $set: { notified: true } }
     );
 
-    // 10. Magpadala ng email
     try {
       await sendEmail({
         email: userEmails,

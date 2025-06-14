@@ -35,7 +35,7 @@ const logger = function (req, res, next) {
 
 app.use(express.json());
 //para sa IPADDRESS
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 app.use(
   session({

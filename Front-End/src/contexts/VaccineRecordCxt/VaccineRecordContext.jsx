@@ -35,37 +35,32 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     }, [customError]);
 
     const fetchVaccineRecordData = async () => {
-        if (!authToken) return;
         setLoading(true);
+
         try {
-            const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord`, {
-                withCredentials: true,
-                headers: { Authorization: `Bearer ${authToken}` },
-            });
+            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord`);
 
             const vaccineData = res?.data?.data || [];
-            console.log("Full vaccine data from API:", vaccineData); // Debug log
+            console.log("Full vaccine data from API:", vaccineData);
+
+            setCustomError("");
 
             if (role === "Admin") {
                 setVaccineRecord(vaccineData);
                 setCalendarData(vaccineData);
             } else if (role === "BHW") {
-                // Process records to only include doses administered by this BHW
                 const filteredRecords = vaccineData
                     .map((record) => {
-                        // Filter doses for this specific BHW
                         const bhwsDoses = record.doses.filter((dose) => dose.administeredById === userId);
-
-                        // Only include records that have doses administered by this BHW
                         return bhwsDoses.length > 0 ? { ...record, doses: bhwsDoses } : null;
                     })
-                    .filter((record) => record !== null); // Remove null entries
+                    .filter((record) => record !== null);
 
                 const filteredByZone = vaccineData.filter(
                     (record) => record.newbornZone?.toLowerCase().trim() === Designatedzone?.toLowerCase().trim(),
                 );
-
                 console.log("VaccineSpecific", filteredByZone);
+
                 setVaccineRecord(filteredRecords);
                 setCalendarData(filteredByZone);
 
@@ -73,21 +68,18 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
                 const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-                // Track unique vaccinated newborns this month
-                const vaccinatedThisMonthMap = new Map(); // Map to store newbornName => gender
-
+                const vaccinatedThisMonthMap = new Map();
                 filteredByZone.forEach((record) => {
                     record.doses.forEach((dose) => {
                         const doseDate = new Date(dose.dateGiven);
                         if (doseDate >= startOfMonth && doseDate <= endOfMonth) {
                             if (!vaccinatedThisMonthMap.has(record.newbornName)) {
-                                vaccinatedThisMonthMap.set(record.newbornName, record.gender); // Save gender for counting
+                                vaccinatedThisMonthMap.set(record.newbornName, record.gender);
                             }
                         }
                     });
                 });
 
-                // Count total, babae, at lalaki
                 const totalVaccinated = vaccinatedThisMonthMap.size;
                 let totalFemale = 0;
                 let totalMale = 0;
@@ -100,10 +92,14 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 setMale(totalMale);
                 setFemale(totalFemale);
                 setTotalVacinated(totalVaccinated);
+            } else {
+                // Any user who is not BHW (or walang role) can view all data
+                setVaccineRecord(vaccineData);
+                setCalendarData(vaccineData);
             }
         } catch (error) {
             console.error("Error fetching vaccine records:", error);
-            setCustomError(error.response?.data?.message || "Failed to fetch data");
+            setCustomError(error.response?.data?.message || "Failed to fetch data. Please try again later.");
         } finally {
             setLoading(false);
         }

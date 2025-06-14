@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
+  email: { type: String,unique: true,sparse: true },
   role: {
     type: String,
     enum: {
@@ -20,10 +20,10 @@ const userSchema = new mongoose.Schema({
   },
   avatar: { type: String },
 
-  FirstName: { type: String, required: [true, "Please Enter FirstName."] }, // First name of the user
-  LastName: { type: String, required: [true, "Please Enter LastName."] }, // Last name of the user
-  address: { type: String, required: [true, "Please Enter Address!"] }, // Home address of the user
-  phoneNumber: { type: String }, // Contact number of the user
+  FirstName: { type: String, required: [true, "Please Enter FirstName."] }, 
+  LastName: { type: String, required: [true, "Please Enter LastName."] },
+  address: { type: String, required: [true, "Please Enter Address!"] },
+  phoneNumber: { type: String },
   dateOfBirth: {
     type: Date,
     required: [true, "Please select a Date of Birth"],

@@ -17,9 +17,7 @@ function BrandTable() {
     const brandsPerPage = 5;
 
     const filteredBrands = useMemo(() => {
-        return (isBrand || []).filter((brand) =>
-            brand.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        return (isBrand || []).filter((brand) => brand.name.toLowerCase().includes(searchTerm.toLowerCase()));
     }, [isBrand, searchTerm]);
 
     const totalPages = Math.ceil(filteredBrands.length / brandsPerPage);
@@ -37,11 +35,11 @@ function BrandTable() {
         });
     };
 
-    const getInitial = (name) => name ? name.charAt(0).toUpperCase() : "B";
+    const getInitial = (name) => (name ? name.charAt(0).toUpperCase() : "B");
 
     const handleAddBrand = () => {
         setFormBrand(true);
-        setPassdata(""); 
+        setPassdata("");
     };
 
     const onUserSelect = (data) => {
@@ -50,8 +48,8 @@ function BrandTable() {
     };
 
     const handleDeleteUser = (id) => {
-        setDeleteID(id); 
-        setVerification(true); 
+        setDeleteID(id);
+        setVerification(true);
     };
 
     const handleConfirmDelete = async () => {
@@ -71,19 +69,7 @@ function BrandTable() {
 
     return (
         <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
-            {/* Header with title and button */}
             <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center gap-4">
-                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Brand List</h2>
-                    <button
-                        onClick={handleAddBrand}
-                        className="inline-flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
-                        title="Add Brand"
-                    >
-                        <Plus className="h-4 w-4" />
-                        Add Brand
-                    </button>
-                </div>
                 <div className="flex items-center gap-2">
                     <input
                         type="text"
@@ -98,7 +84,6 @@ function BrandTable() {
                 </div>
             </div>
 
-            {/* Desktop table */}
             <div className="hidden overflow-x-auto sm:block">
                 <table className="table min-w-full text-sm">
                     <thead className="bg-gray-100 dark:bg-gray-800">
@@ -106,7 +91,15 @@ function BrandTable() {
                             <th className="p-3 text-left">#</th>
                             <th className="p-3 text-left">Name</th>
                             <th className="p-3 text-left">Created At</th>
-                            <th className="p-3 text-left">Actions</th>
+                            <th className="p-3 text-left">
+                                <button
+                                    onClick={handleAddBrand}
+                                    className="hidden items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 sm:inline-flex"
+                                    title="Add Brand"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                </button>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -129,12 +122,13 @@ function BrandTable() {
                                     <td className="p-3 align-top">{brand.name}</td>
                                     <td className="p-3 align-top">{formatDate(brand.createdAt)}</td>
                                     <td className="p-3 align-top">
-                                        <div className="flex gap-2">
+                                        <div className="flex flex-wrap gap-2">
                                             <motion.button
                                                 whileHover={{ scale: 1.1 }}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => onUserSelect(brand)}
-                                                className="rounded bg-blue-500 p-1.5 text-white hover:bg-blue-600"
+                                                className="shrink-0 rounded bg-blue-500 p-1.5 text-white hover:bg-blue-600"
+                                                title="Edit"
                                             >
                                                 <PencilIcon className="h-4 w-4" />
                                             </motion.button>
@@ -142,7 +136,8 @@ function BrandTable() {
                                                 whileHover={{ scale: 1.1 }}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => handleDeleteUser(brand._id)}
-                                                className="rounded bg-red-500 p-1.5 text-white hover:bg-red-600"
+                                                className="shrink-0 rounded bg-red-500 p-1.5 text-white hover:bg-red-600"
+                                                title="Delete"
                                             >
                                                 <TrashIcon className="h-4 w-4" />
                                             </motion.button>
@@ -157,6 +152,14 @@ function BrandTable() {
 
             {/* Mobile view */}
             <div className="mt-4 space-y-4 sm:hidden">
+                <button
+                    onClick={handleAddBrand}
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                >
+                    <Plus className="h-5 w-5" />
+                    Add New Born
+                </button>
+
                 {currentBrands.length === 0 ? (
                     <div className="p-4 text-center text-gray-500 dark:text-gray-400">No brands found.</div>
                 ) : (
@@ -165,33 +168,41 @@ function BrandTable() {
                             key={brand._id}
                             className="rounded-lg border p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
-                                    {getInitial(brand.name)}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
+                                        {getInitial(brand.name)}
+                                    </div>
+                                    <div>
+                                        <h4 className="text-base font-semibold text-gray-800 dark:text-white">{brand.name}</h4>
+                                        <p className="text-sm text-gray-500 dark:text-gray-300">Created: {formatDate(brand.createdAt)}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 className="text-base font-semibold text-gray-800 dark:text-white">{brand.name}</h4>
-                                    <p className="text-sm text-gray-500 dark:text-gray-300">ID: {brand._id}</p>
+                                <div className="flex flex-wrap gap-2">
+                                    <motion.button
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => onUserSelect(brand)}
+                                        className="shrink-0 rounded bg-blue-500 p-1.5 text-white hover:bg-blue-600"
+                                        title="Edit"
+                                    >
+                                        <PencilIcon className="h-4 w-4" />
+                                    </motion.button>
+                                    <motion.button
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => handleDeleteUser(brand._id)}
+                                        className="shrink-0 rounded bg-red-500 p-1.5 text-white hover:bg-red-600"
+                                        title="Delete"
+                                    >
+                                        <TrashIcon className="h-4 w-4" />
+                                    </motion.button>
                                 </div>
                             </div>
-                            <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                <p><span className="font-semibold">Created:</span> {formatDate(brand.createdAt)}</p>
-                                <p><span className="font-semibold">Last Updated:</span> {formatDate(brand.updatedAt)}</p>
-                            </div>
+                            
                         </div>
                     ))
                 )}
-
-                {/* Mobile Add Button */}
-                <div className="flex justify-center">
-                    <button
-                        onClick={handleAddBrand}
-                        className="mt-2 inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    >
-                        <Plus className="h-4 w-4" />
-                        Add Brand
-                    </button>
-                </div>
             </div>
 
             {/* Pagination */}
@@ -218,16 +229,8 @@ function BrandTable() {
             )}
 
             {/* Modals */}
-            <BrandForm
-                isOpen={isFormBrand}
-                onClose={handleCloseModal}
-                BrandData={ispassData}
-            />
-            <StatusVerification
-                isOpen={isVerification}
-                onConfirmDelete={handleConfirmDelete}
-                onClose={handleCloseModal}
-            />
+            <BrandForm isOpen={isFormBrand} onClose={handleCloseModal} BrandData={ispassData} />
+            <StatusVerification isOpen={isVerification} onConfirmDelete={handleConfirmDelete} onClose={handleCloseModal} />
         </div>
     );
 }

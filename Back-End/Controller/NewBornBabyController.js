@@ -87,7 +87,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
 
   const newbornData = toolWithCategory[0];
 
-  // Create Audit Log entry
   const auditLog = new AuditLog({
     userId: userId,
     action: "Create Newborn Record",
@@ -174,7 +173,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         },
         motherID:"$motherName._id",
         address: {
-          $concat: ["$motherName.zone", " ", "$motherName.address"],
+          $concat: ["$motherName.address"],
         },
         phoneNumber: {
           $concat: ["$motherName.phoneNumber"],
@@ -196,7 +195,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
           $concat: ["$firstName", " ", "$middleName", " ", "$lastName"], // Concatenate full name
         },
         fullAddress: {
-          $concat: ["$zone", ", ", "$address"], // Concatenate zone and address
+          $concat: ["$address"], // Concatenate zone and address
         },
       },
     },

@@ -273,7 +273,6 @@ function ParentTable() {
                 </div>
             )}
 
-            {/* Modals */}
             <UserFormModal
                 isOpen={isAddFormOpen}
                 user={selectedUser}

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import ModalLayout from "./ModalLayout";
-
+import { useLocation, useNavigate } from "react-router-dom";
 function ParentComponent() {
   const [formData, setFormData] = useState({
     lastName: "",
@@ -13,7 +12,7 @@ function ParentComponent() {
     zone: "", 
     address: "",
   });
-
+  const navigate = useNavigate();
   const [isPassFormOpen, setPassFormOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [submittedData, setSubmittedData] = useState(null);
@@ -72,7 +71,7 @@ function ParentComponent() {
     setIsLoading(true);
 
     setTimeout(() => {
-      setSubmittedData(formData);
+      navigate("/parent-view", { state: { formData } });
       setPassFormOpen(true);
       setIsLoading(false);
     }, 1500);
@@ -325,12 +324,6 @@ function ParentComponent() {
 
         <p className="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">&copy; NEWBORN TRACKING SYSTEM 2025 | All rights reserved</p>
       </div>
-
-      <ModalLayout
-        isOpen={isPassFormOpen}
-        onClose={handleCloseModal}
-        passData={submittedData}
-      />
     </div>
   );
 }

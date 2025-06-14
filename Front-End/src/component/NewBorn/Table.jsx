@@ -82,9 +82,6 @@ function NewBorn() {
 
 
 };  
-
-console.log("kkkkk",newBorn)
-
 return (
     <div className="card">
         <div className="card-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -100,8 +97,6 @@ return (
                 }}
             />
         </div>
-
-        {/* Mobile Card View */}
         <div className="block p-4 sm:hidden">
             <button
                 onClick={handleAddClick}

@@ -1,42 +1,37 @@
 // ApiFeatures.js
-const mongoose = require('mongoose');  // Ensure mongoose is imported
+const mongoose = require('mongoose'); 
 class Apifeatures {
   constructor(query, queryString) {
-    this.query = query; // The query from the model (e.g., tools.find())
-    this.queryString = queryString; // The query parameters from the request
+    this.query = query;
+    this.queryString = queryString;
   }
 
   filter() {
-    const queryObj = { ...this.queryString }; // Extract query parameters
-    const excludedFields = ['sort', 'page', 'limit']; // Fields to exclude
-    excludedFields.forEach((el) => delete queryObj[el]); // Remove excluded fields
+    const queryObj = { ...this.queryString };
+    const excludedFields = ['sort', 'page', 'limit']; 
+    excludedFields.forEach((el) => delete queryObj[el]); 
     
-    // Check if 'equipmentId' is present in the query string
     if (queryObj.equipmentId) {
-      // Use MongoDB's ObjectId format to ensure it matches the equipment's _id
        queryObj['Equipments'] = new mongoose.Types.ObjectId(queryObj.equipmentId); 
-      delete queryObj.equipmentId; // Remove the equipmentId from the query string
+      delete queryObj.equipmentId;
     }else if(queryObj.Equipments){
       queryObj['Equipments'] = new mongoose.Types.ObjectId(queryObj.Equipments); 
     }
 
-    // Dynamically build the filter query
     this.query = this.query.find(queryObj);
   
     return this;
   }
-  // Sorting logic
   sort() {
     if (this.queryString.sort) {
       const sortBy = this.queryString.sort.split(",").join(" ");
-      this.query = this.query.sort(sortBy); // Apply sorting to the query
+      this.query = this.query.sort(sortBy); 
     } else {
       this.query = this.query.sort("-createdAt"); // Default sorting (e.g., by createdAt)
     }
-    return this; // Returning `this` for method chaining
+    return this; 
   }
 
-  // Limiting the fields returned
   limitFields() {
     if (this.queryString.fields) {
       const fields = this.queryString.fields.split(",").join(" ");

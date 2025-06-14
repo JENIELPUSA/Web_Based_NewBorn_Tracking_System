@@ -45,7 +45,6 @@ export const VaccinePerProvider = ({ children }) => {
 
             console.log("Per Baby",vaccineDAta)
         } catch (error) {
-            toast.error("Failed to fetch data. Please try again later.");
             setCustomError("Failed to fetch data");
         }
     };

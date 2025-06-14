@@ -42,7 +42,6 @@ export const ProfillingDisplayProvider = ({ children }) => {
                 setProfilling([]); // Set an empty array if the data is not in the expected format
             }
         } catch (error) {
-            toast.error("Failed to fetch data. Please try again later.");
             setCustomError("Failed to fetch data");
         }
     };

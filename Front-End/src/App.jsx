@@ -17,6 +17,8 @@ import ParentLayout from "./component/ParentsComponent/LayoutParent";
 import PdfReport from "./component/Reports/ReportsLayout"
 import ParentLayoutTable from "./component/ParentsComponent/ParentLayoutTable";
 import Brand from "./component/Brand/LayoutTable"
+import ParentLayoutFinals from "./component/ParentsComponent/ParentLayoutFinals";
+import ParentComponent from "./component/ParentsComponent/ParentComponent";
 
 function App() {
   const router = createBrowserRouter([
@@ -31,14 +33,16 @@ function App() {
     },
     {
       path: "/parent-dashboard",
-      element: <ParentLayout />,
+      element: <ParentComponent />,
     },
-    // Redirect root path to /login
+    {
+      path: "/parent-view",
+      element: <ParentLayoutFinals />,
+    },
     {
       path: "/",
       element: <Login />,
     },
-    // Dashboard & a    ll children
     {
       path: "/dashboard",
       element: <Layout />,

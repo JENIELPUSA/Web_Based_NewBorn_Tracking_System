@@ -7,7 +7,6 @@ router
   .route("/")
   .post(authController.protect, RecordController.createNewRecord)
   .get(RecordController.DisplayVaccinationRecord)
-// routes/vaccinationRecord.js
 router
   .route("/:recordId/doses/:doseId")  // Now includes doseId
   .patch(
