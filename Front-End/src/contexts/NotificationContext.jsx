@@ -75,14 +75,6 @@ const fetchNotification = async () => {
         }
     } catch (error) {
         console.error("Error fetching notifications:", error);
-
-        // Optional: logout if 401 Unauthorized (token expired)
-        if (error.response?.status === 401) {
-            toast.error("Session expired. Logging out...");
-            logout();
-        } else {
-            toast.error("Failed to fetch notifications.");
-        }
     } finally {
         setLoading(false);
     }
