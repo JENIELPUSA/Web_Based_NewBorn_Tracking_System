@@ -4,19 +4,17 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
 
-// Create context
 export const BrandDisplayContext = createContext();
 
-// Provider component
 export const BrandDisplayProvider = ({ children }) => {
-    const [isBrand, setBrand] = useState([]); // Brand data list
-    const [loading, setLoading] = useState(false); // Loading state
-    const [error, setError] = useState(null); // Error state
-    const { authToken } = useContext(AuthContext); // Get auth token
+    const [isBrand, setBrand] = useState([]); 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const { authToken } = useContext(AuthContext); 
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
     const [customError, setCustomError] = useState("");
-    // Fetch brands from API
+
     const fetchBrandData = async () => {
         if (!authToken) return;
 
@@ -31,7 +29,6 @@ export const BrandDisplayProvider = ({ children }) => {
             console.log("Fetched brands:", res.data.data);
         } catch (error) {
             console.error("Error fetching brands:", error);
-            toast.error("Failed to fetch brand data.");
             setError("Failed to fetch data.");
         } finally {
             setLoading(false);

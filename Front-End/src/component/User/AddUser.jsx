@@ -87,6 +87,7 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
         if (name === "gender") setDropdownOpenGender(false);
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -357,7 +358,7 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                             type="submit"
                             disabled={isSubmitting}
                             className={
-                                "rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-blue-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                                "rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-red-600 dark:text-gray-200 dark:hover:bg-pink-500"
                             }
                         >
                             {isSubmitting ? (

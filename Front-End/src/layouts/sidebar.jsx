@@ -25,12 +25,11 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
             "/login",
             "/dashboard/Profilling_Dash",
             "/dashboard/forgot-password",
-            "/dashboard/add-parent"
+            "/dashboard/add-parent",
+            "/dashboard/PDF-Report"
         ],
-        Admin: [], // Empty array means all links are allowed
+        Admin: [],
     };
-
-    // Filter navbar links based on role
     const filteredNavbarLinks = navbarLinks
         .map((group) => ({
             ...group,
@@ -45,10 +44,9 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
         .filter((group) => group.links.length > 0);
 
     const handleLogout = () => {
-        logout(); // Clear session data
-        setTimeout(() => {
-            navigate("/login", { replace: true });
-        }, 100); // Delay of 100ms, adjust as needed
+        logout(); 
+        navigate("/login", { replace: true });
+ 
     };
 
     return (

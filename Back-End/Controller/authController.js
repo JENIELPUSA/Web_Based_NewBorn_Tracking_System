@@ -6,11 +6,9 @@ const util = require("util");
 const sendEmail = require("../Utils/email");
 const crypto = require("crypto");
 
-//ito ay function para sa secret code
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.SECRET_STR, {
-    //importante ito dapat tugma siya sa back-end o sa app.js na session sa ttl and sa maxage
-    expiresIn: "1d", // 1 day
+    expiresIn: "1d", 
   });
 };
 
@@ -26,8 +24,6 @@ const createSendResponse = (user, statusCode, res) => {
   if (process.env.NODE_ENV === "production") options.secure = true;
 
   res.cookie("jwt", token, options);
-  //para hindi masama ang password fields sa Output
-  //ma save sa databased but not view for in Output
   user.password = undefined;
 
   res.status(statusCode).json({
@@ -272,7 +268,7 @@ exports.forgotPassword = AsyncErrorHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Generate the reset URL
-  const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
   const message = `We have received a password reset request. Please use the below link to reset your password:\n\n${resetUrl} \n\nThis reset password link will be available for 10 minutes.`;
 
   try {
@@ -288,7 +284,6 @@ exports.forgotPassword = AsyncErrorHandler(async (req, res, next) => {
       message: "Password reset link sent to the user email",
     });
   } catch (err) {
-    // Reset the password reset token and expiry fields on error
     user.passwordResetToken = undefined;
     user.passwordResetTokenExpires = undefined;
 

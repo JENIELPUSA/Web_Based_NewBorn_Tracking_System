@@ -37,23 +37,18 @@ export default function StatusModal({ isOpen, onClose, status = "success" }) {
             {isSuccess ? "✅" : "❌"}
           </motion.div>
         </motion.div>
-
-        {/* Heading */}
         <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
           {isSuccess ? "Successfully Accepted!" : "Action Failed!"}
         </h2>
 
-        {/* Message */}
         <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
           {isSuccess
             ? "Your request has been successfully accepted and processed."
             : "Oops! Something went wrong. Please try again later."}
         </p>
-
-        {/* Button */}
         <button
           onClick={onClose}
-          className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-500 transition duration-300 w-full focus:outline-none"
+          className="bg-red-600 text-white px-6 py-3 rounded-full hover:bg-pink-500 transition duration-300 w-full focus:outline-none"
         >
           Got it
         </button>

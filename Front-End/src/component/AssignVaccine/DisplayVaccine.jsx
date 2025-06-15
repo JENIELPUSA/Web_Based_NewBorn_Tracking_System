@@ -185,7 +185,7 @@ const DisplayVaccine = ({ isOpen, onClose, newbornID }) => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleAssign(newbornID)}
-                            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-md transition-all duration-200 hover:bg-blue-700 hover:shadow-lg dark:bg-blue-500 dark:hover:bg-blue-600"
+                            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white shadow-md transition-all duration-200 hover:bg-blue-700 hover:shadow-lg dark:bg-red-500 dark:hover:bg-pink-600"
                         >
                             <Plus className="h-4 w-4" />
                             Add New Vaccine

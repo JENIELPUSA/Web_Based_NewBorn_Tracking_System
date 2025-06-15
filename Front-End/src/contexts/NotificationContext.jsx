@@ -7,7 +7,7 @@ import SuccessFailed from "../ReusableFolder/SuccessandField";
 export const NotificationDisplayContext = createContext();
 export const NotificationDisplayProvider = ({ children }) => {
     const [customError, setCustomError] = useState("");
-    const { authToken, role, userId, Designatedzone } = useContext(AuthContext);
+    const { authToken, role, userId, Designatedzone,logout } = useContext(AuthContext);
     const [notify, setNotification] = useState([]); // Initialize notification state
     const [loading, setLoading] = useState(true); // Initialize loading state
     const [error, setError] = useState(null); // Initialize error state
@@ -27,51 +27,67 @@ export const NotificationDisplayProvider = ({ children }) => {
         fetchNotification();
     }, [authToken]); // Dependencies to trigger effect when page or items per page change
 
-useEffect(() => {
-  if (!Array.isArray(notify) || !userId) return;
+    useEffect(() => {
+        if (!Array.isArray(notify) || !userId) return;
 
-  const unreadNotifications = notify.filter(notification =>
-    !notification.readBy.includes(userId)
-  );
+        const unreadNotifications = notify.filter((notification) => !notification.readBy.includes(userId));
 
-  setPendingCount(unreadNotifications.length);
-}, [notify, userId]);
+        setPendingCount(unreadNotifications.length);
+    }, [notify, userId]);
 
 
-
-
-    const fetchNotification = async () => {
-        if (!authToken) {
-        setNotification(null); 
+const fetchNotification = async () => {
+    if (!authToken) {
+        // Walang token — force logout
+        logout();
         return;
     }
-        setLoading(true); 
-        try {
-            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Notification`, {
+
+    setLoading(true);
+
+    try {
+        const response = await axios.get(
+            `${impYort.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Notification`,
+            {
                 withCredentials: true,
-                headers: { Authorization: `Bearer ${authToken}` },
-            });
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
 
-            const Notify = res?.data.data;
+        const notifications = response?.data?.data || [];
 
-            if (role === "Admin") {
-                setNotification(Notify);
-                console.log("Admindata", Notify);
-            } else if (role === "Guest") {
-                const filteredNotifications = Notify.filter((notification) => notification.mother._id === userId);
-                setNotification(filteredNotifications);
-            } else {
-                    const filteredNotifications = Notify.filter((notification) =>notification.mother.zone === Designatedzone);
-                    setNotification(filteredNotifications);
-                    console.log(filteredNotifications)
-                }
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            setError("Failed to fetch data");
-        } finally {
-            setLoading(false); // Set loading to false after data fetching is complete
+        if (role === "Admin") {
+            setNotification(notifications);
+        } else if (role === "Guest") {
+            const filtered = notifications.filter(
+                (notification) => notification.mother?._id === userId
+            );
+            setNotification(filtered);
+        } else {
+            const filtered = notifications.filter(
+                (notification) =>
+                    notification.mother?.zone?.toLowerCase().trim() ===
+                    Designatedzone?.toLowerCase().trim()
+            );
+            setNotification(filtered);
         }
-    };
+    } catch (error) {
+        console.error("Error fetching notifications:", error);
+
+        // Optional: logout if 401 Unauthorized (token expired)
+        if (error.response?.status === 401) {
+            toast.error("Session expired. Logging out...");
+            logout();
+        } else {
+            toast.error("Failed to fetch notifications.");
+        }
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     return (
         <NotificationDisplayContext.Provider value={{ fetchNotification, notify, setNotification, pendingCount }}>

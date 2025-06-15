@@ -34,7 +34,6 @@ const logger = function (req, res, next) {
 };
 
 app.use(express.json());
-//para sa IPADDRESS
 app.set("trust proxy", 1);
 
 app.use(
@@ -44,20 +43,19 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: process.env.CONN_STR,
-      ttl: 24 * 60 * 60, // 24 hours in seconds
+      ttl: 24 * 60 * 60, 
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
 app.use(
   cors({
-    origin: "https://web-based-newborn-tracking-system.onrender.com",
-    //origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
   })

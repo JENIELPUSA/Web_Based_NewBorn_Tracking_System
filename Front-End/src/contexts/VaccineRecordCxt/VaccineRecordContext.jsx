@@ -28,9 +28,9 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
         if (customError) {
             const timer = setTimeout(() => {
                 setCustomError(null);
-            }, 5000); // auto-dismiss after 5s
+            }, 5000); 
 
-            return () => clearTimeout(timer); // cleanup
+            return () => clearTimeout(timer);
         }
     }, [customError]);
 
@@ -41,8 +41,6 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
             const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord`);
 
             const vaccineData = res?.data?.data || [];
-            console.log("Full vaccine data from API:", vaccineData);
-
             setCustomError("");
 
             if (role === "Admin") {
@@ -59,8 +57,6 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 const filteredByZone = vaccineData.filter(
                     (record) => record.newbornZone?.toLowerCase().trim() === Designatedzone?.toLowerCase().trim(),
                 );
-                console.log("VaccineSpecific", filteredByZone);
-
                 setVaccineRecord(filteredRecords);
                 setCalendarData(filteredByZone);
 
@@ -160,7 +156,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 status: values.status,
             };
 
-            const response = await axiosInstance.patch(
+            const response = await axios.patch(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/${recordId}/doses/${values.doseId}`,
                 requestData,
             );

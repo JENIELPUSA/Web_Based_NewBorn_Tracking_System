@@ -23,6 +23,7 @@ socket.on("connect_error", (err) => {
 });
 
 cron.schedule("0 7 * * *", async () => {
+//cron.schedule("*/2 * * * *", async () => {
   console.log("Cron job triggered");
 
   const today = new Date();

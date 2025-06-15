@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const User = require("./../Models/usermodel"); // Siguraduhin na tama ang path na ito
+const User = require("./../Models/usermodel"); 
 
 cron.schedule("*/5 * * * *", async () => {
   console.log("Running cron job to delete old unverified users...");

@@ -55,8 +55,6 @@ const VaccineLoading = () => {
             />
           ))}
         </motion.div>
-
-        {/* Loading Text */}
         <motion.p
           className="text-xl font-medium tracking-wide"
           animate={{ opacity: [0.6, 1, 0.6] }}

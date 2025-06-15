@@ -15,14 +15,13 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
     administeredBy,
     remarks,
     dateGiven,
-    next_due_date, // Optional field included
+    next_due_date,
     status,
   } = req.body;
 
   const userId = req.user._id;
   const ipAddress = getClientIp(req);
 
-  // Step 1: Validate required fields
   const missingFields = [];
   if (!newborn) missingFields.push("NewBorn");
   if (!vaccine) missingFields.push("Vaccine");
@@ -36,7 +35,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
     });
   }
 
-  // Step 2: Fetch vaccine and determine batch to use
   const vaccineDoc = await Vaccine.findById(vaccine);
   if (!vaccineDoc) {
     return res.status(404).json({ message: "Vaccine not found" });
@@ -56,10 +54,8 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   selectedBatch.stock -= 1;
   await vaccineDoc.save();
 
-  // Step 3: Create or update VaccineRecord
   let record = await VaccineRecord.findOne({ newborn, vaccine });
 
-  // Construct newDose with optional next_due_date
   const newDose = {
     doseNumber: record ? record.doses.length + 1 : 1,
     dateGiven: new Date(dateGiven),
@@ -81,7 +77,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
     await record.save();
   }
 
-  // Step 4: Aggregate and return populated record
   const populatedRecord = await VaccineRecord.aggregate([
     { $match: { _id: record._id } },
     {

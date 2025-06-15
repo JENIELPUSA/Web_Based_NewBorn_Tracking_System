@@ -10,18 +10,15 @@ const checkAllVaccinesCompleted = async (newbornId, io) => {
   const formattedDate = currentDate.toLocaleString();
 
   try {
-    const assignedVaccines = await AssignedVaccine.find({
-  newborn: newbornId,
-})
-  .populate("vaccine")
-  .populate({
-    path: "newborn",
-    populate: {
-      path: "motherName",
-      select: "email zone", // ✅ get email and zone
-    },
-  });
-
+    const assignedVaccines = await AssignedVaccine.find({ newborn: newbornId })
+      .populate("vaccine")
+      .populate({
+        path: "newborn",
+        populate: {
+          path: "motherName",
+          select: "email zone",
+        },
+      });
 
     if (assignedVaccines.length === 0) return;
 
@@ -46,70 +43,68 @@ const checkAllVaccinesCompleted = async (newbornId, io) => {
       }
     }
 
-if (allCompleted && !alreadyMarkedComplete) {
-  const newborn = assignedVaccines[0]?.newborn;
-  if (!newborn) {
-    console.log(`Newborn with ID ${newbornId} not found.`);
-    return;
-  }
+    if (allCompleted && !alreadyMarkedComplete) {
+      const newborn = assignedVaccines[0]?.newborn;
+      if (!newborn) {
+        console.log(`Newborn with ID ${newbornId} not found.`);
+        return;
+      }
 
-  const fullName = `${newborn.firstName} ${newborn.lastName}`;
-  const vaccineList = completedVaccineNames.join(", ");
-  const notificationMessage = `All vaccines are complete for ${fullName}. The completed vaccines are: ${vaccineList}.`;
+      const fullName = `${newborn.firstName} ${newborn.lastName}`;
+      const vaccineList = completedVaccineNames.join(", ");
+      const notificationMessage = `All vaccines are complete for ${fullName}. The completed vaccines are: ${vaccineList}.`;
+      const motherEmail = newborn?.motherName?.email;
+      const motherZone = newborn?.motherName?.zone;
 
-  // 🧠 Extract mother's email and zone
-  const motherEmail = newborn?.motherName?.email;
-  const motherZone = newborn?.motherName?.zone;
+      console.log("Mother's Email:", motherEmail);
+      console.log("Mother's Zone:", motherZone);
 
-  console.log("📧 Mother's Email:", motherEmail);
-  console.log("📍 Mother's Zone:", motherZone);
+      const bhwUsers = await User.find({ Designatedzone: motherZone });
+      const adminUsers = await User.find({ role: "Admin" });
 
-  // 🧠 Find users in same zone
-  const matchedUsers = await User.find({ Designatedzone: motherZone });
-  const emails = matchedUsers.map((user) => user.email);
-  if (motherEmail) emails.push(motherEmail); // ✅ include mother
+      const allRecipients = [...bhwUsers, ...adminUsers];
+      const emails = allRecipients.map((user) => user.email);
+      if (motherEmail) emails.push(motherEmail); // Add mother's email
 
-  // 🔒 Check if notification already exists
-  const existingNotification = await Notification.findOne({
-    newborn: newbornId,
-    type: "vaccine_completion",
-  });
-
-  if (!existingNotification) {
-    await Notification.create({
-      message: notificationMessage,
-      newborn: newbornId,
-      types_of_message: "Check Completed",
-      type: "vaccine_completion",
-    });
-
-    try {
-      await sendEmail({
-        email: emails,
-        subject: "Vaccination Completed",
-        text: notificationMessage,
+      const existingNotification = await Notification.findOne({
+        newborn: newbornId,
+        type: "vaccine_completion",
       });
-      console.log("📧 Email sent to:", emails.join(", "));
-    } catch (err) {
-      console.error("❌ Failed to send email:", err);
+
+      if (!existingNotification) {
+        await Notification.create({
+          message: notificationMessage,
+          newborn: newbornId,
+          types_of_message: "Check Completed",
+          type: "vaccine_completion",
+        });
+
+        try {
+          await sendEmail({
+            email: emails,
+            subject: "Vaccination Completed",
+            text: notificationMessage,
+          });
+          console.log("📧 Email sent to:", emails.join(", "));
+        } catch (err) {
+          console.error("❌ Failed to send email:", err);
+        }
+      }
+
+      await AssignedVaccine.updateMany(
+        { newborn: newbornId, sentComplete: false },
+        { $set: { sentComplete: true } }
+      );
+
+      io.emit("all-vaccines-completed", {
+        message: notificationMessage,
+        status: "pending",
+        newbornId: newborn._id,
+        createdAt: formattedDate,
+      });
+
+      console.log(" All vaccines completed for newborn:", fullName);
     }
-  }
-
-  // ✅ Mark all as completed
-  await AssignedVaccine.updateMany(
-    { newborn: newbornId, sentComplete: false },
-    { $set: { sentComplete: true } }
-  );
-
-  io.emit("all-vaccines-completed", {
-    message: notificationMessage,
-    status: "pending",
-    newbornId: newborn._id,
-    createdAt: formattedDate,
-  });
-
-  console.log("✅ All vaccines completed for newborn:", fullName);
-}
 
   } catch (error) {
     console.error("Error in checkAllVaccinesCompleted:", error);

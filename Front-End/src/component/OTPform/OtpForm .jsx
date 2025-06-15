@@ -38,7 +38,7 @@ const OtpForm = ({ isOpen, onClose, userId }) => {
             setModalStatus("success");
             setShowModal(true);
             setLoading(false);
-            toast.success("OTP verification successful!"); // ✅ Toast here
+            toast.success("OTP verification successful!");
             localStorage.removeItem("userIdForVerification");
             onClose();
         } catch (err) {

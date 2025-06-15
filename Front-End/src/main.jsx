@@ -20,45 +20,45 @@ import AxiosInterceptor from "./component/AxiosInterceptor.jsx";
 import { BrandDisplayProvider } from "./contexts/BrandContext/BrandContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-    //<StrictMode>
+  //<StrictMode>
+  <AuthProvider>
     <ThemeProvider>
-        {" "}
-        <AuthProvider>
-            <BrandDisplayProvider>
-                <ReportDisplayProvider>
-                    <NotificationDisplayProvider>
-                        <ProfillingDisplayProvider>
-                            <LogDisplayProvider>
-                                <VaccinePerProvider>
-                                    <VaccineDisplayProvider>
-                                        <VaccineRecordDisplayProvider>
-                                            <NewBornDisplayProvider>
-                                                <UserDisplayProvider>
-                                                    <App />
-                                                    <AxiosInterceptor />
-                                                    <SocketListener />
-                                                    <ToastContainer
-                                                        position="top-right"
-                                                        autoClose={3000}
-                                                        hideProgressBar={false}
-                                                        newestOnTop={false}
-                                                        closeOnClick
-                                                        pauseOnFocusLoss
-                                                        draggable
-                                                        pauseOnHover
-                                                        theme="light" // or dark
-                                                    />
-                                                </UserDisplayProvider>
-                                            </NewBornDisplayProvider>
-                                        </VaccineRecordDisplayProvider>
-                                    </VaccineDisplayProvider>
-                                </VaccinePerProvider>
-                            </LogDisplayProvider>
-                        </ProfillingDisplayProvider>
-                    </NotificationDisplayProvider>
-                </ReportDisplayProvider>
-            </BrandDisplayProvider>
-        </AuthProvider>
-    </ThemeProvider>,
-    //</StrictMode>,
+      <BrandDisplayProvider>
+        <ReportDisplayProvider>
+          <NotificationDisplayProvider>
+            <ProfillingDisplayProvider>
+              <LogDisplayProvider>
+                <VaccinePerProvider>
+                  <VaccineDisplayProvider>
+                    <VaccineRecordDisplayProvider>
+                      <NewBornDisplayProvider>
+                        <UserDisplayProvider>
+                          <App />
+                          <AxiosInterceptor />
+                          <SocketListener />
+                          <ToastContainer
+                            position="top-right"
+                            autoClose={3000}
+                            hideProgressBar={false}
+                            newestOnTop={false}
+                            closeOnClick
+                            pauseOnFocusLoss
+                            draggable
+                            pauseOnHover
+                            theme="light"
+                          />
+                        </UserDisplayProvider>
+                      </NewBornDisplayProvider>
+                    </VaccineRecordDisplayProvider>
+                  </VaccineDisplayProvider>
+                </VaccinePerProvider>
+              </LogDisplayProvider>
+            </ProfillingDisplayProvider>
+          </NotificationDisplayProvider>
+        </ReportDisplayProvider>
+      </BrandDisplayProvider>
+    </ThemeProvider>
+  </AuthProvider>
+  //</StrictMode>
 );
+

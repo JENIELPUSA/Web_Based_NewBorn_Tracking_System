@@ -65,7 +65,7 @@ const TotalNotExpired = stocks ? ((NotExpired / stocks) * 100).toFixed(1) + "%" 
     ];
 
     const BHWcards = [
-        { title: "In-coming Schedule", value: "15,400", percentage: "+15%", icon: Syringe },
+         { title: "Total Vaccine", value: totalVaccine, percentage: `${TotalExpired} Expired | ${TotalNotExpired} Not Expired`, icon: Syringe },
         { title: "New Born", value: TotalnewbornsThisMonth, percentage: `${TotalCurrentMale} Male | ${TotalCurrentFemale} Female`, icon: Baby },
         { title: "Monthly Vaccinated", value: isTotalVacinated, percentage: `${AllMale} Male | ${AllFemale} Female`, icon: Baby },
         { title: "Total Stocks Available", value: stocks,icon: ShieldCheck },

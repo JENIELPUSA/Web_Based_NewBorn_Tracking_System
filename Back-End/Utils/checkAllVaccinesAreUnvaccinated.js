@@ -16,10 +16,8 @@ const checkAllVaccinesAreUnvaccinated = async (newbornId, io) => {
       notified: false,
     }).populate("vaccine");
 
-    // 2. Kung walang assigned vaccines, itigil
     if (assignedVaccines.length === 0) return;
 
-    // 3. I-check bawat assigned vaccine kung may record na may dose
     let allVaccinesHaveZeroDoses = true;
 
     for (const assigned of assignedVaccines) {
@@ -30,7 +28,7 @@ const checkAllVaccinesAreUnvaccinated = async (newbornId, io) => {
 
       if (record && record.doses && record.doses.length > 0) {
         allVaccinesHaveZeroDoses = false;
-        break; // May isa nang may dose, wag na mag-notify
+        break;
       }
     }
 

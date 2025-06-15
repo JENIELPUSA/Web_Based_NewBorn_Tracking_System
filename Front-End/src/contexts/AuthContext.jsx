@@ -85,19 +85,15 @@ const logout = () => {
   localStorage.removeItem("maintenanceData");
   localStorage.removeItem("maintenanceLabels");
 
-  // Clear state
   setAuthToken(null);
   setRole(null);
   setUserID(null);
 
-  // Remove token from axios headers
   delete axios.defaults.headers["Authorization"];
 
-  // Confirm removal
-  console.log("UserID after removal:", localStorage.getItem("userId")); // Should be null
+  console.log("UserID after removal:", localStorage.getItem("userId")); 
 
-  // Redirect to login page after logout
-  window.location.href = "/login"; // Redirect to the login page
+  window.location.href = "/login";
 };
 
   <ToastContainer />
@@ -111,5 +107,4 @@ const logout = () => {
   
 };
 
-// Custom hook to use AuthContext
 export const useAuth = () => useContext(AuthContext);

@@ -33,7 +33,7 @@ return (
             <WeeklySchedule/>
             <Footer />
         </div>
-    ):null // or you can render another component here for other roles
+    ):null
 );
 
 };
