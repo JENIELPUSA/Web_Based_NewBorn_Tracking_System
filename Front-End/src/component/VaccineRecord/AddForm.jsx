@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import { VaccineDisplayContext } from "../../contexts/VaccineContext/VaccineContext";
 import { AuthContext } from "../../contexts/AuthContext";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
-import {VaccinePerContext} from "../../contexts/PerBabyVacine/PerBabyVacineContext"
+import { VaccinePerContext } from "../../contexts/PerBabyVacine/PerBabyVacineContext";
 
 function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataAssign }) {
-    const {isPerVaccine}=useContext(VaccinePerContext)
+    const { isPerVaccine } = useContext(VaccinePerContext);
     const { userId } = useContext(AuthContext);
     const { vaccine } = useContext(VaccineDisplayContext);
     const { AssignVaccine, UpdateContext, customError } = useContext(VaccineRecordDisplayContext);
@@ -14,6 +14,7 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
     const [selectedDosage, setSelectedDosage] = useState("");
     const [dropdownOpenVaccine, setDropdownOpenVaccine] = useState(false);
     const [dropdownOpenStatus, setDropdownOpenStatus] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
         newborn: newbordID || "",
@@ -95,21 +96,25 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (editDose) {
-            console.log("Updating ID:", formData);
-            await UpdateContext(formData, dataAssign._id, formData._id);
+        setIsSubmitting(true); // Start loading
+
+        try {
+            if (editDose) {
+                console.log("Updating ID:", formData);
+                await UpdateContext(formData, dataAssign._id, formData._id);
+            } else {
+                console.log("Form Data:", formData);
+                await AssignVaccine(formData);
+            }
 
             setTimeout(() => {
                 resetForm();
                 onClose();
+                setIsSubmitting(false); // Stop loading after close
             }, 1000);
-        } else {
-            console.log("Form Data:", formData);
-            await AssignVaccine(formData);
-            setTimeout(() => {
-                resetForm();
-                onClose();
-            }, 1000);
+        } catch (error) {
+            setIsSubmitting(false); // Stop loading on error
+            console.error("Submit error:", error);
         }
     };
 
@@ -164,7 +169,7 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                                     {dropdownOpenVaccine && (
                                         <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
                                             <li
-                                                className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-slate-200"
+                                                className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-600"
                                                 onClick={() => {
                                                     handleVaccineSelect("");
                                                     setDropdownOpenVaccine(false);
@@ -175,7 +180,7 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                                             {vaccine.map((v) => (
                                                 <li
                                                     key={v._id}
-                                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-slate-200"
+                                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-600"
                                                     onClick={() => handleVaccineSelect(v._id)}
                                                 >
                                                     {v.name}
@@ -290,9 +295,42 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
                         </button>
                         <button
                             type="submit"
-                            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+                            disabled={isSubmitting}
+                            className={`rounded-lg px-5 py-2 font-medium text-white transition ${
+                                isSubmitting
+                                    ? "cursor-not-allowed bg-blue-400"
+                                    : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+                            }`}
                         >
-                            {editDose ? "Update Record" : "Add Record"}
+                            {isSubmitting ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg
+                                        className="h-4 w-4 animate-spin text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v8z"
+                                        ></path>
+                                    </svg>
+                                    {editDose ? "Updating..." : "Submitting..."}
+                                </span>
+                            ) : editDose ? (
+                                "Update Record"
+                            ) : (
+                                "Add Record"
+                            )}
                         </button>
                     </div>
                 </form>

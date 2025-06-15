@@ -10,9 +10,10 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
     const { vaccine } = useContext(VaccineDisplayContext);
     const { AssignVaccine, UpdateContext } = useContext(VaccineRecordDisplayContext);
     const { AddAssignedVaccine, UpdateAssign, customError } = useContext(VaccinePerContext);
+
     const [selectedDosage, setSelectedDosage] = useState("");
     const [dropdownOpenVaccine, setDropdownOpenVaccine] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false); // Ito na ang loading state
 
     const [formData, setFormData] = useState({
         userId: userId,
@@ -27,6 +28,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
             vaccine: "",
             totalDoses: "",
         });
+        setSelectedDosage("");
     };
 
     useEffect(() => {
@@ -38,14 +40,9 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
             });
             setSelectedDosage(editData.dosage || "");
         } else {
-            setFormData({
-                newborn: idBorn || "",
-                vaccine: "",
-                totalDoses: "",
-            });
-            setSelectedDosage("");
+            clear();
         }
-    }, [editData, newbordID, userId]);
+    }, [editData, newbordID, userId, idBorn]); // Idinagdag ang idBorn sa dependency array
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -61,7 +58,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
     };
 
     const handleVaccineSelect = (vaccineId) => {
-        if (editDose) return; // Prevent selection during edit mode
+        if (editDose) return;
         setFormData((prev) => ({
             ...prev,
             vaccine: vaccineId,
@@ -73,23 +70,37 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
+        if (isSubmitting) return; // Pigilan ang multiple submit habang loading
 
-        if (editData) {
-            const result = await UpdateAssign(editData, formData);
-            if (result?.success === true) {
-                clear();
-                onClose();
-            }
-        } else {
-            const result = await AddAssignedVaccine(formData, idBorn);
-            if (result?.success === true) {
-                clear();
-                onClose();
-            }
+        // Optional: Client-side validation bago mag-submit
+        if (!formData.vaccine || !formData.totalDoses || formData.totalDoses <= 0) {
+            // Maaari kang magpakita ng error message dito, halimbawa:
+            // setCustomError("Please select a vaccine and enter a valid number of doses (at least 1).");
+            return;
         }
 
-        setIsSubmitting(false);
+        setIsSubmitting(true); // Simulan ang loading state
+        let result;
+
+        try {
+            if (editData) {
+                result = await UpdateAssign(editData, formData);
+            } else {
+                result = await AddAssignedVaccine(formData, idBorn);
+            }
+
+            if (result?.success === true) {
+                clear();
+                onClose();
+            }
+            // Kung may error sa customError mula sa context, mananatili itong display
+            // at hindi magsasara ang form.
+        } catch (error) {
+            console.error("Submission error:", error);
+            // Maaari kang mag-handle ng generic error dito kung kailangan.
+        } finally {
+            setIsSubmitting(false); // Tapusin ang loading state, kahit may error man o wala
+        }
     };
 
     if (!isOpen) return null;
@@ -112,11 +123,8 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                     </div>
                 )}
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="space-y-4"
-                >
-                    {/* Custom Vaccine Dropdown */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Vaccine Dropdown */}
                     <div className="relative w-full">
                         <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Vaccine</label>
                         {editDose ? (
@@ -126,7 +134,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                         ) : (
                             <>
                                 <div
-                                    className={`flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:border-slate-400 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 ${editData ? "cursor-not-allowed" : ""}`}
+                                    className={`flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:border-slate-400 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 ${editData ? "cursor-not-allowed opacity-70" : ""}`}
                                     onClick={() => !editData && setDropdownOpenVaccine(!dropdownOpenVaccine)}
                                 >
                                     <span>
@@ -140,10 +148,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                                     <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
                                         <li
                                             className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-gray-200 dark:hover:bg-slate-600"
-                                            onClick={() => {
-                                                handleVaccineSelect("");
-                                                setDropdownOpenVaccine(false);
-                                            }}
+                                            onClick={() => handleVaccineSelect("")}
                                         >
                                             Select Vaccine
                                         </li>
@@ -162,7 +167,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                         )}
                     </div>
 
-                    {/* Dosage Field (read-only) */}
+                    {/* Dosage */}
                     <div>
                         <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Dosage</label>
                         <input
@@ -170,11 +175,11 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                             value={selectedDosage}
                             readOnly
                             className="w-full cursor-not-allowed rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                            placeholder={editDose ? "Dosage cannot be changed" : "Dosage will appear here..."}
+                            placeholder="Dosage will appear here..."
                         />
                     </div>
 
-                    {/* Total Doses Field */}
+                    {/* Total Doses */}
                     <div>
                         <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Total Doses</label>
                         <input
@@ -184,24 +189,27 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                             onChange={handleChange}
                             required
                             min="1"
-                            className={`w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 ${editData ? "cursor-not-allowed" : ""}`}
+                            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             placeholder="Enter total number of doses"
+                            disabled={isSubmitting} // Disable input while submitting
                         />
                     </div>
+
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end sm:gap-4">
                         <button
                             type="button"
                             onClick={onClose}
                             className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                            disabled={isSubmitting} // Disable cancel button while submitting
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            disabled={isSubmitting}
+                            disabled={isSubmitting} // Disable submit button while submitting
                             className={`flex items-center justify-center gap-2 rounded-lg px-5 py-2 font-medium text-white transition duration-200 ${
                                 isSubmitting
-                                    ? "cursor-not-allowed bg-pink-400 dark:bg-red-500"
+                                    ? "cursor-not-allowed bg-pink-400 dark:bg-red-500" // Grey out or change color
                                     : "bg-red-600 hover:bg-pink-700 dark:bg-red-700 dark:hover:bg-pink-800"
                             }`}
                         >
@@ -227,7 +235,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                                     />
                                 </svg>
                             )}
-                            {isSubmitting ? (editData ? "Updating..." : "Submitting...") : editData ? "Update Record" : "Add Record"}
+                            {isSubmitting ? (editData ? "Updating..." : "Adding...") : editData ? "Update Record" : "Add Record"}
                         </button>
                     </div>
                 </form>
