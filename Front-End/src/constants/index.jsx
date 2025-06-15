@@ -65,9 +65,9 @@ export const navbarLinks = [
         title: "Settings",
         links: [
             {
-                label: "ForgotPassword",
+                label: "Change Password",
                 icon: KeyRound,
-                path: "/dashboard/forgot-password",
+                path: "/dashboard/update-password",
             },
         ],
     },
