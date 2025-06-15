@@ -50,7 +50,7 @@ export const navbarLinks = [
                  path: "/dashboard/new-vaccine",
             },
              {
-                label: "Assign Vaccine",
+                label: "Vaccination Records",
                 icon: Syringe,
                  path: "/dashboard/new-record-vaccine",
             },
