@@ -47,7 +47,7 @@ const fetchNotification = async () => {
 
     try {
         const response = await axios.get(
-            `${impYort.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Notification`,
+            `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Notification`,
             {
                 withCredentials: true,
                 headers: {
