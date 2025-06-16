@@ -556,28 +556,21 @@ exports.DisplayGraph = AsyncErrorHandler(async (req, res, next) => {
 
 exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
     try {
-        const { from, to } = req.query; // Date range mula sa query params (format:YYYY-MM-DD)
-
-        // Siguraduhin na ang `from` at `to` ay valid date strings
+        const { from, to } = req.query; 
         const fromDate = new Date(from);
         let toDate = new Date(to);
-
-        // I-validate ang mga petsa
         if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
             return next(new CustomError('Invalid date format. Please use ISO 8601 format (YYYY-MM-DD).', 400));
         }
 
-        // Ayusin ang toDate para isama ang buong araw
         toDate.setHours(23, 59, 59, 999);
 
-        // Kunin ang profile data na may date filtering gamit ang aggregation
         const aggregationResult = await NewBaby.aggregate([
             {
                 $match: {
                     dateOfBirth: { $gte: fromDate, $lte: toDate },
                 },
             },
-            // Lookup para sa 'addedBy' user
             {
                 $lookup: {
                     from: "users",
@@ -592,24 +585,22 @@ exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
                     preserveNullAndEmptyArrays: true,
                 },
             },
-            // Lookup para sa 'motherDetails' (na galing sa User model)
             {
                 $lookup: {
                     from: "users",
-                    localField: "motherName", // <--- Ginamit na ang 'motherName' as per your schema!
+                    localField: "motherName", 
                     foreignField: "_id",
-                    as: "motherDetails", // Gamitin pa rin ang 'motherDetails' para maiwasan ang conflict sa '$project'
+                    as: "motherDetails", 
                 },
             },
             {
                 $unwind: {
                     path: "$motherDetails",
-                    preserveNullAndEmptyArrays: true, // Mahalaga ito kung optional ang motherName o posibleng hindi makita ang User
+                    preserveNullAndEmptyArrays: true, 
                 }
             },
             {
                 $project: {
-                    // Newborn's own details
                     firstName: 1,
                     middleName: 1,
                     lastName: 1,
@@ -623,10 +614,8 @@ exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
                         },
                     },
                     gender: 1,
-                    birthWeight: { $concat: [ { $toString: "$birthWeight" }, " kg" ] },
-                    birthHeight: { $concat: [ { $toString: "$birthHeight" }, " cm" ] },
-
-                    // Mother's details (galing sa motherDetails lookup)
+                    birthWeight: { $concat: [{ $toString: "$birthWeight" }, " kg"] },
+                    birthHeight: { $concat: [{ $toString: "$birthHeight" }, " cm"] },
                     motherName: {
                         $cond: {
                             if: { $eq: [{ $type: "$motherDetails" }, "object"] },
@@ -648,7 +637,6 @@ exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
                             else: "N/A",
                         },
                     },
-                    // addedByName (from addedBy lookup)
                     addedByName: {
                         $cond: {
                             if: { $eq: [{ $type: "$addedBy" }, "object"] },
@@ -660,7 +648,6 @@ exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
                 },
             },
             { $sort: { newbornName: 1 } },
-            // Grouping for total counts (optional, remove if not needed for the PDF)
             {
                 $group: {
                     _id: null,
@@ -778,6 +765,23 @@ exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
             return y;
         }
 
+        // --- Helper Function to Add Page Numbers ---
+        function addPageNumbers(doc) {
+            let pages = doc.bufferedPageRange(); // Get total pages after content is added
+            for (let i = 0; i < pages.count; i++) {
+                doc.switchToPage(i);
+                let oldBottomMargin = doc.page.margins.bottom;
+                doc.page.margins.bottom = 0; // Temporarily remove bottom margin to write in the footer
+                doc.font('Helvetica').fontSize(9).text(
+                    `Page ${i + 1} of ${pages.count}`,
+                    0,
+                    doc.page.height - oldBottomMargin / 2, // Position in the center of the original bottom margin
+                    { align: 'center' }
+                );
+                doc.page.margins.bottom = oldBottomMargin; // Restore bottom margin
+            }
+        }
+
         // --- PDF Header Content ---
         doc.font('Helvetica-Bold').fontSize(18).text('Newborn Profile Report', { align: 'center' });
         doc.font('Helvetica').fontSize(12).text(`Date Range: ${from} to ${to}`, { align: 'center' });
@@ -829,6 +833,9 @@ exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
             rowFontSize: 10
         });
         doc.moveDown(1.5);
+
+        // Add page numbers to the document after all content is added
+        addPageNumbers(doc);
 
         // Finalize the PDF document
         doc.end();

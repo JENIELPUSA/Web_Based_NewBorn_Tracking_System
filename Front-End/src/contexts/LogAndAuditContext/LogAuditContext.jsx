@@ -20,24 +20,34 @@ export const LogDisplayProvider = ({ children }) => {
     fetchLogData();
   }, [authToken]);
 
-  const fetchLogData = async () => {
-    try {
-      const res = await axiosInstance.get(
-        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/LogAudit`,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
-      );
+const fetchLogData = async () => {
+  try {
+    const res = await axiosInstance.get(
+      `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/LogAudit`,
+      {
+        headers: { Authorization: `Bearer ${authToken}` },
+      }
+    );
 
-      const userData = res?.data.data;
-      setLogData(userData);
-      console.log("fwqfqwf",userData)
-    } catch (error) {
-      console.error("Error fetching log data:", error);
-      toast.error("Failed to fetch log data. Please try again later.");
-      setError("Failed to fetch log data");
+    const userData = res?.data?.data;
+
+    if (!userData || userData.length === 0) {
+      setLogData(null); 
+      console.log("No log data found");
+      return null;
     }
-  };
+
+    setLogData(userData);
+    console.log("Log data:", userData);
+    return userData;
+  } catch (error) {
+    console.error("Error fetching log data:", error);
+    setError("Failed to fetch log data");
+    setLogData(null); // Also set to null on error
+    return null;
+  }
+};
+
 
   return (
     <LogContext.Provider value={{ LogData}}>

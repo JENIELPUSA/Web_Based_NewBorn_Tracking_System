@@ -231,8 +231,8 @@ exports.UpdateVaccine = AsyncErrorHandler(async (req, res, next) => {
 });
 
 exports.deleteVaccine = AsyncErrorHandler(async (req, res, next) => {
-  const { id } = req.params; // Vaccine ID
-  const { batchId } = req.body; // Batch ID (required)
+  const { id } = req.params; 
+  const { batchId } = req.body; 
 
   if (!batchId) {
     return res.status(400).json({
@@ -240,8 +240,6 @@ exports.deleteVaccine = AsyncErrorHandler(async (req, res, next) => {
       message: "batchId is required to delete a batch",
     });
   }
-
-  // Remove the specific batch from the batches array
   const updatedVaccine = await Vaccine.findByIdAndUpdate(
     id,
     { $pull: { batches: { _id: batchId } } },
@@ -264,13 +262,9 @@ exports.deleteVaccine = AsyncErrorHandler(async (req, res, next) => {
 
 exports.getReportsVaccine = AsyncErrorHandler(async (req, res, next) => {
     try {
-        const { from, to } = req.query; // Date range mula sa query params (format:YYYY-MM-DD)
-
-        // Siguraduhin na ang `from` at `to` ay valid date strings
+        const { from, to } = req.query; // Date range from query params (format:YYYY-MM-DD)
         const fromDate = new Date(from);
         let toDate = new Date(to);
-
-        // I-validate ang mga petsa
         if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
             return next(
                 new CustomError(
@@ -280,28 +274,23 @@ exports.getReportsVaccine = AsyncErrorHandler(async (req, res, next) => {
             );
         }
 
-        // Ayusin ang toDate para isama ang buong araw
         toDate.setHours(23, 59, 59, 999);
 
-        // Kunin ang data na may date filtering gamit ang aggregation
         const aggregationResult = await Vaccine.aggregate([
-            // Step 1: Unwind the batches array to process each batch individually
             { $unwind: "$batches" },
 
-            // Step 2: Match on the 'addedAt' field within each batch
             {
                 $match: {
                     "batches.addedAt": { $gte: fromDate, $lte: toDate },
                 },
             },
 
-            // Step 3: Lookup for 'brand' (original vaccine document's brand)
             {
                 $lookup: {
-                    from: "brands", // Assuming your brands collection is named 'brands'
+                    from: "brands", 
                     localField: "brand",
                     foreignField: "_id",
-                    as: "brandInfo", // Changed 'as' name to avoid conflict
+                    as: "brandInfo", 
                 },
             },
             {
@@ -350,7 +339,22 @@ exports.getReportsVaccine = AsyncErrorHandler(async (req, res, next) => {
 
         doc.pipe(res);
 
-        // --- Helper Function to Draw Table ---
+        function addPageNumbers(doc) {
+            let pages = doc.bufferedPageRange(); 
+            for (let i = 0; i < pages.count; i++) {
+                doc.switchToPage(i);
+                let oldBottomMargin = doc.page.margins.bottom;
+                doc.page.margins.bottom = 0;
+                doc.font('Helvetica').fontSize(9).text(
+                    `Page ${i + 1} of ${pages.count}`,
+                    0,
+                    doc.page.height - oldBottomMargin / 2,
+                    { align: 'center' }
+                );
+                doc.page.margins.bottom = oldBottomMargin; 
+            }
+        }
+
         function drawTable(
             doc,
             data,
@@ -373,8 +377,6 @@ exports.getReportsVaccine = AsyncErrorHandler(async (req, res, next) => {
 
             doc.lineWidth(borderWidth);
             doc.strokeColor(textColor);
-
-            // Draw Headers
             doc.font("Helvetica-Bold").fontSize(headerFontSize);
             doc
                 .fillColor(headerFillColor)
@@ -400,10 +402,8 @@ exports.getReportsVaccine = AsyncErrorHandler(async (req, res, next) => {
 
             doc.font("Helvetica").fontSize(rowFontSize);
 
-            // Draw Data Rows
             data.forEach((row, rowIndex) => {
                 let maxRowHeight = 0;
-                // Calculate max row height based on content
                 headers.forEach((header, i) => {
                     const value =
                         row[header] !== undefined && row[header] !== null
@@ -544,6 +544,7 @@ exports.getReportsVaccine = AsyncErrorHandler(async (req, res, next) => {
         doc.moveDown(1.5);
 
         // Finalize the PDF document
+        addPageNumbers(doc); // Call addPageNumbers before doc.end()
         doc.end();
     } catch (error) {
         console.error("Error generating vaccine inventory PDF:", error);
@@ -554,3 +555,4 @@ exports.getReportsVaccine = AsyncErrorHandler(async (req, res, next) => {
         }
     }
 });
+

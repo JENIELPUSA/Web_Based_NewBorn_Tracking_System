@@ -399,29 +399,23 @@ exports.deleteProfilling = AsyncErrorHandler(async (req, res, next) => {
 
 exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
     try {
-        const { from, to } = req.query; // Date range from query params (format:YYYY-MM-DD)
+        const { from, to } = req.query; 
 
-        // Ensure that `from` and `to` are valid date strings
+
         const fromDate = new Date(from);
         let toDate = new Date(to);
 
-        // Validate the dates
         if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-            return next(new CustomError('Invalid date format. Please use YYYY-MM-DD.', 400));
+            return next(new CustomError('Invalid date format. Please use ISO 8601 format (YYYY-MM-DD).', 400));
         }
 
-        // Adjust toDate to include the entire day
         toDate.setHours(23, 59, 59, 999);
-
-        // Fetch the profile data with date filtering using aggregation
         const profileData = await Profile.aggregate([
-            // Stage 1: Match documents by the 'createdAt' field within the specified date range
             {
                 $match: {
                     createdAt: { $gte: fromDate, $lte: toDate },
                 },
             },
-            // Stage 2: Join with Newborn collection
             {
                 $lookup: {
                     from: "newborns",
@@ -430,12 +424,9 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     as: "newborn",
                 },
             },
-            // Stage 3: Deconstruct the newborn array (assuming one newborn per profile).
-            // Changed to preserveNullAndEmptyArrays to prevent dropping profiles without newborns.
+
             { $unwind: { path: "$newborn", preserveNullAndEmptyArrays: true } },
 
-            // Stage 4: Join with User collection for Mother Info
-            // IMPORTANT: This assumes newborn.motherName stores the User _id of the mother.
             {
                 $lookup: {
                     from: "users",
@@ -444,10 +435,7 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     as: "mother",
                 },
             },
-            // Stage 5: Deconstruct the mother array, preserving nulls if no mother found
             { $unwind: { path: "$mother", preserveNullAndEmptyArrays: true } },
-
-            // Stage 6: Join with VaccinationRecord based on newborn._id
             {
                 $lookup: {
                     from: "vaccinationrecords",
@@ -456,11 +444,8 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     as: "vaccinationRecords",
                 },
             },
-            // Stage 7: Unwind vaccinationRecords to process each record individually.
-            // This is crucial for correctly linking vaccine details and administeredBy users to each record.
-            { $unwind: { path: "$vaccinationRecords", preserveNullAndEmptyArrays: true } },
+            { $unwind: "$vaccinationRecords" },
 
-            // Stage 8: Lookup vaccine details for the current vaccination record
             {
                 $lookup: {
                     from: "vaccines",
@@ -469,23 +454,19 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     as: "vaccineDetails",
                 },
             },
-            // Stage 9: Deconstruct vaccineDetails array (assuming one match per vaccine)
             { $unwind: { path: "$vaccineDetails", preserveNullAndEmptyArrays: true } },
 
-            // Stage 10: Create a temporary array of all administeredBy user IDs from doses.
-            // This is needed because 'administeredBy' is nested within 'doses' and we need to lookup users.
             {
                 $addFields: {
                     allAdministeredByIds: {
                         $reduce: {
-                            input: { $ifNull: ["$vaccinationRecords.doses", []] }, // Handle cases where doses might be null/undefined
+                            input: { $ifNull: ["$vaccinationRecords.doses", []] },
                             initialValue: [],
                             in: { $concatArrays: ["$$value", [{ $ifNull: ["$$this.administeredBy", null] }]] }
                         }
                     }
                 }
             },
-            // Stage 11: Lookup all users who administered any dose within this profile's records
             {
                 $lookup: {
                     from: "users",
@@ -495,7 +476,6 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                 },
             },
 
-            // Stage 12: Final Projection to shape the output document
             {
                 $project: {
                     _id: 1,
@@ -504,7 +484,6 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     notes: 1,
                     createdAt: 1,
 
-                    // Newborn info
                     newbornName: {
                         $concat: [
                             { $ifNull: ["$newborn.firstName", ""] },
@@ -516,10 +495,6 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     gender: "$newborn.gender",
                     birthWeight: "$newborn.birthWeight",
                     birthHeight: "$newborn.birthHeight",
-
-                    // Mother info - Assuming User model has 'firstName' and 'lastName'
-                    // IMPORTANT: If your User model uses 'FirstName' and 'LastName' (capitalized),
-                    // you must change these fields accordingly.
                     motherName: {
                         $concat: [
                             { $ifNull: ["$mother.FirstName", ""] },
@@ -535,8 +510,6 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                             { $ifNull: ["$newborn.zone", ""] },
                         ],
                     },
-
-                    // Vaccination Record details
                     vaccinationRecord: {
                         vaccine: "$vaccinationRecords.vaccine",
                         vaccineName: "$vaccineDetails.name",
@@ -566,7 +539,6 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                                                     ]
                                                 }
                                             },
-                                            // Make sure 'FirstName' and 'LastName' match your User model field names for administeredBy users
                                             in: {
                                                 $concat: [
                                                     { $ifNull: ["$$adminUser.FirstName", ""] },
@@ -601,7 +573,6 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     },
                 },
             },
-            // Stage 13: Group back by profile _id to get all vaccination records in an array
             {
                 $group: {
                     _id: "$_id",
@@ -623,10 +594,9 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
         ]);
 
         if (!profileData || profileData.length === 0) {
-            return next(new CustomError('No newborn profile data found for the selected date range.', 404));
+            return next(new CustomError('No newborn profile data found with vaccination records for the selected date range.', 404));
         }
 
-        // --- PDF Document Setup ---
         const doc = new PDFDocument({ layout: 'landscape', margin: 30 });
 
         res.setHeader('Content-Type', 'application/pdf');
@@ -634,7 +604,7 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
 
         doc.pipe(res);
 
-        // --- Helper Function to Draw Table ---
+
         function drawTable(doc, data, headers, startY, startX, colWidths, options = {}) {
             let y = startY;
             let x = startX;
@@ -646,11 +616,11 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
             const headerFontSize = options.headerFontSize || 10;
             const rowFontSize = options.rowFontSize || 9;
             const borderWidth = options.borderWidth || 0.5;
+            const includeRowNumber = options.includeRowNumber || false; // Control if 'Row No.' column is automatically added
+            const startRowNumber = options.startRowNumber || 1; // New option for starting row number
 
             doc.lineWidth(borderWidth);
             doc.strokeColor(textColor);
-
-            // Draw Headers
             doc.font('Helvetica-Bold').fontSize(headerFontSize);
             doc.fillColor(headerFillColor).rect(x, y, colWidths.reduce((a, b) => a + b, 0), 25).fill();
             doc.fillColor(textColor);
@@ -659,7 +629,7 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
             headers.forEach((header, i) => {
                 doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
                     width: colWidths[i] - 2 * cellPadding,
-                    align: 'left', // Changed to left alignment
+                    align: 'left',
                     lineBreak: true
                 });
                 currentHeaderX += colWidths[i];
@@ -667,8 +637,6 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
             y += 25;
 
             doc.font('Helvetica').fontSize(rowFontSize);
-
-            // Draw Data Rows
             data.forEach((row, rowIndex) => {
                 let maxRowHeight = 0;
                 headers.forEach((header, i) => {
@@ -680,9 +648,11 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     maxRowHeight = Math.max(maxRowHeight, textHeight + 2 * cellPadding);
                 });
 
+                // Check for page break
                 if (y + maxRowHeight > doc.page.height - doc.page.margins.bottom) {
                     doc.addPage();
                     y = doc.page.margins.top;
+                    // Redraw headers on new page
                     currentHeaderX = x;
                     doc.font('Helvetica-Bold').fontSize(headerFontSize);
                     doc.fillColor(headerFillColor).rect(x, y, colWidths.reduce((a, b) => a + b, 0), 25).fill();
@@ -690,7 +660,7 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                     headers.forEach((header, i) => {
                         doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
                             width: colWidths[i] - 2 * cellPadding,
-                            align: 'left', // Changed to left alignment
+                            align: 'left',
                             lineBreak: true
                         });
                         currentHeaderX += colWidths[i];
@@ -705,11 +675,17 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
 
                 let currentRowX = x;
                 headers.forEach((header, i) => {
-                    const value = row[header] !== undefined && row[header] !== null ? row[header].toString() : 'N/A';
+                    let valueToPrint;
+                    if (includeRowNumber && header === 'Row No.') { // Apply numbering if 'includeRowNumber' is true and header is 'Row No.'
+                        valueToPrint = (startRowNumber + rowIndex).toString();
+                    } else {
+                        valueToPrint = row[header] !== undefined && row[header] !== null ? row[header].toString() : 'N/A';
+                    }
+
                     doc.rect(currentRowX, y, colWidths[i], maxRowHeight).stroke();
-                    doc.text(value, currentRowX + cellPadding, y + cellPadding, {
+                    doc.text(valueToPrint, currentRowX + cellPadding, y + cellPadding, {
                         width: colWidths[i] - 2 * cellPadding,
-                        align: 'left', // Changed to left alignment
+                        align: 'left',
                         valign: 'top',
                         lineBreak: true
                     });
@@ -720,15 +696,30 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
             return y;
         }
 
-        // --- PDF Header Content ---
-        doc.font('Helvetica-Bold').fontSize(18).text('Newborn Profile Report', { align: 'center' }); // Made title bold
+        function addPageNumbers(doc) {
+            let pages = doc.bufferedPageRange(); 
+            for (let i = 0; i < pages.count; i++) {
+                doc.switchToPage(i);
+                let oldBottomMargin = doc.page.margins.bottom;
+                doc.page.margins.bottom = 0;
+                doc.font('Helvetica').fontSize(9).text(
+                    `Page ${i + 1} of ${pages.count}`, 
+                    0,
+                    doc.page.height - oldBottomMargin / 2,
+                    { align: 'center' }
+                );
+                doc.page.margins.bottom = oldBottomMargin;
+            }
+        }
+
+        doc.font('Helvetica-Bold').fontSize(18).text('Newborn Profile Report', { align: 'center' }); 
         doc.font('Helvetica').fontSize(12).text(`Date Range: ${from} to ${to}`, { align: 'center' });
         doc.moveDown(1.5);
 
-        // --- Main Profile Data Table (Overview) ---
         const mainTableHeaders = [
+            'Row No.', 
             'Newborn Name',
-            'DoB',
+            'Date of Birth',
             'Gender',
             'Blood Type',
             'Health Condition',
@@ -739,58 +730,64 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
 
         const totalPageContentWidth = doc.page.width - 2 * doc.page.margins.left;
         const mainColWidths = [
-            totalPageContentWidth * 0.16, // Newborn Name
-            totalPageContentWidth * 0.08, // DoB
-            totalPageContentWidth * 0.07, // Gender
-            totalPageContentWidth * 0.08, // Blood Type
-            totalPageContentWidth * 0.14, // Health Condition
-            totalPageContentWidth * 0.15, // Mother Name
-            totalPageContentWidth * 0.10, // Mother Phone
-            totalPageContentWidth * 0.22, // Mother Address
+            totalPageContentWidth * 0.04, 
+            totalPageContentWidth * 0.14,
+            totalPageContentWidth * 0.08, 
+            totalPageContentWidth * 0.07, 
+            totalPageContentWidth * 0.08, 
+            totalPageContentWidth * 0.13, 
+            totalPageContentWidth * 0.15,
+            totalPageContentWidth * 0.10, 
+            totalPageContentWidth * 0.21, 
         ];
 
         const mainTableData = profileData.map(profile => ({
             'Newborn Name': profile.newbornName || 'N/A',
-            'DoB': profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString('en-US') : 'N/A',
+            'Date of Birth': profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString('en-US') : 'N/A',
             'Gender': profile.gender || 'N/A',
             'Blood Type': profile.blood_type || 'N/A',
-            'Health Condition': profile.health_condition || 'N/A',
+            'Health Condition': (profile.health_condition && profile.health_condition.length > 100) ? profile.health_condition.substring(0, 97) + '...' : profile.health_condition || 'N/A',
             'Mother Name': profile.motherName || 'N/A',
             'Mother Phone': profile.motherPhoneNumber || 'N/A',
             'Mother Address': profile.motherAddressZone || 'N/A'
         }));
 
-        doc.font('Helvetica-Bold').fontSize(14).text('Newborn Profiles Overview:', { underline: true, align: 'left' }); // Made bold and left aligned
-        doc.font('Helvetica').moveDown(0.5); // Reset font after title
+        doc.font('Helvetica-Bold').fontSize(14).text('Newborn Profiles Overview:', { underline: true, align: 'left' });
+        doc.font('Helvetica').moveDown(0.5);
 
         let currentY = drawTable(doc, mainTableData, mainTableHeaders, doc.y, doc.page.margins.left, mainColWidths, {
             headerFillColor: '#ADD8E6',
             rowFillColor1: '#E0FFFF',
             rowFillColor2: '#F5FFFA',
-            headerFontSize: 11,
-            rowFontSize: 10
+            headerFontSize: 9.5,
+            rowFontSize: 8.5,
+            includeRowNumber: true
         });
         doc.moveDown(1.5);
+        let overallVaccineRecordCount = 1; 
 
-        // --- Vaccination Records Details for Each Profile ---
         profileData.forEach((profile, index) => {
             const validVaccinationRecords = profile.vaccinationRecords.filter(r => r && r.vaccineName);
-
-            const estimatedVacSectionHeight = 25 + (validVaccinationRecords.length * 30) + 10;
+            const estimatedVacSectionHeight = 35 + (validVaccinationRecords.length * 30) + 10; // Header + rows + padding
 
             if (doc.y + estimatedVacSectionHeight > doc.page.height - doc.page.margins.bottom && index > 0) {
                 doc.addPage();
                 currentY = doc.page.margins.top;
             }
-doc.font('Helvetica-Bold').fontSize(14).text(`Vaccination Records for ${profile.newbornName}:`, { underline: true, align: 'right' });
 
-            doc.font('Helvetica').moveDown(0.5); // Reset font after title
+            doc.strokeColor('#AAAAAA').lineWidth(0.5).moveTo(doc.page.margins.left, doc.y).lineTo(doc.page.width - doc.page.margins.right, doc.y).stroke();
+            doc.moveDown(0.7);
+
+            doc.x = doc.page.margins.left;
+            doc.font('Helvetica-Bold').fontSize(12).text(`Vaccination for ${profile.newbornName}`, { align: 'center', width: doc.page.width - 2 * doc.page.margins.left });
+            doc.moveDown(0.5); 
 
             if (validVaccinationRecords.length > 0) {
                 const vaccinationTableHeaders = [
+                    'Overall Record No.',
                     'Vaccine',
                     'Dose #',
-                    'Given Date',
+                    'Date Given',
                     'Next Due',
                     'Status',
                     'Administered By',
@@ -800,14 +797,15 @@ doc.font('Helvetica-Bold').fontSize(14).text(`Vaccination Records for ${profile.
 
                 const vacTableWidth = doc.page.width - 2 * doc.page.margins.left;
                 const vacColWidths = [
-                    vacTableWidth * 0.15, // Vaccine
-                    vacTableWidth * 0.07, // Dose #
-                    vacTableWidth * 0.10, // Given Date
-                    vacTableWidth * 0.10, // Next Due
-                    vacTableWidth * 0.08, // Status
-                    vacTableWidth * 0.15, // Administered By
-                    vacTableWidth * 0.10, // Role
-                    vacTableWidth * 0.25  // Remarks
+                    vacTableWidth * 0.06, 
+                    vacTableWidth * 0.13, 
+                    vacTableWidth * 0.07, 
+                    vacTableWidth * 0.10, 
+                    vacTableWidth * 0.10, 
+                    vacTableWidth * 0.08,
+                    vacTableWidth * 0.15, 
+                    vacTableWidth * 0.10, 
+                    vacTableWidth * 0.21  
                 ];
 
                 const vaccinationRecordsData = [];
@@ -815,26 +813,27 @@ doc.font('Helvetica-Bold').fontSize(14).text(`Vaccination Records for ${profile.
                     if (record.doses && record.doses.length > 0) {
                         record.doses.forEach(dose => {
                             vaccinationRecordsData.push({
+                                'Overall Record No.': overallVaccineRecordCount++, 
                                 'Vaccine': record.vaccineName || 'N/A',
                                 'Dose #': dose.doseNumber || 'N/A',
-                                'Given Date': dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString('en-US') : 'N/A',
+                                'Date Given': dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString('en-US') : 'N/A',
                                 'Next Due': dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString('en-US') : 'N/A',
                                 'Status': dose.status || 'N/A',
                                 'Administered By': dose.administeredByName || 'N/A',
                                 'Role': dose.administeredByRole || 'N/A',
-                                'Remarks': dose.remarks || 'N/A'
+                                'Remarks': (dose.remarks && dose.remarks.length > 150) ? dose.remarks.substring(0, 147) + '...' : dose.remarks || 'N/A'
                             });
                         });
                     } else {
-                        // If a vaccine record exists but has no doses, still show vaccine name
                         vaccinationRecordsData.push({
+                            'Overall Record No.': overallVaccineRecordCount++, 
                             'Vaccine': record.vaccineName || 'N/A',
                             'Dose #': 'N/A',
-                            'Given Date': 'N/A',
+                            'Date Given': 'N/A',
                             'Next Due': 'N/A',
                             'Status': 'N/A',
                             'Administered By': 'N/A',
-                            'Role': 'N/A', // Include Role even if no doses
+                            'Role': 'N/A',
                             'Remarks': 'No doses recorded for this vaccine'
                         });
                     }
@@ -845,8 +844,9 @@ doc.font('Helvetica-Bold').fontSize(14).text(`Vaccination Records for ${profile.
                         headerFillColor: '#D8BFD8',
                         rowFillColor1: '#E6E6FA',
                         rowFillColor2: '#F0F8FF',
-                        headerFontSize: 10,
-                        rowFontSize: 9
+                        headerFontSize: 8.5,
+                        rowFontSize: 7.5,
+                        includeRowNumber: false 
                     });
                     doc.moveDown(1);
                 } else {
@@ -858,8 +858,8 @@ doc.font('Helvetica-Bold').fontSize(14).text(`Vaccination Records for ${profile.
                 doc.moveDown(1);
             }
         });
+        addPageNumbers(doc);
 
-        // Finalize the PDF document
         doc.end();
     } catch (error) {
         console.error('Error generating profile PDF:', error);
@@ -868,4 +868,5 @@ doc.font('Helvetica-Bold').fontSize(14).text(`Vaccination Records for ${profile.
         }
     }
 });
+
 

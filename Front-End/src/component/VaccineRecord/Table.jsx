@@ -1,10 +1,10 @@
-import React, { useState, useContext, useEffect } from "react";
-import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
+import React, { useState, useContext, useMemo, useEffect } from "react";
+import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext"; // <- AYUSIN ITO KUNG MALI
 import { PencilIcon, TrashIcon, BabyIcon, Plus } from "lucide-react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import AddNewBornForm from "../VaccineRecord/AddForm";
-import StatusVerification from "../../ReusableFolder/StatusModal";
+import { motion } from "framer-motion"; // Idagdag ang motion import
+import AddNewBornForm from "../VaccineRecord/AddForm"; // <- AYUSIN ITO KUNG MALI
+import StatusVerification from "../../ReusableFolder/StatusModal"; // <- AYUSIN ITO KUNG MALI
+import DisplayVaccine from "../AssignVaccine/DisplayVaccine"; // <- AYUSIN ITO KUNG MALI
 
 // Status badge color mapping
 const statusColors = {
@@ -36,6 +36,17 @@ const StatusBadge = ({ status }) => {
     return <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${color.bg} ${color.text}`}>{color.display}</span>;
 };
 
+// Inilabas ang formatDate function sa labas ng component para masiguro ang availability nito.
+const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-PH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
+};
+
 function VaccineRecordTable() {
     const { vaccineRecord, DeleteContext } = useContext(VaccineRecordDisplayContext);
     const [isVerification, setVerification] = useState(false);
@@ -44,21 +55,69 @@ function VaccineRecordTable() {
     const [dose, setDose] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [dateRange, setDateRange] = useState([null, null]);
+    const [itemsPerPage, setItemsPerPage] = useState(5); // State for items per page
+    const [dateFrom, setDateFrom] = useState(""); // State for 'created at' date filter start (string format for input)
+    const [dateTo, setDateTo] = useState(""); // State for 'created at' date filter end (string format for input)
+
     const [doseId, setDoseID] = useState("");
     const [dataID, setDataId] = useState("");
 
-    const usersPerPage = 5;
-    const [startDate, endDate] = dateRange;
+    // Memoize filtered records
+    const filteredRecord = useMemo(() => {
+        const data = Array.isArray(vaccineRecord) ? vaccineRecord : [];
+        return data.filter((user) => {
+            const matchesSearch =
+                `${user.firstName || ""} ${user.lastName || ""} ${user.username || ""} ${user.email || ""} ${user.newbornName || ""} ${user.motherName || ""}`
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase());
+
+            let matchesDateRange = true;
+            if (dateFrom && dateTo) {
+                // Check if both date filters are set
+                const fromDateObj = new Date(dateFrom);
+                fromDateObj.setHours(0, 0, 0, 0); // Normalize to start of the day
+                const toDateObj = new Date(dateTo);
+                toDateObj.setHours(23, 59, 59, 999); // Normalize to end of the day
+
+                matchesDateRange = user.doses.some((dose) => {
+                    const doseDate = new Date(dose.dateGiven);
+                    return dose.dateGiven && doseDate >= fromDateObj && doseDate <= toDateObj;
+                });
+            }
+
+            return matchesSearch && matchesDateRange;
+        });
+    }, [vaccineRecord, searchTerm, dateFrom, dateTo]); // Dependencies changed to dateFrom, dateTo
+
+    // Calculate pagination details
+    const totalPages = Math.ceil(filteredRecord.length / itemsPerPage);
+    const indexOfLastUser = currentPage * itemsPerPage;
+    const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+    const currentUsers = filteredRecord.slice(indexOfFirstUser, indexOfLastUser);
+
+    // Effect hook to adjust the current page if needed after filtering or changing itemsPerPage.
+    useEffect(() => {
+        const newTotalPages = Math.ceil(filteredRecord.length / itemsPerPage);
+
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+            setCurrentPage(newTotalPages);
+        } else if (filteredRecord.length > 0 && currentUsers.length === 0 && currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        } else if (filteredRecord.length === 0 && currentPage !== 1) {
+            setCurrentPage(1);
+        }
+    }, [filteredRecord.length, currentPage, itemsPerPage, currentUsers.length]);
 
     const handleAddClick = () => {
         setAssignFormOpen(true);
+        setAssignData(null); // Clear any previous data for add operation
+        setDose(null); // Clear any previous dose for add operation
     };
 
-    const handleEdit = (doseId, userData) => {
+    const handleEdit = (dose, userData) => {
         setAssignFormOpen(true);
-        setAssignData(userData);
-        setDose(doseId);
+        setAssignData(userData); // Pass the entire user data
+        setDose(dose); // Pass the specific dose object
     };
 
     const handleDeleteAssign = (doseId, userId) => {
@@ -83,91 +142,101 @@ function VaccineRecordTable() {
         }
     };
 
-    console.log("fwef", vaccineRecord);
-
-    const filteredRecord = vaccineRecord.filter((user) => {
-        const matchesSearch = `${user.firstName} ${user.lastName} ${user.username} ${user.email} ${user.newbornName} ${user.motherName}`
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase());
-
-        if (startDate && endDate) {
-            return (
-                matchesSearch &&
-                user.doses.some((dose) => {
-                    const doseDate = new Date(dose.dateGiven);
-                    return dose.dateGiven && doseDate >= startDate && doseDate <= endDate;
-                })
-            );
+    const getInitials = (name) => {
+        if (!name) return "NB";
+        const names = name.split(" ");
+        let initials = names[0].substring(0, 1).toUpperCase();
+        if (names.length > 1) {
+            initials += names[names.length - 1].substring(0, 1).toUpperCase();
         }
+        return initials;
+    };
 
-        return matchesSearch;
-    });
+    // Handler for changing items per page (dropdown)
+    const handleItemsPerPageChange = (e) => {
+        setItemsPerPage(Number(e.target.value));
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
 
-    const totalPages = Math.ceil(filteredRecord.length / usersPerPage);
-    const indexOfLastUser = currentPage * usersPerPage;
-    const indexOfFirstUser = indexOfLastUser - usersPerPage;
-    const currentUsers = filteredRecord.slice(indexOfFirstUser, indexOfLastUser);
+    // Function to clear both start and end dates
+    const clearDateRange = () => {
+        setDateFrom(""); // Clear to empty string for datetime-local
+        setDateTo(""); // Clear to empty string for datetime-local
+        setCurrentPage(1); // Reset page on clear
+    };
 
     return (
-        <div className="card">
+        <div className="card rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
             {/* Card Header */}
-            <div className="card-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="card-title text-gray-900 dark:text-white">Vaccination Records</p>
+            <div className="card-header flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
+                <p className="card-title text-lg font-semibold text-gray-900 dark:text-white">Vaccination Records</p>
 
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                    {/* Date Picker */}
-                    <div className="flex items-center gap-2">
-                        <DatePicker
-                            selectsRange
-                            startDate={startDate}
-                            endDate={endDate}
-                            onChange={(update) => setDateRange(update)}
-                            isClearable
-                            placeholderText="Select date range"
-                            className="input input-sm w-48 rounded-md border px-2 py-1 text-sm text-gray-900 dark:bg-slate-800 dark:text-white"
-                            dateFormat="MMM d, yyyy"
-                            withPortal
-                        />
-                        {(startDate || endDate) && (
-                            <button
-                                onClick={() => setDateRange([null, null])}
-                                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                            >
-                                Clear
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Search Input */}
+                              <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                    {/* Search input */}
                     <input
                         type="text"
-                        placeholder="Search records..."
-                        className="input input-sm w-56 rounded-md border px-3 py-1 text-sm text-gray-900 dark:bg-slate-800 dark:text-white"
+                        placeholder="Search users..."
+                        className="input input-sm flex-grow rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white min-w-[180px] md:min-w-0"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
                             setCurrentPage(1);
                         }}
                     />
+                    {/* Date filter inputs - Now uses flex-wrap to stack on small screens */}
+                    <div className="flex flex-wrap items-center gap-2 flex-grow-0">
+                        <label htmlFor="dateFrom" className="text-sm font-medium text-gray-700 dark:text-gray-300">From:</label>
+                        <input
+                            type="date"
+                            id="dateFrom"
+                            value={dateFrom}
+                            onChange={(e) => {
+                                setDateFrom(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white w-32 md:w-auto"
+                            title="Filter by 'Created At' date (From)"
+                        />
+                        <label htmlFor="dateTo" className="text-sm font-medium text-gray-700 dark:text-gray-300">To:</label>
+                        <input
+                            type="date"
+                            id="dateTo"
+                            value={dateTo}
+                            onChange={(e) => {
+                                setDateTo(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white w-32 md:w-auto"
+                            title="Filter by 'Created At' date (To)"
+                        />
+                    </div>
+                    {/* Page size selector */}
+                    <div className="flex items-center gap-2 flex-grow-0">
+                        <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700 dark:text-gray-300">Show:</label>
+                        <input
+                            type="number"
+                            id="itemsPerPage"
+                            min="1"
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            onBlur={handleItemsPerPageChange}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleItemsPerPageChange(e);
+                                }
+                            }}
+                            className="input input-xs w-16 text-center rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                            aria-label="Items per page"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">users per page</span>
+                    </div>
                 </div>
             </div>
-
-            {/* Add button on XS screens */}
-            <div className=" flex justify-center sm:hidden">
-                <button
-                    onClick={handleAddClick}
-                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-red-500 px-4 py-2 text-white hover:bg-pink-600"
-                >
-                    <Plus className="h-5 w-5" />
-                    Add New Born
-                </button>
-            </div>
-
-            {/* Card Body */}
+            {/* Card Body with Table/Card Views */}
             <div className="card-body p-0">
                 <div className="relative h-[500px] w-full overflow-auto">
-                    {/* Mobile View */}
-                    <div className="block sm:hidden">
+                    {/* Mobile View (Cards) */}
+                    <div className="block p-2 sm:hidden">
                         {currentUsers.length === 0 ? (
                             <div className="p-4 text-center text-gray-900 dark:text-white">No records found.</div>
                         ) : (
@@ -195,12 +264,14 @@ function VaccineRecordTable() {
                                                     <p className="text-sm text-gray-700 dark:text-gray-300">{user.FullAddress}</p>
                                                 </div>
                                             </div>
-                                            <p className="text-gray-900 dark:text-white">{user.motherName}</p>
-                                            <p className="text-gray-900 dark:text-white">{user.vaccineName}</p>
-                                            <p className="text-gray-900 dark:text-white">{user.description}</p>
-                                            <p className="capitalize text-gray-900 dark:text-white">{dose.doseNumber || "—"}</p>
-                                            <p className="text-gray-900 dark:text-white">{dose.remarks || "—"}</p>
-                                            <div className="flex gap-2">
+                                            <p className="text-gray-900 dark:text-white">Mother: {user.motherName}</p>
+                                            <p className="text-gray-900 dark:text-white">Vaccine: {user.vaccineName}</p>
+                                            <p className="text-gray-900 dark:text-white">Description: {user.description}</p>
+                                            <p className="capitalize text-gray-900 dark:text-white">Dose: {dose.doseNumber || "—"}</p>
+                                            <p className="text-gray-900 dark:text-white">Remarks: {dose.remarks || "—"}</p>
+                                            <p className="text-gray-900 dark:text-white">Administered By: {dose.administeredBy || "—"}</p>
+  
+                                            <div className="mt-2 flex gap-2">
                                                 <StatusBadge status={dose.status} />
                                             </div>
                                             <div className="mt-2 flex gap-2">
@@ -210,7 +281,6 @@ function VaccineRecordTable() {
                                                 >
                                                     <PencilIcon className="h-4 w-4" />
                                                 </button>
-
                                                 <button
                                                     onClick={() => handleDeleteAssign(dose._id, user._id)}
                                                     className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
@@ -225,7 +295,7 @@ function VaccineRecordTable() {
                         )}
                     </div>
 
-                    {/* Desktop View */}
+                    {/* Desktop View (Table) */}
                     <table className="hidden w-full min-w-[1200px] table-auto text-sm sm:table">
                         <thead className="sticky top-0 bg-gray-100 shadow-sm dark:bg-gray-800">
                             <tr>
@@ -242,14 +312,14 @@ function VaccineRecordTable() {
                                 <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Remarks</th>
                                 <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Administered By</th>
                                 <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Dose Info</th>
-                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Actions</th>
+                                                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {currentUsers.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan="14"
+                                        colSpan="15"
                                         className="p-4 text-center text-gray-900 dark:text-white"
                                     >
                                         No records found.
@@ -296,11 +366,11 @@ function VaccineRecordTable() {
                                                 <div className="space-y-1 text-sm text-gray-900 dark:text-white">
                                                     <div>
                                                         <span className="font-medium">Given:</span>{" "}
-                                                        {dose.dateGiven ? new Date(dose.dateGiven).toLocaleDateString() : "—"}
+                                                        {dose.dateGiven ? formatDate(dose.dateGiven) : "—"}
                                                     </div>
                                                     <div>
                                                         <span className="font-medium">Next Due:</span>{" "}
-                                                        {dose.next_due_date ? new Date(dose.next_due_date).toLocaleDateString() : "—"}
+                                                        {dose.next_due_date ? formatDate(dose.next_due_date) : "—"}
                                                     </div>
                                                 </div>
                                             </td>
@@ -330,21 +400,20 @@ function VaccineRecordTable() {
                     </table>
                 </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                    <div className="flex items-center justify-between border-t px-4 py-3 dark:border-gray-700">
+                {totalPages > 0 && (
+                    <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 dark:border-gray-700 sm:flex-row">
                         <button
-                            className="btn btn-sm btn-ghost text-gray-900 dark:text-white"
+                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
                         >
                             Previous
                         </button>
-                        <span className="text-sm text-gray-900 dark:text-white">
-                            Page {currentPage} of {totalPages}
+                        <span>
+                            Page {currentPage} of {totalPages} • {filteredRecord.length} records
                         </span>
                         <button
-                            className="btn btn-sm btn-ghost text-gray-900 dark:text-white"
+                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}
                         >
@@ -361,7 +430,6 @@ function VaccineRecordTable() {
                 editDose={dose}
                 dataAssign={assignData}
             />
-
             <StatusVerification
                 isOpen={isVerification}
                 onConfirmDelete={handleConfirmDelete}

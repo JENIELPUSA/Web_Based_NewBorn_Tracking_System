@@ -9,19 +9,31 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
     const { downloadProfillingReport, downloadNewBornReport, downloadIventoryReport } = useContext(ReportDisplayContext);
     const [fromDate, setFromDate] = useState(defaultFromDate);
     const [toDate, setToDate] = useState(defaultToDate);
+    const [loading, setLoading] = useState(false); 
 
     const handleDownload = async () => {
         if (!fromDate || !toDate) {
-            alert("Please select both start and end dates.");
+            toast.error("Please select both start and end dates."); 
             return;
         }
 
-        if (title === "Profilling Reports") {
-            await downloadProfillingReport(fromDate, toDate);
-        } else if (title === "New Born Reports") {
-            await downloadNewBornReport(fromDate, toDate);
-        } else {
-            await downloadIventoryReport(fromDate, toDate);
+        setLoading(true);
+
+        try {
+            if (title === "Profilling Reports") {
+                await downloadProfillingReport(fromDate, toDate);
+            } else if (title === "New Born Reports") {
+                await downloadNewBornReport(fromDate, toDate);
+            } else {
+                await downloadIventoryReport(fromDate, toDate);
+            }
+            setFromDate(""); 
+            setToDate(""); 
+        } catch (error) {
+            toast.error(`Error downloading ${title}. Please try again.`);
+            console.error("Download error:", error);
+        } finally {
+            setLoading(false); 
         }
     };
 
@@ -58,6 +70,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
                         value={fromDate}
                         onChange={(e) => setFromDate(e.target.value)}
                         className="w-full rounded-md border border-gray-300 p-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:ring-blue-400"
+                        disabled={loading} // Disable input while loading
                     />
                 </div>
                 <div className="w-full">
@@ -73,16 +86,27 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
                         value={toDate}
                         onChange={(e) => setToDate(e.target.value)}
                         className="w-full rounded-md border border-gray-300 p-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:ring-blue-400"
+                        disabled={loading} // Disable input while loading
                     />
                 </div>
             </div>
 
             <button
                 onClick={handleDownload}
-                className="mt-3 w-full rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-5 sm:text-sm"
+                className="mt-3 w-full rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-5 sm:text-sm flex items-center justify-center"
+                disabled={loading} // Disable button while loading
             >
-                Download Now
-                <Download className="ml-2 inline-block h-4 w-4" />
+                {loading ? (
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                ) : (
+                    <>
+                        Download Now
+                        <Download className="ml-2 inline-block h-4 w-4" />
+                    </>
+                )}
             </button>
         </div>
     );
