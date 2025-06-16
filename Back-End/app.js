@@ -55,8 +55,8 @@ app.use(
 );
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
-    //origin: "https://web-based-newborn-tracking-system.onrender.com",
+    //origin: process.env.FRONTEND_URL,
+    origin: "https://web-based-newborn-tracking-system.onrender.com",
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
   })

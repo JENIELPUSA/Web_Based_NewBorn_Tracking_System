@@ -268,7 +268,7 @@ exports.forgotPassword = AsyncErrorHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Generate the reset URL
-  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+  const resetUrl = `https://web-based-newborn-tracking-system.onrender.com/reset-password/${resetToken}`;
   const message = `We have received a password reset request. Please use the below link to reset your password:\n\n${resetUrl} \n\nThis reset password link will be available for 10 minutes.`;
 
   try {
