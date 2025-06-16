@@ -1,6 +1,8 @@
 
 const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+const path = require("path");
+dotenv.config({ path: path.resolve(__dirname, "config.env") });
+
 const Notification =require("./Models/NotificationSchema")
 
 const mongoose = require("mongoose");
