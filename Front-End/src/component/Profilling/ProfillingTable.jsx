@@ -1,31 +1,31 @@
 import React, { useState, useContext, useMemo, useEffect } from "react";
-import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
+import { UserDisplayContext } from "../../contexts/UserContxet/UserContext"; // <- AYUSIN ITO KUNG MALI
 import { PencilIcon, TrashIcon, Plus } from "lucide-react";
 import { motion } from "framer-motion";
-import UserFormModal from "../Profilling/ProfillingAddForm"; 
-import StatusVerification from "../../ReusableFolder/StatusModal"; 
-import { ProfillingContexts } from "../../contexts/ProfillingContext/ProfillingContext";
+import UserFormModal from "../Profilling/ProfillingAddForm"; // <- AYUSIN ITO KUNG MALI
+import StatusVerification from "../../ReusableFolder/StatusModal"; // <- AYUSIN ITO KUNG MALI
+import { ProfillingContexts } from "../../contexts/ProfillingContext/ProfillingContext"; // <- AYUSIN ITO KUNG MALI
 
 function Profille() {
     const [selectedUser, setSelectedUser] = useState(null);
     const { isProfilling, DeleteProfile, setProfilling } = useContext(ProfillingContexts);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
-    const [dateFrom, setDateFrom] = useState("");
-    const [dateTo, setDateTo] = useState(""); 
+    const [itemsPerPage, setItemsPerPage] = useState(5); // State for items per page
+    const [dateFrom, setDateFrom] = useState(""); // State for 'created at' date filter start (string format for input)
+    const [dateTo, setDateTo] = useState("");     // State for 'created at' date filter end (string format for input)
     const [isAddFormOpen, setAddFormOpen] = useState(false);
     const [isVerification, setVerification] = useState(false);
-    const [idToDelete, setIdToDelete] = useState("");
+    const [idToDelete, setIdToDelete] = useState(""); // Renamed from isDeleteID for clarity
+
+    // Filter users based on search term and date range
     const filteredUsers = useMemo(() => {
         if (!Array.isArray(isProfilling)) return [];
         return isProfilling.filter((user) => {
-            const matchesSearch =
-                `${user.FirstName || ""} ${user.LastName || ""} ${user.username || ""} ${user.email || ""} ${user.newbornName || ""}`
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase());
+            const matchesSearch = `${user.FirstName || ''} ${user.LastName || ''} ${user.username || ''} ${user.email || ''} ${user.newbornName || ''}`.toLowerCase().includes(searchTerm.toLowerCase());
 
             let matchesDateRange = true;
+            // Assuming `user.createdAt` exists and is a valid date string/object in your data
             if (user.createdAt && dateFrom && dateTo) {
                 const userCreatedAtDate = new Date(user.createdAt);
                 userCreatedAtDate.setHours(0, 0, 0, 0);
@@ -37,6 +37,7 @@ function Profille() {
 
                 matchesDateRange = userCreatedAtDate >= fromDateObj && userCreatedAtDate <= toDateObj;
             } else if (dateFrom || dateTo) {
+                // If filters are set but user.createdAt is missing or outside the range
                 matchesDateRange = false;
             }
 
@@ -44,23 +45,27 @@ function Profille() {
         });
     }, [isProfilling, searchTerm, dateFrom, dateTo]);
 
+    // Pagination calculations
     const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
     const indexOfLastUser = currentPage * itemsPerPage;
     const indexOfFirstUser = indexOfLastUser - itemsPerPage;
     const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
+    // Effect hook to adjust the current page if needed after filtering, deletion, or changing itemsPerPage.
     useEffect(() => {
         const newTotalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
         if (currentPage > newTotalPages && newTotalPages > 0) {
             setCurrentPage(newTotalPages);
         } else if (filteredUsers.length > 0 && currentUsers.length === 0 && currentPage > 1) {
-            setCurrentPage((prevPage) => prevPage - 1);
+            setCurrentPage(prevPage => prevPage - 1);
         } else if (filteredUsers.length === 0 && currentPage !== 1) {
             setCurrentPage(1);
         }
     }, [filteredUsers.length, currentPage, itemsPerPage, currentUsers.length]);
 
+
+    // Modal and deletion handlers
     const handleAddClick = () => {
         setSelectedUser(null);
         setAddFormOpen(true);
@@ -79,7 +84,7 @@ function Profille() {
 
     const handleDeleteUser = (userId) => {
         console.log("ehjgergergje", userId);
-        setIdToDelete(userId); 
+        setIdToDelete(userId); // Set the ID to delete
         setVerification(true);
     };
 
@@ -89,6 +94,7 @@ function Profille() {
         handleCloseModal();
     };
 
+    // Utility functions
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
@@ -105,94 +111,94 @@ function Profille() {
         return parts[0][0].toUpperCase() + (parts[1] ? parts[1][0].toUpperCase() : "");
     };
 
+    // Handler for changing items per page (input box)
     const handleItemsPerPageChange = (e) => {
         setItemsPerPage(Number(e.target.value));
-        setCurrentPage(1);
+        setCurrentPage(1); // Reset to first page when changing items per page
     };
+
+    // Function to clear both start and end dates
     const clearDateRange = () => {
         setDateFrom("");
         setDateTo("");
         setCurrentPage(1);
     };
 
+
     return (
         <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
+            {/* Header */}
             <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Profilling</h2>
-                <div className="flex w-full flex-wrap items-center gap-4 md:w-auto">
+                {/* Filters container - Adjusted for stacking on mobile, inline on desktop */}
+                {/* New structure to match the image: Search on its own line for better mobile visibility too */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    {/* Search input - Always takes full width in its container, centered on mobile */}
                     <input
                         type="text"
-                        placeholder="Search New Borns..."
-                        className="input input-sm min-w-[180px] flex-grow rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 dark:bg-slate-800 dark:text-gray-200 md:min-w-0"
+                        placeholder="Search users..."
+                        className="input input-sm flex-grow rounded-md border px-3 py-1 text-sm text-gray-800 dark:bg-gray-800 dark:text-white w-full sm:w-auto"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
                             setCurrentPage(1);
                         }}
                     />
-                    <div className="flex flex-grow-0 flex-wrap items-center gap-2">
-                        <label
-                            htmlFor="dateFrom"
-                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            From:
-                        </label>
-                        <input
-                            type="date"
-                            id="dateFrom"
-                            value={dateFrom}
-                            onChange={(e) => {
-                                setDateFrom(e.target.value);
-                                setCurrentPage(1);
-                            }}
-                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-auto"
-                            title="Filter by 'Created At' date (From)"
-                        />
-                        <label
-                            htmlFor="dateTo"
-                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            To:
-                        </label>
-                        <input
-                            type="date"
-                            id="dateTo"
-                            value={dateTo}
-                            onChange={(e) => {
-                                setDateTo(e.target.value);
-                                setCurrentPage(1);
-                            }}
-                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-auto"
-                            title="Filter by 'Created At' date (To)"
-                        />
-                    </div>
-                    <div className="flex flex-grow-0 items-center gap-2">
-                        <label
-                            htmlFor="itemsPerPage"
-                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            Show:
-                        </label>
-                        <input
-                            type="number"
+                    {/* Container for Date Filters and Show selector - now side-by-side on desktop, wraps on mobile */}
+                    <div className="flex flex-wrap items-center gap-2 flex-grow-0 w-full sm:w-auto justify-center sm:justify-start">
+                        {/* From Date Input */}
+                        <div className="flex flex-col items-start flex-grow">
+                            <label htmlFor="dateFrom" className="text-xs font-medium text-gray-700 dark:text-gray-300">From:</label>
+                            <input
+                                type="date"
+                                id="dateFrom"
+                                value={dateFrom}
+                                onChange={(e) => setDateFrom(e.target.value)}
+                                className="input input-xs w-full rounded-md border px-2 py-1 text-sm text-gray-900 dark:bg-gray-800 dark:text-white"
+                                title="Petsa ng simula"
+                            />
+                        </div>
+                        {/* To Date Input */}
+                        <div className="flex flex-col items-start flex-grow">
+                            <label htmlFor="dateTo" className="text-xs font-medium text-gray-700 dark:text-gray-300">To:</label>
+                            <input
+                                type="date"
+                                id="dateTo"
+                                value={dateTo}
+                                onChange={(e) => setDateTo(e.target.value)}
+                                className="input input-xs w-full rounded-md border px-2 py-1 text-sm text-gray-900 dark:bg-gray-800 dark:text-white"
+                                title="Petsa ng pagtatapos"
+                            />
+                        </div>
+
+                        {(dateFrom || dateTo) && (
+                            <button
+                                onClick={clearDateRange}
+                                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 flex-shrink-0"
+                            >
+                                Clear
+                            </button>
+                        )}
+                        {/* Show items per page */}
+                        <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2">Show:</label>
+                        <select
                             id="itemsPerPage"
-                            min="1"
                             value={itemsPerPage}
                             onChange={handleItemsPerPageChange}
-                            onBlur={handleItemsPerPageChange}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    handleItemsPerPageChange(e);
-                                }
-                            }}
-                            className="input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                             aria-label="Items per page"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">new borns per page</span>
+                        >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                        </select>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">users per page</span>
                     </div>
                 </div>
             </div>
 
+            {/* Mobile Add Button */}
             <div className="mt-4 flex justify-center sm:hidden">
                 <button
                     onClick={handleAddClick}
@@ -203,6 +209,7 @@ function Profille() {
                 </button>
             </div>
 
+            {/* Desktop Table (hidden on mobile) */}
             <div className="hidden overflow-x-auto sm:block">
                 <table className="table min-w-full text-sm">
                     <thead className="bg-gray-100 dark:bg-gray-800">
@@ -220,6 +227,7 @@ function Profille() {
                             <th className="p-2 text-left">Notes</th>
                             <th className="p-2 text-left">Mother Name</th>
                             <th className="p-2 text-left">Contact #</th>
+                            <th className="p-2 text-left">Vacination Record</th>
                             <th className="p-2 text-left">Created At</th>
                             <th className="p-2 text-left">
                                 <button
@@ -276,6 +284,38 @@ function Profille() {
                                     <td className="p-2">{user.notes || "N/A"}</td>
                                     <td className="p-2">{user.motherName || "N/A"}</td>
                                     <td className="p-2">{user.motherPhoneNumber || "N/A"}</td>
+                                    {/* Vaccination Record Column - KEEP THIS */}
+                                    <td className="p-2">
+                                        {user.vaccinationRecords?.length ? (
+                                            <ul className="list-disc space-y-2 pl-4">
+                                                {user.vaccinationRecords.map((record, i) => (
+                                                    <li key={i}>
+                                                        <div>
+                                                            <b>Vaccine:</b> {record.vaccineName}
+                                                        </div>
+                                                        {Array.isArray(record.doses) && record.doses.length > 0 ? (
+                                                            <ul className="ml-4 list-disc space-y-1">
+                                                                {record.doses.map((dose, j) => (
+                                                                    <li key={j} className="text-xs">
+                                                                        <div>
+                                                                            <b>Dose: {dose.doseNumber}</b>
+                                                                        </div>
+                                                                        <div>
+                                                                            <b>Date:</b> {formatDate(dose.dateGiven)}
+                                                                        </div>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        ) : (
+                                                            <div className="text-gray-500">No dose data</div>
+                                                        )}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-gray-500">No vaccination records</p>
+                                        )}
+                                    </td>
                                     <td className="p-2">{formatDate(user.createdAt)}</td>
                                     <td className="p-2">
                                         <div className="flex gap-2">
@@ -302,6 +342,7 @@ function Profille() {
                 </table>
             </div>
 
+            {/* Mobile Card View (hidden on desktop) */}
             <div className="block grid grid-cols-1 gap-4 sm:hidden">
                 {currentUsers.length === 0 ? (
                     <div className="p-4 text-center text-gray-500 dark:text-gray-400">No profilling records found.</div>
@@ -385,11 +426,40 @@ function Profille() {
                                     <p className="text-gray-500 dark:text-gray-400">Created At</p>
                                     <p className="dark:text-white">{formatDate(user.createdAt)}</p>
                                 </div>
+                                {/* Vaccination Records in Mobile Card View */}
+                                <details className="col-span-2 mt-3">
+                                    <summary className="cursor-pointer text-sm font-medium text-blue-600 dark:text-blue-400">Vaccination Records</summary>
+                                    <div className="mt-2 space-y-3 pl-2 text-sm">
+                                        {user.vaccinationRecords?.length ? (
+                                            user.vaccinationRecords.map((record, i) => (
+                                                <div key={i} className="rounded border p-2 dark:border-gray-700">
+                                                    <p className="font-medium dark:text-white">Vaccine: {record.vaccineName}</p>
+                                                    {Array.isArray(record.doses) && record.doses.length > 0 ? (
+                                                        <ul className="mt-1 space-y-1">
+                                                            {record.doses.map((dose, j) => (
+                                                                <li key={j} className="text-xs">
+                                                                    <span className="font-medium dark:text-white">Dose {dose.doseNumber}:</span>{" "}
+                                                                    <span className="dark:text-white">{dose.dateGiven ? formatDate(dose.dateGiven) : "—"}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <p className="text-xs text-gray-500">No dose data</p>
+                                                    )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">No vaccination records</p>
+                                        )}
+                                    </div>
+                                </details>
                             </div>
                         </motion.div>
                     ))
                 )}
             </div>
+
+            {/* Pagination */}
             {totalPages > 0 && (
                 <div className="flex items-center justify-between border-t px-4 py-3 dark:border-gray-700">
                     <button
@@ -412,6 +482,7 @@ function Profille() {
                 </div>
             )}
 
+            {/* Modals */}
             <UserFormModal
                 isOpen={isAddFormOpen}
                 onClose={handleCloseModal}
