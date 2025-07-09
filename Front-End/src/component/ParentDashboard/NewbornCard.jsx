@@ -6,16 +6,20 @@ function NewbornCard({ newborn, onSelect }) {
     console.log('Card dragged:', newborn.newbornName);
   };
 
+  const handleClick = () => {
+    if (onSelect) onSelect(newborn); // fallback for mobile/tablet
+  };
+
   return (
     <div
       className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition"
       draggable
       onDragStart={handleDragStart}
-      onClick={() => onSelect(newborn)}
+      onClick={handleClick}
     >
       <h2 className="text-xl font-bold text-blue-600">{newborn.newbornName}</h2>
       <p className="text-gray-500">Birth: {newborn.dateOfBirth}</p>
-       <p className="text-gray-500">Address: {newborn.FullAddress}</p>
+      <p className="text-gray-500">Address: {newborn.FullAddress}</p>
     </div>
   );
 }
