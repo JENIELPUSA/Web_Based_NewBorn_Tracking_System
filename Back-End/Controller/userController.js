@@ -1,7 +1,13 @@
+const mongoose = require("mongoose");
 const AsyncErrorHandler = require("../Utils/AsyncErrorHandler");
 const CustomError = require("../Utils/CustomError");
 const user = require("../Models/usermodel");
 const Apifeatures = require("./../Utils/ApiFeatures");
+const LogAudit = require("./../Models/LogAndAudit");
+const newBorn = require("./../Models/NewBornmodel");
+const Checkup = require("./../Models/CheckupRecords");
+const Notify = require("./../Models/NotificationSchema");
+const VaccinationRecrd = require("./../Models/VaccinationRecord");
 
 exports.createUser = AsyncErrorHandler(async (req, res) => {
   const { FirstName, LastName, email, password, role } = req.body;
@@ -43,8 +49,6 @@ exports.createUser = AsyncErrorHandler(async (req, res) => {
   });
 });
 
-  
-
 exports.DisplayAll = AsyncErrorHandler(async (req, res) => {
   const features = new Apifeatures(user.find(), req.query)
     .filter()
@@ -61,19 +65,19 @@ exports.DisplayAll = AsyncErrorHandler(async (req, res) => {
   // Perform aggregation to count male and female users
   const result = await user.aggregate([
     {
-      $match: {} // Match all users (after the query filters are applied)
+      $match: {}, // Match all users (after the query filters are applied)
     },
     {
       $group: {
         _id: null, // No grouping by any field
         totalMale: {
-          $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] },
         },
         totalFemale: {
-          $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] }
-        }
-      }
-    }
+          $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] },
+        },
+      },
+    },
   ]);
 
   // Get the count of male and female users
@@ -89,8 +93,23 @@ exports.DisplayAll = AsyncErrorHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteUser = AsyncErrorHandler(async (req, res) => {
+  const [hasLogsAudit, hasNewBorn, hasCheckup, hasNotify, hasRecord] =
+    await Promise.all([
+      LogAudit.exists({ userId: req.params.id }),
+      newBorn.exists({ addedBy: req.params.id }),
+      Checkup.exists({ addedBy: req.params.id }),
+      Notify.exists({ readBy: req.params.id }),
+      VaccinationRecrd.exists({ administeredBy: req.params.id }),
+    ]);
+
+  if (hasLogsAudit || hasNewBorn || hasCheckup || hasNotify || hasRecord) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Cannot delete User: there are existing related records.",
+    });
+  }
+
   await user.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
@@ -100,14 +119,9 @@ exports.deleteUser = AsyncErrorHandler(async (req, res) => {
 });
 
 exports.Updateuser = AsyncErrorHandler(async (req, res, next) => {
-  const { FirstName, LastName, email, role } = req.body;
+  const { FirstName, LastName, email } = req.body;
 
-  if (
-    !FirstName ||
-    !LastName ||
-    !email ||
-    (role !== "Guest" && !role)
-  ) {
+  if (!FirstName || !LastName || !email) {
     return res.status(400).json({
       status: "fail",
       message: "Please fill in all required fields.",
@@ -123,7 +137,6 @@ exports.Updateuser = AsyncErrorHandler(async (req, res, next) => {
     data: updateuser,
   });
 });
-
 
 exports.Getiduser = AsyncErrorHandler(async (req, res, next) => {
   const users = await user.findById(req.params.id);
@@ -156,25 +169,94 @@ exports.updatePassword = AsyncErrorHandler(async (req, res, next) => {
 });
 
 exports.signup = AsyncErrorHandler(async (req, res, next) => {
-  const { FirstName, Middle, LastName, email, password,role } = req.body;
+  const { FirstName, Middle, LastName, email, password, role } = req.body;
   user
     .findOne({ email: email })
     .then((user) => {
       if (user) {
         res.json("Already Have an Account!");
       } else {
-        user.create({
-          FirstName: FirstName,
-          Middle: Middle,
-          LastName: LastName,
-          email: email,
-          password: password,
-          role:role
-        })
+        user
+          .create({
+            FirstName: FirstName,
+            Middle: Middle,
+            LastName: LastName,
+            email: email,
+            password: password,
+            role: role,
+          })
           .then((result) => res.json(result))
 
           .catch((err) => res.json(err));
       }
     })
     .catch((err) => res.json(err));
+});
+
+exports.DisplayProfile = AsyncErrorHandler(async (req, res) => {
+  const userId = req.params.id;
+
+  let displayuser;
+
+  if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+    const foundUser = await user.findById(userId);
+    if (!foundUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    displayuser = [foundUser];
+  } else {
+    const features = new Apifeatures(user.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    displayuser = await features.query;
+  }
+
+  const result = await user.aggregate([
+    { $match: userId ? { _id: new mongoose.Types.ObjectId(userId) } : {} },
+    {
+      $group: {
+        _id: null,
+        totalMale: {
+          $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] },
+        },
+        totalFemale: {
+          $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] },
+        },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    data: displayuser,
+    stats: result[0] || {},
+  });
+});
+
+
+exports.updateUserProfile = AsyncErrorHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!req.file) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "No file uploaded" });
+  }
+
+  const updateFields = {
+    avatar: `/uploads/${req.file.filename}`,
+  };
+
+  const updatedUser = await user.findByIdAndUpdate(id, updateFields, {
+    new: true,
+  });
+
+  if (!updatedUser) {
+    return res.status(404).json({ status: "error", message: "User not found" });
+  }
+
+  res.status(200).json({ status: "success", data: updatedUser });
 });

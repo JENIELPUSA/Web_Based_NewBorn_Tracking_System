@@ -14,5 +14,6 @@ router
     RecordController.UpdateRecord
   )
   .delete(authController.protect,RecordController.deleteRecord)
+  router.get("/vaccination-records", RecordController.DisplayNewbornData);
 
 module.exports = router;

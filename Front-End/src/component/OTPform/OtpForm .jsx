@@ -53,7 +53,7 @@ const OtpForm = ({ isOpen, onClose, userId }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

@@ -1,22 +1,20 @@
 import React, { useState, useContext, useMemo } from "react";
 import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
+import { ParentDisplayContext } from "../../contexts/ParentContext/ParentContext";
 import { PencilIcon, TrashIcon, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import UserFormModal from "../User/AddUser";
 import StatusVerification from "../../ReusableFolder/StatusModal";
 
 function ParentTable() {
+    const {isParent,DeleteParent}=useContext(ParentDisplayContext)
     const [selectedUser, setSelectedUser] = useState(null);
-    const { isParent, users, DeleteUser, setUsers } = useContext(UserDisplayContext);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const usersPerPage = 5;
     const [isAddFormOpen, setAddFormOpen] = useState(false);
     const [isVerification, setVerification] = useState(false);
     const [isDeleteID, setIsDeleteId] = useState("");
-    console.log("para sa user", users);
-    console.log("para sa parents", isParent);
-
     const filteredUsers = useMemo(() => {
         const data = Array.isArray(isParent) ? isParent : [];
         return data.filter((user) =>
@@ -48,7 +46,7 @@ function ParentTable() {
     };
 
     const handleConfirmDelete = async () => {
-        await DeleteUser(isDeleteID);
+        await DeleteParent(isDeleteID);
         setUsers((prevUsers) => prevUsers.filter((user) => user._id !== isDeleteID));
         handleCloseModal();
     };
@@ -160,9 +158,12 @@ function ParentTable() {
                                             </div>
                                         )}
                                     </td>
-                                    <td className="p-3 align-top">{`${user.FirstName} ${user.LastName}`}</td>
+                                    <td className="p-3 align-top">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
                                     <td className="p-3 align-top">{user.email}</td>
-                                    <td className="max-w-xs truncate p-3 align-top">{user.address || "N/A"}</td>
+                                    <td className="max-w-xs truncate p-3 align-top">
+                                        {user.zone ? `${user.zone}, ${user.address}` : user.address || "N/A"}
+                                    </td>
+
                                     <td className="p-3 align-top">{user.phoneNumber || "N/A"}</td>
                                     <td className="p-3 align-top">{formatDate(user.dateOfBirth)}</td>
                                     <td className="p-3 align-top capitalize">{user.gender || "N/A"}</td>

@@ -3,9 +3,10 @@ import { motion } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext";
 import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornContext";
 import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
-
+import { ParentDisplayContext } from "../../contexts/ParentContext/ParentContext";
 function AddNewBorn({ isOpen, onClose, born }) {
-    const { users, isParent } = useContext(UserDisplayContext);
+    const { isParent } = useContext(ParentDisplayContext);
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
     const { userId, DesignatedZone ,role} = useContext(AuthContext);
@@ -37,8 +38,6 @@ function AddNewBorn({ isOpen, onClose, born }) {
             birthHeight: "",
         });
     };
-
-    console.log("Para sa Parents", isParent);
     useEffect(() => {
         if (born) {
             setFormData({
@@ -104,7 +103,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 p-4">
             <motion.div
                 initial={{ opacity: 0, y: -40 }}
                 animate={{ opacity: 1, y: 0 }}

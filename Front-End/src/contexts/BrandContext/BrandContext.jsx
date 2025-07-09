@@ -24,9 +24,7 @@ export const BrandDisplayProvider = ({ children }) => {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
-
             setBrand(res.data.data);
-            console.log("Fetched brands:", res.data.data);
         } catch (error) {
             console.error("Error fetching brands:", error);
             setError("Failed to fetch data.");

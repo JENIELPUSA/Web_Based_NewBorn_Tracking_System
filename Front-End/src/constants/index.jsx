@@ -1,4 +1,4 @@
-import { CircleUserRound, Home, NotepadText, KeyRound,ShieldCheck, Syringe, UserPlus, Baby,CalendarDays,FilePlus2  } from "lucide-react";
+import { CircleUserRound, Home, NotepadText, UserCog ,ShieldCheck, Syringe, UserPlus, Baby,CalendarDays,FilePlus2  } from "lucide-react";
 
 export const navbarLinks = [
     {
@@ -65,8 +65,8 @@ export const navbarLinks = [
         title: "Settings",
         links: [
             {
-                label: "Change Password",
-                icon: KeyRound,
+                label: "My Account",
+                icon: UserCog ,
                 path: "/dashboard/update-password",
             },
         ],

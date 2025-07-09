@@ -68,10 +68,8 @@ export const ReportDisplayProvider = ({ children }) => {
             );
             setProfilingData(res.data);
             if (res.data && res.data.length === 0) {
-                toast.info("No profiling data found for the selected date range.");
                 setmessage("No data found."); // Set a specific message for no data
             } else {
-                toast.success("Profiling data fetched successfully!");
                 setmessage("Data fetched successfully!");
             }
         } catch (error) {

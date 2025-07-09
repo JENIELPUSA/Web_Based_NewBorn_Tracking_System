@@ -42,8 +42,6 @@ export const VaccinePerProvider = ({ children }) => {
 
             const vaccineDAta = res?.data.data;
             setPerVaccine(vaccineDAta);
-
-            console.log("Per Baby",vaccineDAta)
         } catch (error) {
             setCustomError("Failed to fetch data");
         }

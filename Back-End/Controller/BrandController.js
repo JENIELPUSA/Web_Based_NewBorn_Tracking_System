@@ -1,6 +1,7 @@
 const AsyncErrorHandler = require('../Utils/AsyncErrorHandler');
 const brand = require('./../Models/BrandModel');
 const Apifeatures = require('./../Utils/ApiFeatures');
+const Brand = require('./../Models/VaccineModel')
 
 
 exports.createBrand=AsyncErrorHandler(async(req,res) => {
@@ -42,6 +43,15 @@ exports.Updatebrand =AsyncErrorHandler(async (req,res,next) =>{
   })
 
   exports.deletebrand = AsyncErrorHandler(async(req,res,next)=>{
+
+      const hasBrand = await Brand.exists({ brand: req.params.id });
+    
+      if (hasBrand) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Cannot delete Brand: there are existing related records.",
+        });
+      }
     await brand.findByIdAndDelete(req.params.id)
 
     res.status(200).json({

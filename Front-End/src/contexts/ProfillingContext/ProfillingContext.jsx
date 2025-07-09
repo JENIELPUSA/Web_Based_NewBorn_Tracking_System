@@ -8,11 +8,10 @@ import axiosInstance from "../../ReusableFolder/axioxInstance";
 export const ProfillingContexts = createContext();
 
 export const ProfillingDisplayProvider = ({ children }) => {
-
     const [isProfilling, setProfilling] = useState([]); // Change this to an empty array
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
-    const { authToken } = useContext(AuthContext);
+    const { authToken,role,Designatedzone } = useContext(AuthContext);
     const [customError, setCustomError] = useState("");
 
     useEffect(() => {
@@ -23,7 +22,6 @@ export const ProfillingDisplayProvider = ({ children }) => {
 
         fetchProfilling();
     }, [authToken]);
-
     const fetchProfilling = async () => {
         if (!authToken) return;
 
@@ -33,68 +31,73 @@ export const ProfillingDisplayProvider = ({ children }) => {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
-            const vaccineData = res?.data?.data;
+            let vaccineData = res?.data?.data;
 
             if (Array.isArray(vaccineData)) {
-                setProfilling(vaccineData); // Set the fetched data if it's an array
+                if (role === "BHW") {
+                    vaccineData = vaccineData.filter((item) => item.zone === Designatedzone);
+                }
+
+                setProfilling(vaccineData);
             } else {
                 console.error("Unexpected data format:", vaccineData);
-                setProfilling([]); // Set an empty array if the data is not in the expected format
+                setProfilling([]);
             }
         } catch (error) {
+            console.error("Error fetching profilling:", error);
             setCustomError("Failed to fetch data");
         }
     };
 
-        useEffect(() => {
-            if (customError) {
-                const timer = setTimeout(() => {
-                    setCustomError(null);
-                }, 5000); // auto-dismiss after 5s
-    
-                return () => clearTimeout(timer); // cleanup
-            }
-        }, [customError]);
+    useEffect(() => {
+        if (customError) {
+            const timer = setTimeout(() => {
+                setCustomError(null);
+            }, 5000); // auto-dismiss after 5s
 
-        const AddProf = async (values, userId) => {
-            try {
-                const res = await axiosInstance.post(
-                    `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling`,
-                    {
-                        newborn_id: values.newborn_id,
-                        blood_type: values.blood_type,
-                        health_condition: values.health_condition,
-                        notes: values.notes
-                    },
-                    {
-                        headers: { Authorization: `Bearer ${authToken}` },
-                    },
-                );
-                if (res.data.status === "success") {
-                    setProfilling((prevUsers) => [...prevUsers, res.data.data]);
-                    setModalStatus("success");
-                    setShowModal(true);
-                } else {
-                    setModalStatus("failed");
-                    setShowModal(true);
-                    return { success: false, error: "Unexpected response from server." };
-                }
-            } catch (error) {
-                if (error.response && error.response.data) {
-                    const errorData = error.response.data;
-                    const message = typeof errorData === "string" ? errorData : errorData.message || errorData.error || "Something went wrong.";
-                    setCustomError(message);
-                } else if (error.request) {
-                    setCustomError("No response from the server.");
-                } else {
-                    setCustomError(error.message || "Unexpected error occurred.");
-                }
+            return () => clearTimeout(timer); // cleanup
+        }
+    }, [customError]);
+
+    const AddProf = async (values, userId) => {
+        try {
+            const res = await axiosInstance.post(
+                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling`,
+                {
+                    newborn_id: values.newborn_id,
+                    blood_type: values.blood_type,
+                    health_condition: values.health_condition,
+                    notes: values.notes,
+                },
+                {
+                    headers: { Authorization: `Bearer ${authToken}` },
+                },
+            );
+            if (res.data.status === "success") {
+                fetchProfilling();
+                setModalStatus("success");
+                setShowModal(true);
+            } else {
+                setModalStatus("failed");
+                setShowModal(true);
+                return { success: false, error: "Unexpected response from server." };
             }
-        };
+        } catch (error) {
+            if (error.response && error.response.data) {
+                const errorData = error.response.data;
+                const message = typeof errorData === "string" ? errorData : errorData.message || errorData.error || "Something went wrong.";
+                setCustomError(message);
+            } else if (error.request) {
+                setCustomError("No response from the server.");
+            } else {
+                setCustomError(error.message || "Unexpected error occurred.");
+            }
+        }
+    };
 
     const DeleteProfile = async (newbordID) => {
         try {
-            const response = await axiosInstance.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/${newbordID}`, {
+            const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/${newbordID}`, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
@@ -113,47 +116,48 @@ export const ProfillingDisplayProvider = ({ children }) => {
         }
     };
 
-
-       const UpdateProf = async (values) => {
-            try {
-               
-                const response = await axiosInstance.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/${values._id}`, {
-                        blood_type: values.blood_type,
-                        health_condition: values.health_condition,
-                        notes: values.notes
-                }, {
+    const UpdateProf = async (values) => {
+        try {
+            const response = await axiosInstance.patch(
+                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/${values._id}`,
+                {
+                    blood_type: values.blood_type,
+                    latestHealthCondition: values.latestHealthCondition,
+                    latestNotes: values.latestNotes,
+                },
+                {
                     headers: { Authorization: `Bearer ${authToken}` },
-                });
-    
-                if (response.data && response.data.status === "success") {
-                    console.log("Updated newborn data:", response.data.updateBaby); // For debugging
-    
-                    // Use the full response data to update the state
-                    setProfilling((prevUsers) => prevUsers.map((u) => (u._id === response.data.data._id ? { ...u, ...response.data.data } : u)));
-    
-                    setModalStatus("success");
-                    setShowModal(true);
-                } else {
-                    setModalStatus("failed");
-                    setShowModal(true);
-                    return { success: false, error: "Unexpected response from server." };
-                }
-            } catch (error) {
-                if (error.response && error.response.data) {
-                    const errorData = error.response.data;
-                    const message = typeof errorData === "string" ? errorData : errorData.message || errorData.error || "Something went wrong.";
-                    setCustomError(message);
-                } else if (error.request) {
-                    setCustomError("No response from the server.");
-                } else {
-                    setCustomError(error.message || "Unexpected error occurred.");
-                }
+                },
+            );
+
+            if (response.data && response.data.status === "success") {
+                console.log("Updated newborn data:", response.data.updateBaby); // For debugging
+
+                // Use the full response data to update the state
+                setProfilling((prevUsers) => prevUsers.map((u) => (u._id === response.data.data._id ? { ...u, ...response.data.data } : u)));
+
+                setModalStatus("success");
+                setShowModal(true);
+            } else {
+                setModalStatus("failed");
+                setShowModal(true);
+                return { success: false, error: "Unexpected response from server." };
             }
-        };
-    
+        } catch (error) {
+            if (error.response && error.response.data) {
+                const errorData = error.response.data;
+                const message = typeof errorData === "string" ? errorData : errorData.message || errorData.error || "Something went wrong.";
+                setCustomError(message);
+            } else if (error.request) {
+                setCustomError("No response from the server.");
+            } else {
+                setCustomError(error.message || "Unexpected error occurred.");
+            }
+        }
+    };
 
     return (
-        <ProfillingContexts.Provider value={{ isProfilling,AddProf,DeleteProfile,setProfilling,UpdateProf,customError }}>
+        <ProfillingContexts.Provider value={{ isProfilling, AddProf, DeleteProfile, setProfilling, UpdateProf, customError }}>
             {children}
 
             {/* Modal should be rendered here */}

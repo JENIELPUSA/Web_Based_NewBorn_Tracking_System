@@ -21,7 +21,7 @@ export const NewBornDisplayProvider = ({ children }) => {
     const [Totalbaby, setTotalBaby] = useState("");
     const [TotalMale, setTotalMale] = useState("");
     const [TotalFemale, setTotalFemale] = useState("");
-    const [isGraphData,setGraphData]=useState("")
+    const [isGraphData, setGraphData] = useState("");
 
     // Get token from localStorage
     const [usersPerPage, setusersPerPage] = useState(6);
@@ -48,18 +48,18 @@ export const NewBornDisplayProvider = ({ children }) => {
         }
     }, [customError]);
 
-      useEffect(() => {
-    if (!newBorn || newBorn.length === 0) {
-      setTotalBaby(0);
-      setTotalMale(0);
-      setTotalFemale(0);
-      return;
-    }
+    useEffect(() => {
+        if (!newBorn || newBorn.length === 0) {
+            setTotalBaby(0);
+            setTotalMale(0);
+            setTotalFemale(0);
+            return;
+        }
 
-    setTotalBaby(newBorn.length);
-    setTotalMale(newBorn.filter((nb) => nb.gender === "Male").length);
-    setTotalFemale(newBorn.filter((nb) => nb.gender === "Female").length);
-  }, [newBorn]);
+        setTotalBaby(newBorn.length);
+        setTotalMale(newBorn.filter((nb) => nb.gender === "Male").length);
+        setTotalFemale(newBorn.filter((nb) => nb.gender === "Female").length);
+    }, [newBorn]);
 
     const fetchUserData = async () => {
         if (!authToken) return;
@@ -80,7 +80,6 @@ export const NewBornDisplayProvider = ({ children }) => {
                 setNewBorn(NewBornData);
                 setTotalFemale(TotalFemale);
                 setTotalBaby(Totalbaby);
-                console.log("UserdAta", NewBornData);
             } else if (role === "BHW") {
                 const filteredUserData = NewBornData.filter((user) => {
                     return user.zone?.toLowerCase().trim() === Designatedzone.toLowerCase().trim();
@@ -90,15 +89,13 @@ export const NewBornDisplayProvider = ({ children }) => {
             }
         } catch (error) {
             console.error("Error fetching data:", error);
-            toast.error("Failed to fetch data. Please try again later.");
             setError("Failed to fetch data");
         } finally {
             setLoading(false); // Set loading to false after data fetching is complete
         }
     };
 
-
-      const fetchGraph = async () => {
+    const fetchGraph = async () => {
         if (!authToken) return;
         setLoading(true); // Set loading to true before fetching data
         try {
@@ -107,23 +104,18 @@ export const NewBornDisplayProvider = ({ children }) => {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
-            const GraphData=res.data.topBabies;
+            const GraphData = res.data.topBabies;
 
-            
-
-
-             if (role === "Admin") {
-                setGraphData(GraphData)      
+            if (role === "Admin") {
+                setGraphData(GraphData);
             } else if (role === "BHW") {
                 const filteredUserData = GraphData.filter((user) => {
                     return user.zone?.toLowerCase().trim() === Designatedzone.toLowerCase().trim();
                 });
                 setGraphData(filteredUserData);
             }
-
         } catch (error) {
             console.error("Error fetching data:", error);
-            toast.error("Failed to fetch data. Please try again later.");
             setError("Failed to fetch data");
         } finally {
             setLoading(false); // Set loading to false after data fetching is complete
@@ -138,7 +130,7 @@ export const NewBornDisplayProvider = ({ children }) => {
                     firstName: values.firstName,
                     lastName: values.lastName,
                     middleName: values.middleName,
-                    extensionName:values.extensionName,
+                    extensionName: values.extensionName,
                     dateOfBirth: values.dateOfBirth,
                     gender: values.gender,
                     birthWeight: values.birthWeight,
@@ -200,7 +192,7 @@ export const NewBornDisplayProvider = ({ children }) => {
             const dataToSend = {
                 firstName: values.firstName || "",
                 lastName: values.lastName || "",
-                extensionName:values.extensionName  || "",
+                extensionName: values.extensionName || "",
                 middleName: values.middleName || "",
                 dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth).toISOString().slice(0, 10) : "",
                 gender: values.gender || "",
@@ -213,12 +205,8 @@ export const NewBornDisplayProvider = ({ children }) => {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
-            if (response.data && response.data.status === "success") {
-                console.log("Updated newborn data:", response.data.updateBaby); // For debugging
-
-                // Use the full response data to update the state
-                setNewBorn((prevUsers) => prevUsers.map((u) => (u._id === response.data.data._id ? { ...u, ...response.data.data } : u)));
-
+            if (response.data?.status === "success") {
+                fetchUserData();
                 setModalStatus("success");
                 setShowModal(true);
             } else {
@@ -250,7 +238,7 @@ export const NewBornDisplayProvider = ({ children }) => {
                 AddNewBorn,
                 DeleteNewBorn,
                 UpdateBorn,
-                isGraphData
+                isGraphData,
             }}
         >
             {children}

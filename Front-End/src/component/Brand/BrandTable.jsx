@@ -11,7 +11,7 @@ function BrandTable() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5); // State for number of items per page
     const [dateFrom, setDateFrom] = useState(""); // State for 'created at' date filter start
-    const [dateTo, setDateTo] = useState("");     // State for 'created at' date filter end
+    const [dateTo, setDateTo] = useState(""); // State for 'created at' date filter end
 
     const [isFormBrand, setFormBrand] = useState(false);
     const [ispassData, setPassdata] = useState("");
@@ -24,20 +24,19 @@ function BrandTable() {
             let matchesDateRange = true;
             if (brand.createdAt) {
                 const brandCreatedAtDate = new Date(brand.createdAt);
-                brandCreatedAtDate.setHours(0, 0, 0, 0); 
+                brandCreatedAtDate.setHours(0, 0, 0, 0);
 
                 if (dateFrom) {
                     const fromDateObj = new Date(dateFrom);
-                    fromDateObj.setHours(0, 0, 0, 0); 
+                    fromDateObj.setHours(0, 0, 0, 0);
                     matchesDateRange = matchesDateRange && brandCreatedAtDate >= fromDateObj;
                 }
                 if (dateTo) {
                     const toDateObj = new Date(dateTo);
-                    toDateObj.setHours(23, 59, 59, 999); 
+                    toDateObj.setHours(23, 59, 59, 999);
                     matchesDateRange = matchesDateRange && brandCreatedAtDate <= toDateObj;
                 }
             } else if (dateFrom || dateTo) {
-
                 matchesDateRange = false;
             }
 
@@ -56,7 +55,7 @@ function BrandTable() {
         if (currentPage > newTotalPages && newTotalPages > 0) {
             setCurrentPage(newTotalPages);
         } else if (filteredBrands.length > 0 && currentBrands.length === 0 && currentPage > 1) {
-            setCurrentPage(prevPage => prevPage - 1);
+            setCurrentPage((prevPage) => prevPage - 1);
         } else if (filteredBrands.length === 0 && currentPage !== 1) {
             setCurrentPage(1);
         }
@@ -115,12 +114,12 @@ function BrandTable() {
             <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Brand List</h2>
                 {/* Consolidated filter controls into one flex container for responsive layout */}
-                <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                <div className="flex w-full flex-wrap items-center gap-4 md:w-auto">
                     {/* Search input */}
                     <input
                         type="text"
                         placeholder="Search brands by name..."
-                        className="input input-sm flex-grow rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white min-w-[180px] md:min-w-0"
+                        className="input input-sm min-w-[180px] flex-grow rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:min-w-0"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -128,8 +127,13 @@ function BrandTable() {
                         }}
                     />
                     {/* Date filter inputs */}
-                    <div className="flex flex-wrap items-center gap-2 flex-grow-0">
-                        <label htmlFor="dateFrom" className="text-sm font-medium text-gray-700 dark:text-gray-300">From:</label>
+                    <div className="flex flex-grow-0 flex-wrap items-center gap-2">
+                        <label
+                            htmlFor="dateFrom"
+                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            From:
+                        </label>
                         <input
                             type="date"
                             id="dateFrom"
@@ -138,10 +142,15 @@ function BrandTable() {
                                 setDateFrom(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white w-32 md:w-auto"
+                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-auto"
                             title="Filter by 'Created At' date (From)"
                         />
-                        <label htmlFor="dateTo" className="text-sm font-medium text-gray-700 dark:text-gray-300">To:</label>
+                        <label
+                            htmlFor="dateTo"
+                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            To:
+                        </label>
                         <input
                             type="date"
                             id="dateTo"
@@ -150,13 +159,18 @@ function BrandTable() {
                                 setDateTo(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white w-32 md:w-auto"
+                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-auto"
                             title="Filter by 'Created At' date (To)"
                         />
                     </div>
                     {/* Page size selector */}
-                    <div className="flex items-center gap-2 flex-grow-0">
-                        <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700 dark:text-gray-300">Show:</label>
+                    <div className="flex flex-grow-0 items-center gap-2">
+                        <label
+                            htmlFor="itemsPerPage"
+                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            Show:
+                        </label>
                         <input
                             type="number"
                             id="itemsPerPage"
@@ -165,11 +179,11 @@ function BrandTable() {
                             onChange={handleItemsPerPageChange}
                             onBlur={handleItemsPerPageChange}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
+                                if (e.key === "Enter") {
                                     handleItemsPerPageChange(e);
                                 }
                             }}
-                            className="input input-xs w-16 text-center rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                            className="input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                             aria-label="Items per page"
                         />
                         <span className="text-sm text-gray-700 dark:text-gray-300">brands per page</span>
@@ -198,7 +212,10 @@ function BrandTable() {
                     <tbody>
                         {currentBrands.length === 0 ? (
                             <tr>
-                                <td colSpan="4" className="p-4 text-center text-gray-500 dark:text-gray-400">
+                                <td
+                                    colSpan="4"
+                                    className="p-4 text-center text-gray-500 dark:text-gray-400"
+                                >
                                     No brands found.
                                 </td>
                             </tr>
@@ -261,7 +278,7 @@ function BrandTable() {
                             key={brand._id}
                             className="rounded-lg border p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                         >
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
                                         {getInitial(brand.name)}
@@ -298,11 +315,15 @@ function BrandTable() {
             </div>
 
             {/* Pagination */}
-            <div className="flex flex-col sm:flex-row items-center justify-between border-t px-4 py-3 dark:border-gray-700 gap-3">
+            <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 dark:border-gray-700 sm:flex-row">
                 {totalPages > 0 && (
                     <div className="flex items-center gap-4">
                         <button
-                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
+                            className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
+                                currentPage === totalPages
+                                    ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
+                                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                            }`}
                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
                         >
@@ -312,7 +333,11 @@ function BrandTable() {
                             Page {currentPage} of {totalPages} • {filteredBrands.length} brands
                         </span>
                         <button
-                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
+                            className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
+                                currentPage === totalPages
+                                    ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
+                                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                            }`}
                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}
                         >
@@ -323,8 +348,16 @@ function BrandTable() {
             </div>
 
             {/* Modals */}
-            <BrandForm isOpen={isFormBrand} onClose={handleCloseModal} BrandData={ispassData} />
-            <StatusVerification isOpen={isVerification} onConfirmDelete={handleConfirmDelete} onClose={handleCloseModal} />
+            <BrandForm
+                isOpen={isFormBrand}
+                onClose={handleCloseModal}
+                BrandData={ispassData}
+            />
+            <StatusVerification
+                isOpen={isVerification}
+                onConfirmDelete={handleConfirmDelete}
+                onClose={handleCloseModal}
+            />
         </div>
     );
 }

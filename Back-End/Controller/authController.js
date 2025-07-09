@@ -8,7 +8,7 @@ const crypto = require("crypto");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.SECRET_STR, {
-    expiresIn: "1d", 
+    expiresIn: "1d",
   });
 };
 
@@ -40,6 +40,8 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
     FirstName,
     LastName,
     email,
+    extensionName,
+    Middle,
     password,
     role,
     avatar,
@@ -88,6 +90,8 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
       email,
       password,
       role,
+      extensionName,
+      Middle,
       avatar,
       address,
       phoneNumber,
@@ -120,7 +124,6 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
   }
 });
 
-
 exports.login = AsyncErrorHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -132,16 +135,24 @@ exports.login = AsyncErrorHandler(async (req, res, next) => {
   }
 
   // Step 2: Check if password is correct
-  const isPasswordCorrect = await user.comparePasswordInDb(password, user.password);
+  const isPasswordCorrect = await user.comparePasswordInDb(
+    password,
+    user.password
+  );
   if (!isPasswordCorrect) {
     console.log("Password mismatch, throwing error");
     return next(new CustomError("Incorrect email or password", 400));
   }
 
-  // ✅ Step 3: Check if user is verified
+  // Step 3: Check if user is verified
   if (!user.isVerified) {
     console.log("User not verified, blocking login");
-    return next(new CustomError("Your account is not verified. Please check your email for the verification link or OTP.", 403));
+    return next(
+      new CustomError(
+        "Your account is not verified. Please check your email for the verification link or OTP.",
+        403
+      )
+    );
   }
 
   // Step 4: Create JWT token
@@ -170,7 +181,6 @@ exports.login = AsyncErrorHandler(async (req, res, next) => {
     fullName,
   });
 });
-
 
 exports.logout = AsyncErrorHandler(async (req, res, next) => {
   req.session.destroy((err) => {
@@ -355,5 +365,36 @@ exports.resetPassword = AsyncErrorHandler(async (req, res, next) => {
 
   return res.status(200).json({
     status: "Success",
+  });
+});
+
+exports.updatePassword = AsyncErrorHandler(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select("+password");
+
+  if (!user) {
+    return next(new CustomError("User not found.", 404));
+  }
+
+  const isMatch = await user.comparePasswordInDb(
+    req.body.currentPassword,
+    user.password
+  );
+  if (!isMatch) {
+    return next(
+      new CustomError("The current password you provided is wrong", 401)
+    );
+  }
+
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save();
+
+  const token = signToken(user._id);
+  res.status(200).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
   });
 });

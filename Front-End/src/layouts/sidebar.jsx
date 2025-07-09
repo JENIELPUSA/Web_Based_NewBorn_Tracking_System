@@ -6,7 +6,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { navbarLinks } from "@/constants";
 import { LogOut } from "lucide-react"; // Import the logout icon
 
-
 export const Sidebar = forwardRef(({ collapsed }, ref) => {
     const { role, logout } = useAuth(); // Get role and logout from context
     const navigate = useNavigate();
@@ -19,15 +18,14 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
         BHW: [
             "/dashboard",
             "/dashboard/calendar",
-            "/dashboard/reports",
             "/dashboard/new-born",
             "/dashboard/new-record-vaccine",
             "/login",
             "/dashboard/Profilling_Dash",
             "/dashboard/forgot-password",
             "/dashboard/add-parent",
-            "/dashboard/PDF-Report",
-            "/dashboard/update-password"
+            "/dashboard/new-vaccine",
+            "/dashboard/update-password",
         ],
         Admin: [],
     };
@@ -45,9 +43,8 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
         .filter((group) => group.links.length > 0);
 
     const handleLogout = () => {
-        logout(); 
+        logout();
         navigate("/login", { replace: true });
- 
     };
 
     return (
@@ -59,7 +56,6 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
                 collapsed ? "max-md:-left-full" : "max-md:left-0",
             )}
         >
-
             <div className="flex gap-x-3 p-3">
                 {!collapsed && <p className="text-lg font-medium text-slate-900 dark:text-slate-50">NEWBORN TRACKING SYSTEM</p>}
             </div>

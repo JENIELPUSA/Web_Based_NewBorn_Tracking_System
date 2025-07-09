@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
-  email: { type: String,unique: true,sparse: true },
+  email: { type: String, unique: true, sparse: true },
   role: {
     type: String,
     enum: {
@@ -20,8 +20,10 @@ const userSchema = new mongoose.Schema({
   },
   avatar: { type: String },
 
-  FirstName: { type: String, required: [true, "Please Enter FirstName."] }, 
+  FirstName: { type: String, required: [true, "Please Enter FirstName."] },
   LastName: { type: String, required: [true, "Please Enter LastName."] },
+  Middle: { type: String },
+  extensionName: { type: String },
   address: { type: String, required: [true, "Please Enter Address!"] },
   phoneNumber: { type: String },
   dateOfBirth: {
@@ -38,7 +40,6 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 
-  
   otp: { type: String },
   otpExpiresAt: { type: Date },
   isVerified: { type: Boolean, default: false },
@@ -76,7 +77,6 @@ userSchema.pre("save", function (next) {
   }
   next();
 });
-
 
 userSchema.methods.createResetTokenPassword = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");

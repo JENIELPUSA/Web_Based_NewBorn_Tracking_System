@@ -17,6 +17,10 @@ router.route('/resetPassword/:token')
 router.route('/mail-verification')
 .post(authController.verifyOtp)
 
+router.route('/updatePassword')
+.patch(authController.protect,authController.updatePassword)
+
+
 
 
 

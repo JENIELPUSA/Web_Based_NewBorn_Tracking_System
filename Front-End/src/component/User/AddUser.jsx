@@ -2,8 +2,10 @@ import React, { useEffect, useState, useContext } from "react";
 import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
 import { motion } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext";
+import { ParentDisplayContext } from "../../contexts/ParentContext/ParentContext";
 
 const UserFormModal = ({ isOpen, onClose, user, role }) => {
+    const { AddParent, UpdateParent } = useContext(ParentDisplayContext);
     const { AddUser, UpdateUser, customError } = useContext(UserDisplayContext);
     const [dropdownOpenRole, setDropdownOpenRole] = useState(false);
     const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
@@ -22,7 +24,10 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
         zone: "",
         password: "",
         Designatedzone: "",
+        Middle: "",
+        extensionName: "",
     });
+
     const resetForm = () => {
         setFormData({
             FirstName: "",
@@ -38,8 +43,11 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
             zone: "",
             password: "",
             Designatedzone: "",
+            Middle: "",
+            extensionName: "",
         });
     };
+
     useEffect(() => {
         if (user) {
             setFormData({
@@ -49,16 +57,19 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                 email: user.email || "",
                 role: user.role || "",
                 address: user.address || "",
+                extensionName: user.extensionName || "",
+                Middle: user.Middle || "",
                 phoneNumber: user.phoneNumber || "",
                 dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().slice(0, 10) : "",
                 gender: user.gender || "",
                 avatar: user.avatar || "",
                 zone: user.zone || "",
-                password: "",
                 Designatedzone: user.Designatedzone || "",
             });
         } else {
             setFormData({
+                Middle: "",
+                extensionName: "",
                 FirstName: "",
                 LastName: "",
                 username: "",
@@ -87,56 +98,50 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
         if (name === "gender") setDropdownOpenGender(false);
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        if (user) {
-            if (role == "Guest") {
-                const updatedata = {
-                    ...formData,
-                    role: formData.role?.trim() === "" ? "Guest" : formData.role,
-                };
-                 console.log("IDD",user._id)
-                await UpdateUser(user._id, updatedata);
-               
+        try {
+            if (user) {
+                // Prepare updated data (exclude password)
+                const updatedData = { ...formData };
+                delete updatedData.password;
+
+                if (role === "Guest") { // If the form is specifically for a Parent (Guest role)
+                    updatedData.role = updatedData.role?.trim() === "" ? "Guest" : updatedData.role;
+                    await UpdateParent(user._id, updatedData);
+                } else { // For other user roles
+                    await UpdateUser(user._id, updatedData);
+                }
             } else {
-                await UpdateUser(user._id, formData);
+                // Adding a new user, include password
+                const newUserData = { ...formData };
+                if (role === "Guest") { // If adding a new Parent (Guest role)
+                    newUserData.role = newUserData.role?.trim() === "" ? "Guest" : newUserData.role;
+                    await AddParent(newUserData);
+                } else { // For adding other user roles
+                    await AddUser(newUserData);
+                }
             }
 
+            // Cleanup
             setTimeout(() => {
                 resetForm();
                 setIsSubmitting(false);
                 onClose();
             }, 1000);
-        } else {
-            if (role == "Guest") {
-                const newUserData = {
-                    ...formData,
-                    role: formData.role?.trim() === "" ? "Guest" : formData.role,
-                };
-                await AddUser(newUserData);
-                setTimeout(() => {
-                    resetForm();
-                    setIsSubmitting(false);
-                    onClose();
-                }, 1000);
-            } else {
-                await AddUser(formData);
-                setTimeout(() => {
-                    resetForm();
-                    setIsSubmitting(false);
-                    onClose();
-                }, 1000);
-            }
+        } catch (err) {
+            console.error("Submit error:", err);
+            setIsSubmitting(false);
         }
     };
 
     if (!isOpen) return null;
+    const isParentRole = role === "Guest";
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 p-4">
             <motion.div
                 initial={{ opacity: 0, y: -40 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -155,14 +160,24 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                     onSubmit={handleSubmit}
                     className="space-y-4"
                 >
-                    {/* First and Last Name */}
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* First, Middle, Last, and Extension Name */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">First Name</label>
                             <input
                                 type="text"
                                 name="FirstName"
                                 value={formData.FirstName}
+                                onChange={handleChange}
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Middle Name</label>
+                            <input
+                                type="text"
+                                name="Middle"
+                                value={formData.Middle || ""}
                                 onChange={handleChange}
                                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
@@ -177,10 +192,20 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
+                        <div>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Extension Name</label>
+                            <input
+                                type="text"
+                                name="extensionName"
+                                value={formData.extensionName || ""}
+                                onChange={handleChange}
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                            />
+                        </div>
                     </div>
 
                     {/* Email and Role (conditionally rendered) */}
-                    <div className={`grid gap-4 ${role ? "grid-cols-1" : "grid-cols-2"}`}>
+                    <div className={`grid gap-4 ${isParentRole ? "grid-cols-2" : "grid-cols-2"}`}>
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Email</label>
                             <input
@@ -193,7 +218,7 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                         </div>
 
                         {/* Custom Role Dropdown - Hidden for Guest role */}
-                        {!role && (
+                        {!isParentRole && (
                             <div className="relative">
                                 <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Role</label>
                                 <div
@@ -229,8 +254,8 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                         )}
                     </div>
 
-                    {/* Address and Zone (conditionally rendered) */}
-                    <div className={`grid gap-4 ${role ? "grid-cols-1" : "grid-cols-2"}`}>
+                    {/* Address and Zone */}
+                    <div className={`grid gap-4 ${isParentRole ? "grid-cols-2" : "grid-cols-2"}`}>
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Address</label>
                             <input
@@ -241,22 +266,21 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             />
                         </div>
-                        {/* Conditionally render Zone */}
-                    
-                            <div>
-                                <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Zone</label>
-                                <input
-                                    type="text"
-                                    name="zone"
-                                    value={formData.zone}
-                                    onChange={handleChange}
-                                    className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
-                                />
-                            </div>
+
+                        <div>
+                            <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Zone</label>
+                            <input
+                                type="text"
+                                name="zone"
+                                value={formData.zone}
+                                onChange={handleChange}
+                                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                            />
+                        </div>
                     </div>
 
                     {/* Phone Number and Password (conditionally rendered) */}
-                    <div className={`grid gap-4 ${role ? "grid-cols-1" : "grid-cols-2"}`}>
+                    <div className={`grid gap-4 ${isParentRole ? "grid-cols-2" : "grid-cols-2"}`}>
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Phone Number</label>
                             <input
@@ -268,7 +292,7 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                             />
                         </div>
                         {/* Conditionally render Password */}
-                        {!role && (
+                        {!isParentRole && (
                             <div>
                                 <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Password</label>
                                 <input
@@ -283,7 +307,7 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                     </div>
 
                     {/* Date of Birth, Gender, and Designated Zone (conditionally rendered) */}
-                    <div className={`grid gap-4 ${role ? "grid-cols-1" : "grid-cols-2"}`}>
+                    <div className={`grid gap-4 ${isParentRole ? "grid-cols-2" : "grid-cols-2"}`}>
                         <div>
                             <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Date of Birth</label>
                             <input
@@ -328,7 +352,7 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                             )}
                         </div>
                         {/* Conditionally render Designated Zone */}
-                        {!role && (
+                        {!isParentRole && (
                             <div>
                                 <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Designated Zone</label>
                                 <input

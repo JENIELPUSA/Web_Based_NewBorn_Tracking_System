@@ -161,6 +161,7 @@
     "mpath": "^0.9.0",
     "mquery": "^5.0.0",
     "ms": "^2.0.0",
+    "multer": "^2.0.1",
     "negotiator": "^0.6.3",
     "neo-async": "^2.6.2",
     "node-cron": "^3.0.3",

@@ -33,16 +33,13 @@ const fetchLogData = async () => {
 
     if (!userData || userData.length === 0) {
       setLogData(null); 
-      console.log("No log data found");
       return null;
     }
 
     setLogData(userData);
-    console.log("Log data:", userData);
     return userData;
   } catch (error) {
     console.error("Error fetching log data:", error);
-    setError("Failed to fetch log data");
     setLogData(null); // Also set to null on error
     return null;
   }

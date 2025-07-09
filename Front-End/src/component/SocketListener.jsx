@@ -11,7 +11,6 @@ useEffect(() => {
 
   const handleConnect = () => {
     socket.emit("register-user", { userId, role });
-    console.log(`User ${role} (${userId}) registered on socket connect.`);
   };
 
   socket.on("connect", handleConnect);
@@ -20,11 +19,9 @@ useEffect(() => {
   // Handlers
   const handleNotification = (data) => {
     console.log("Maintenance notification:", data);
-    toast.info(data.message || "New maintenance request");
   };
 
   const handleVaccineNotification = (data) => {
-    console.log("Vaccine notification:", data.message);
     toast.success(data.message || "Vaccine notification received");
   };
 

@@ -1,31 +1,24 @@
 const express = require("express");
 const cors = require("cors");
-
+const path = require("path");
 const morgan = require("morgan");
 
 const ErrorController = require("./Controller/errorController");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
-
 const PDFRoutes = require("./Routes/PDFRoutes");
 const usersroutes = require("./Routes/UserRoutes");
 const ProfillingRoutes=require("./Routes/ProfillingRoutes")
-
 const VaccinationRecord = require("./Routes/VaccinationRecordRoute");
 const AssignedPerBaby = require("./Routes/AssignedPerBabyRoute");
-
 const VaccineRoutes = require("./Routes/VaccineRoutes");
-
 const NewBornBabyRoutes = require("./Routes/NewBornBabyRoutes");
-
 const BrandRoute = require("./Routes/BrandRoute");
-
 const auditLogRoute = require("./Routes/auditLogRoute");
-
 const NotifyRoute=require("./Routes/NotificationRoutes")
-
-
 const authentic = require("./Routes/authRouter");
+const Record = require("./Routes/RecordRoute")
+const Parent = require("./Routes/ParentRoutes")
 let app = express();
 
 const logger = function (req, res, next) {
@@ -67,7 +60,7 @@ app.use(logger);
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/v1/users", usersroutes);
 
 app.use("/api/v1/NewBorn", NewBornBabyRoutes);
@@ -80,6 +73,9 @@ app.use("/api/v1/VaccinationRecord", VaccinationRecord);
 app.use("/api/v1/Profilling", ProfillingRoutes);
 app.use("/api/v1/AssignedPerBabyVaccine", AssignedPerBaby);
 app.use("/api/v1/Notification", NotifyRoute);
+app.use("/api/v1/Record", Record);
+app.use("/api/v1/Parent",Parent);
+
 
 
 app.use(ErrorController);

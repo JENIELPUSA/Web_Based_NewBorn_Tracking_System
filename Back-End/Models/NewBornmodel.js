@@ -11,7 +11,7 @@ const newbornSchema = new mongoose.Schema({
   birthHeight:Number, 
   motherName: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // Reference to the User who added the newborn
+    ref: "Parent",
     required: true
   },
   addedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

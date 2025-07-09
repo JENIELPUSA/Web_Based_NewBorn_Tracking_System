@@ -18,47 +18,54 @@ import { NotificationDisplayProvider } from "./contexts/NotificationContext.jsx"
 import { ReportDisplayProvider } from "./contexts/Report/ReportContext.jsx";
 import AxiosInterceptor from "./component/AxiosInterceptor.jsx";
 import { BrandDisplayProvider } from "./contexts/BrandContext/BrandContext.jsx";
-
+import { UpdatePasswordDisplayProvider } from "./contexts/UpdatePasswordContext/UpdateContext.jsx";
+import { VisitRecordProvider } from "./contexts/VisitRecordContext/VisitRecordContext.jsx";
+import { ParentDisplayProvider } from "./contexts/ParentContext/ParentContext.jsx";
 createRoot(document.getElementById("root")).render(
-  //<StrictMode>
-  <AuthProvider>
-    <ThemeProvider>
-      <BrandDisplayProvider>
-        <ReportDisplayProvider>
-          <NotificationDisplayProvider>
-            <ProfillingDisplayProvider>
-              <LogDisplayProvider>
-                <VaccinePerProvider>
-                  <VaccineDisplayProvider>
-                    <VaccineRecordDisplayProvider>
-                      <NewBornDisplayProvider>
-                        <UserDisplayProvider>
-                          <App />
-                          <AxiosInterceptor />
-                          <SocketListener />
-                          <ToastContainer
-                            position="top-right"
-                            autoClose={3000}
-                            hideProgressBar={false}
-                            newestOnTop={false}
-                            closeOnClick
-                            pauseOnFocusLoss
-                            draggable
-                            pauseOnHover
-                            theme="light"
-                          />
-                        </UserDisplayProvider>
-                      </NewBornDisplayProvider>
-                    </VaccineRecordDisplayProvider>
-                  </VaccineDisplayProvider>
-                </VaccinePerProvider>
-              </LogDisplayProvider>
-            </ProfillingDisplayProvider>
-          </NotificationDisplayProvider>
-        </ReportDisplayProvider>
-      </BrandDisplayProvider>
-    </ThemeProvider>
-  </AuthProvider>
-  //</StrictMode>
+    //<StrictMode>
+    <AuthProvider>
+        <ThemeProvider>
+            <ParentDisplayProvider>
+                <VisitRecordProvider>
+                    <UpdatePasswordDisplayProvider>
+                        <BrandDisplayProvider>
+                            <ReportDisplayProvider>
+                                <NotificationDisplayProvider>
+                                    <ProfillingDisplayProvider>
+                                        <LogDisplayProvider>
+                                            <VaccinePerProvider>
+                                                <VaccineDisplayProvider>
+                                                    <VaccineRecordDisplayProvider>
+                                                        <NewBornDisplayProvider>
+                                                            <UserDisplayProvider>
+                                                                <App />
+                                                                <AxiosInterceptor />
+                                                                <SocketListener />
+                                                                <ToastContainer
+                                                                    position="top-right"
+                                                                    autoClose={3000}
+                                                                    hideProgressBar={false}
+                                                                    newestOnTop={false}
+                                                                    closeOnClick
+                                                                    pauseOnFocusLoss
+                                                                    draggable
+                                                                    pauseOnHover
+                                                                    theme="light"
+                                                                />
+                                                            </UserDisplayProvider>
+                                                        </NewBornDisplayProvider>
+                                                    </VaccineRecordDisplayProvider>
+                                                </VaccineDisplayProvider>
+                                            </VaccinePerProvider>
+                                        </LogDisplayProvider>
+                                    </ProfillingDisplayProvider>
+                                </NotificationDisplayProvider>
+                            </ReportDisplayProvider>
+                        </BrandDisplayProvider>
+                    </UpdatePasswordDisplayProvider>
+                </VisitRecordProvider>
+            </ParentDisplayProvider>
+        </ThemeProvider>
+    </AuthProvider>,
+    //</StrictMode>
 );
-

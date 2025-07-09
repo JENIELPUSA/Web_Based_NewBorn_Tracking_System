@@ -5,15 +5,16 @@ import { motion } from "framer-motion";
 import UserFormModal from "../Profilling/ProfillingAddForm"; // <- AYUSIN ITO KUNG MALI
 import StatusVerification from "../../ReusableFolder/StatusModal"; // <- AYUSIN ITO KUNG MALI
 import { ProfillingContexts } from "../../contexts/ProfillingContext/ProfillingContext"; // <- AYUSIN ITO KUNG MALI
-
+import { AuthContext } from "../../contexts/AuthContext";
 function Profille() {
+    const { role } = useContext(AuthContext);
     const [selectedUser, setSelectedUser] = useState(null);
     const { isProfilling, DeleteProfile, setProfilling } = useContext(ProfillingContexts);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5); // State for items per page
     const [dateFrom, setDateFrom] = useState(""); // State for 'created at' date filter start (string format for input)
-    const [dateTo, setDateTo] = useState("");     // State for 'created at' date filter end (string format for input)
+    const [dateTo, setDateTo] = useState(""); // State for 'created at' date filter end (string format for input)
     const [isAddFormOpen, setAddFormOpen] = useState(false);
     const [isVerification, setVerification] = useState(false);
     const [idToDelete, setIdToDelete] = useState(""); // Renamed from isDeleteID for clarity
@@ -22,7 +23,10 @@ function Profille() {
     const filteredUsers = useMemo(() => {
         if (!Array.isArray(isProfilling)) return [];
         return isProfilling.filter((user) => {
-            const matchesSearch = `${user.FirstName || ''} ${user.LastName || ''} ${user.username || ''} ${user.email || ''} ${user.newbornName || ''}`.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesSearch =
+                `${user.FirstName || ""} ${user.LastName || ""} ${user.username || ""} ${user.email || ""} ${user.newbornName || ""}`
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase());
 
             let matchesDateRange = true;
             // Assuming `user.createdAt` exists and is a valid date string/object in your data
@@ -58,12 +62,11 @@ function Profille() {
         if (currentPage > newTotalPages && newTotalPages > 0) {
             setCurrentPage(newTotalPages);
         } else if (filteredUsers.length > 0 && currentUsers.length === 0 && currentPage > 1) {
-            setCurrentPage(prevPage => prevPage - 1);
+            setCurrentPage((prevPage) => prevPage - 1);
         } else if (filteredUsers.length === 0 && currentPage !== 1) {
             setCurrentPage(1);
         }
     }, [filteredUsers.length, currentPage, itemsPerPage, currentUsers.length]);
-
 
     // Modal and deletion handlers
     const handleAddClick = () => {
@@ -124,7 +127,6 @@ function Profille() {
         setCurrentPage(1);
     };
 
-
     return (
         <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
             {/* Header */}
@@ -132,12 +134,12 @@ function Profille() {
                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Profilling</h2>
                 {/* Filters container - Adjusted for stacking on mobile, inline on desktop */}
                 {/* New structure to match the image: Search on its own line for better mobile visibility too */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                <div className="flex w-full flex-col items-center gap-4 sm:flex-row md:w-auto">
                     {/* Search input - Always takes full width in its container, centered on mobile */}
                     <input
                         type="text"
                         placeholder="Search users..."
-                        className="input input-sm flex-grow rounded-md border px-3 py-1 text-sm text-gray-800 dark:bg-gray-800 dark:text-white w-full sm:w-auto"
+                        className="input input-sm w-full flex-grow rounded-md border px-3 py-1 text-sm text-gray-800 dark:bg-gray-800 dark:text-white sm:w-auto"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -145,10 +147,15 @@ function Profille() {
                         }}
                     />
                     {/* Container for Date Filters and Show selector - now side-by-side on desktop, wraps on mobile */}
-                    <div className="flex flex-wrap items-center gap-2 flex-grow-0 w-full sm:w-auto justify-center sm:justify-start">
+                    <div className="flex w-full flex-grow-0 flex-wrap items-center justify-center gap-2 sm:w-auto sm:justify-start">
                         {/* From Date Input */}
-                        <div className="flex flex-col items-start flex-grow">
-                            <label htmlFor="dateFrom" className="text-xs font-medium text-gray-700 dark:text-gray-300">From:</label>
+                        <div className="flex flex-grow flex-col items-start">
+                            <label
+                                htmlFor="dateFrom"
+                                className="text-xs font-medium text-gray-700 dark:text-gray-300"
+                            >
+                                From:
+                            </label>
                             <input
                                 type="date"
                                 id="dateFrom"
@@ -159,8 +166,13 @@ function Profille() {
                             />
                         </div>
                         {/* To Date Input */}
-                        <div className="flex flex-col items-start flex-grow">
-                            <label htmlFor="dateTo" className="text-xs font-medium text-gray-700 dark:text-gray-300">To:</label>
+                        <div className="flex flex-grow flex-col items-start">
+                            <label
+                                htmlFor="dateTo"
+                                className="text-xs font-medium text-gray-700 dark:text-gray-300"
+                            >
+                                To:
+                            </label>
                             <input
                                 type="date"
                                 id="dateTo"
@@ -174,13 +186,18 @@ function Profille() {
                         {(dateFrom || dateTo) && (
                             <button
                                 onClick={clearDateRange}
-                                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 flex-shrink-0"
+                                className="flex-shrink-0 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                             >
                                 Clear
                             </button>
                         )}
                         {/* Show items per page */}
-                        <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2">Show:</label>
+                        <label
+                            htmlFor="itemsPerPage"
+                            className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            Show:
+                        </label>
                         <select
                             id="itemsPerPage"
                             value={itemsPerPage}
@@ -278,10 +295,10 @@ function Profille() {
                                     <td className="p-2">{formatDate(user.dateOfBirth)}</td>
                                     <td className="p-2">{user.motherAddressZone || "N/A"}</td>
                                     <td className="p-2">{user.blood_type || "N/A"}</td>
-                                    <td className="p-2">{user.birthWeight || "N/A"}</td>
-                                    <td className="p-2">{user.birthHeight || "N/A"}</td>
-                                    <td className="p-2">{user.health_condition || "N/A"}</td>
-                                    <td className="p-2">{user.notes || "N/A"}</td>
+                                    <td className="p-2">{user.latestWeight || "N/A"}</td>
+                                    <td className="p-2">{user.latestHeight || "N/A"}</td>
+                                    <td className="p-2">{user.latestHealthCondition || "N/A"}</td>
+                                    <td className="p-2">{user.latestNotes || "N/A"}</td>
                                     <td className="p-2">{user.motherName || "N/A"}</td>
                                     <td className="p-2">{user.motherPhoneNumber || "N/A"}</td>
                                     {/* Vaccination Record Column - KEEP THIS */}
@@ -296,7 +313,10 @@ function Profille() {
                                                         {Array.isArray(record.doses) && record.doses.length > 0 ? (
                                                             <ul className="ml-4 list-disc space-y-1">
                                                                 {record.doses.map((dose, j) => (
-                                                                    <li key={j} className="text-xs">
+                                                                    <li
+                                                                        key={j}
+                                                                        className="text-xs"
+                                                                    >
                                                                         <div>
                                                                             <b>Dose: {dose.doseNumber}</b>
                                                                         </div>
@@ -326,13 +346,16 @@ function Profille() {
                                             >
                                                 <PencilIcon className="h-4 w-4" />
                                             </button>
-                                            <button
-                                                onClick={() => handleDeleteUser(user._id)}
-                                                className="rounded bg-red-500 p-1 text-white hover:bg-red-600"
-                                                title="Delete"
-                                            >
-                                                <TrashIcon className="h-4 w-4" />
-                                            </button>
+
+                                            {role !== "BHW" && (
+                                                <button
+                                                    onClick={() => handleDeleteUser(user._id)}
+                                                    className="rounded bg-red-500 p-1 text-white hover:bg-red-600"
+                                                    title="Delete"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </motion.tr>
@@ -383,13 +406,16 @@ function Profille() {
                                     >
                                         <PencilIcon className="h-4 w-4" />
                                     </button>
-                                    <button
-                                        onClick={() => handleDeleteUser(user._id)}
-                                        className="rounded bg-red-500 p-1 text-white hover:bg-red-600"
-                                        title="Delete"
-                                    >
-                                        <TrashIcon className="h-4 w-4" />
-                                    </button>
+
+                                    {role !== "BHW" && (
+                                        <button
+                                            onClick={() => handleDeleteUser(user._id)}
+                                            className="rounded bg-red-500 p-1 text-white hover:bg-red-600"
+                                            title="Delete"
+                                        >
+                                            <TrashIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 
@@ -428,18 +454,28 @@ function Profille() {
                                 </div>
                                 {/* Vaccination Records in Mobile Card View */}
                                 <details className="col-span-2 mt-3">
-                                    <summary className="cursor-pointer text-sm font-medium text-blue-600 dark:text-blue-400">Vaccination Records</summary>
+                                    <summary className="cursor-pointer text-sm font-medium text-blue-600 dark:text-blue-400">
+                                        Vaccination Records
+                                    </summary>
                                     <div className="mt-2 space-y-3 pl-2 text-sm">
                                         {user.vaccinationRecords?.length ? (
                                             user.vaccinationRecords.map((record, i) => (
-                                                <div key={i} className="rounded border p-2 dark:border-gray-700">
+                                                <div
+                                                    key={i}
+                                                    className="rounded border p-2 dark:border-gray-700"
+                                                >
                                                     <p className="font-medium dark:text-white">Vaccine: {record.vaccineName}</p>
                                                     {Array.isArray(record.doses) && record.doses.length > 0 ? (
                                                         <ul className="mt-1 space-y-1">
                                                             {record.doses.map((dose, j) => (
-                                                                <li key={j} className="text-xs">
+                                                                <li
+                                                                    key={j}
+                                                                    className="text-xs"
+                                                                >
                                                                     <span className="font-medium dark:text-white">Dose {dose.doseNumber}:</span>{" "}
-                                                                    <span className="dark:text-white">{dose.dateGiven ? formatDate(dose.dateGiven) : "—"}</span>
+                                                                    <span className="dark:text-white">
+                                                                        {dose.dateGiven ? formatDate(dose.dateGiven) : "—"}
+                                                                    </span>
                                                                 </li>
                                                             ))}
                                                         </ul>

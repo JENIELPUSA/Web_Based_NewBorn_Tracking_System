@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
@@ -23,23 +23,23 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const [isFemaleVacinated, setFemale] = useState("");
     const [isTotalVacinated, setTotalVacinated] = useState("");
     const { fetchPerVaccine } = useContext(VaccinePerContext);
+    const [records, setRecords] = useState([]);
+    const [patientID, setPatientID] = useState("");
 
     useEffect(() => {
         if (customError) {
             const timer = setTimeout(() => {
                 setCustomError(null);
-            }, 5000); 
+            }, 5000);
 
             return () => clearTimeout(timer);
         }
     }, [customError]);
-
     const fetchVaccineRecordData = async () => {
         setLoading(true);
 
         try {
             const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord`);
-
             const vaccineData = res?.data?.data || [];
             setCustomError("");
 
@@ -47,25 +47,24 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 setVaccineRecord(vaccineData);
                 setCalendarData(vaccineData);
             } else if (role === "BHW") {
-                const filteredRecords = vaccineData
-                    .map((record) => {
-                        const bhwsDoses = record.doses.filter((dose) => dose.administeredById === userId);
-                        return bhwsDoses.length > 0 ? { ...record, doses: bhwsDoses } : null;
-                    })
-                    .filter((record) => record !== null);
-
                 const filteredByZone = vaccineData.filter(
                     (record) => record.newbornZone?.toLowerCase().trim() === Designatedzone?.toLowerCase().trim(),
                 );
+                const filteredRecords = filteredByZone
+                    .map((record) => {
+                        const bhwDoses = record.doses.filter((dose) => dose.administeredById === userId);
+                        return bhwDoses.length > 0 ? { ...record, doses: bhwDoses } : null;
+                    })
+                    .filter((record) => record !== null);
                 setVaccineRecord(filteredRecords);
-                setCalendarData(filteredByZone);
-
+                setCalendarData(filteredRecords);
                 const now = new Date();
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
                 const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
                 const vaccinatedThisMonthMap = new Map();
-                filteredByZone.forEach((record) => {
+
+                filteredRecords.forEach((record) => {
                     record.doses.forEach((dose) => {
                         const doseDate = new Date(dose.dateGiven);
                         if (doseDate >= startOfMonth && doseDate <= endOfMonth) {
@@ -89,7 +88,6 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 setFemale(totalFemale);
                 setTotalVacinated(totalVaccinated);
             } else {
-                // Any user who is not BHW (or walang role) can view all data
                 setVaccineRecord(vaccineData);
                 setCalendarData(vaccineData);
             }
@@ -194,7 +192,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
     const DeleteContext = async (recordId, doseId) => {
         try {
             setLoading(true);
-            const response = await axiosInstance.delete(
+            const response = await axios.delete(
                 `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/${recordId}/doses/${doseId}`,
             );
 
@@ -227,6 +225,69 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
         }
     };
 
+    const fetchVaccinationNewborn = useCallback(async (filters = {}) => {
+        const formatFullAddress = (fullAddress) => {
+            if (!fullAddress) return "";
+            if (fullAddress.includes(",")) return fullAddress.trim();
+            const match = fullAddress.match(/^ZONE\s+(\d+)\s+(.*)$/i);
+            if (match) {
+                const zone = match[1];
+                const address = match[2];
+                return `ZONE ${zone}, ${address}`;
+            }
+            return fullAddress.trim();
+        };
+
+        const cleanFilters = Object.fromEntries(
+            Object.entries(filters)
+                .filter(([_, val]) => val !== "" && val !== null && val !== undefined)
+                .map(([key, val]) => {
+                    const trimmed = String(val).trim();
+                    if (key === "FullAddress") {
+                        return [key, formatFullAddress(trimmed)];
+                    }
+                    return [key, trimmed];
+                }),
+        );
+
+        if (Object.keys(cleanFilters).length === 0) {
+            setRecords([]);
+            setCustomError(null);
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const params = Object.entries(cleanFilters)
+                .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
+                .join("&");
+
+            console.log("✅ Final encoded query:", params);
+
+            const response = await axios.get(
+                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/vaccination-records?${params}`,
+            );
+
+            const data = response.data.data;
+
+            if (Array.isArray(data) && data.length > 0) {
+                setRecords(data);
+                setPatientID(response.data.patientID);
+                setCustomError(null);
+            } else {
+                setRecords([]);
+                setCustomError("Walang tumugma sa iyong filter.");
+            }
+        } catch (err) {
+            console.error("❌ Axios Error:", err);
+            setCustomError("Failed to fetch vaccination records");
+            setRecords([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     // Auto-fetch on mount
     useEffect(() => {
         fetchVaccineRecordData();
@@ -246,7 +307,12 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 vaccineRecord,
                 loading,
                 error,
-                refetch: fetchVaccineRecordData, // optional
+                refetch: fetchVaccineRecordData,
+                fetchVaccinationNewborn,
+                records,
+                patientID,
+                setRecords,
+                setPatientID,
             }}
         >
             {children}

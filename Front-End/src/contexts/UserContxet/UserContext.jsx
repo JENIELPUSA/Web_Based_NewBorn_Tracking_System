@@ -1,23 +1,22 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
 import OtpForm from "../../component/OTPform/OtpForm ";
 import axiosInstance from "../../ReusableFolder/axioxInstance";
+
 export const UserDisplayContext = createContext();
-//gagamit tayo nito kung gusto mo ng auto log out agad instead na axios ilagay
-//mo siya sa reausable axiosInstances.jsx
+
 export const UserDisplayProvider = ({ children }) => {
     const [customError, setCustomError] = useState("");
-    const { authToken, zone, role } = useContext(AuthContext);
-    const [users, setUsers] = useState([]); // Initialize equipment state
-    const [loading, setLoading] = useState(true); // Initialize loading state
-    const [error, setError] = useState(null); // Initialize error state
+    const { authToken, user } = useContext(AuthContext);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
-    // Get token from localStorage
     const [usersPerPage, setusersPerPage] = useState(6);
     const [isTotal, setTotal] = useState("");
     const [isMale, setMale] = useState("");
@@ -25,17 +24,30 @@ export const UserDisplayProvider = ({ children }) => {
     const [isOTPModal, setOTPModal] = useState(false);
     const [userId, setUserId] = useState("");
     const [isParent, setParent] = useState("");
+    const [isProfile, setProfile] = useState("");
 
+    useEffect(() => {
+        if (user && user._id) {
+            setUserId(user._id);
+        } else {
+            const storedId = localStorage.getItem("userId");
+            if (storedId) setUserId(storedId);
+        }
+    }, [user]);
     useEffect(() => {
         if (!authToken) {
             setUsers([]);
-            setLoading(false); // Stop loading when there is no token
+            setLoading(false);
             return;
         }
 
         fetchUserData();
-    }, [authToken]); // Dependencies to trigger effect when page or items per page change
-    //para mag refresh satwing maybagong data
+
+        if (userId) {
+            fetchProfileData(userId);
+        }
+    }, [authToken, userId]);
+
     useEffect(() => {
         if (!users || users.length === 0) return;
 
@@ -47,25 +59,25 @@ export const UserDisplayProvider = ({ children }) => {
         setTotal(users.length);
     }, [users]);
 
+    // Custom error timeout
     useEffect(() => {
         if (customError) {
-            const timer = setTimeout(() => {
-                setCustomError(null);
-            }, 5000); // auto-dismiss after 5s
-
-            return () => clearTimeout(timer); // cleanup
+            const timer = setTimeout(() => setCustomError(null), 5000);
+            return () => clearTimeout(timer);
         }
     }, [customError]);
 
     const fetchUserData = async () => {
         if (!authToken) return;
-        setLoading(true); // Set loading to true before fetching data
+        setLoading(true);
         try {
             const res = await axiosInstance.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
             });
+
             setUsers(res.data.data);
+
             const guestUsers = res.data.data
                 .filter((user) => user.role === "Guest")
                 .map((user) => ({
@@ -73,23 +85,44 @@ export const UserDisplayProvider = ({ children }) => {
                     FirstName: user.FirstName,
                     LastName: user.LastName,
                     email: user.email,
-                    address: `${user.zone} ${user.address}`,
+                    address: `${user.address}`,
                     phoneNumber: user.phoneNumber,
                     dateOfBirth: user.dateOfBirth,
                     gender: user.gender,
-                    zone:`${user.zone}`
+                    zone: `${user.zone}`,
                 }));
 
             const selectedUsers = res.data.data.filter((user) => user.role === "Admin" || user.role === "BHW");
+
             setParent(guestUsers);
             setUsers(selectedUsers);
         } catch (error) {
             console.error("Error fetching data:", error);
             setError("Failed to fetch data");
         } finally {
-            setLoading(false); // Set loading to false after data fetching is complete
+            setLoading(false);
         }
     };
+
+    const fetchProfileData = useCallback(
+        async (id) => {
+            if (!authToken || !id) return;
+            setLoading(true);
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/Profile/${id}`, {
+                    withCredentials: true,
+                    headers: { Authorization: `Bearer ${authToken}` },
+                });
+                setProfile(res.data.data);
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+                setError("Failed to fetch profile data");
+            } finally {
+                setLoading(false);
+            }
+        },
+        [authToken], // dependencies — only recreate if authToken changes
+    );
 
     const handleOTP = (userId) => {
         setOTPModal(true);
@@ -98,30 +131,14 @@ export const UserDisplayProvider = ({ children }) => {
 
     const AddUser = async (values) => {
         try {
-            const res = await axiosInstance.post(
-                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/authentication/signup`,
-                {
-                    FirstName: values.FirstName,
-                    LastName: values.LastName,
-                    email: values.email,
-                    password: values.password,
-                    role: values.role,
-                    zone: values.zone,
-                    address: values.address,
-                    phoneNumber: values.phoneNumber,
-                    dateOfBirth: values.dateOfBirth,
-                    gender: values.gender,
-                    Designatedzone: values.Designatedzone,
-                },
-                {
-                    headers: { Authorization: `Bearer ${authToken}` },
-                },
-            );
+            const res = await axiosInstance.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/authentication/signup`, values, {
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
+
             if (res.data.status === "Success") {
-                const data = res.data.data;
                 fetchUserData();
                 if (["BHW", "Admin"].includes(values.role)) {
-                    handleOTP(data._id);
+                    handleOTP(res.data.data._id);
                 }
             } else {
                 setModalStatus("failed");
@@ -129,83 +146,99 @@ export const UserDisplayProvider = ({ children }) => {
                 return { success: false, error: "Unexpected response from server." };
             }
         } catch (error) {
-            if (error.response && error.response.data) {
-                const errorData = error.response.data;
-                const message = typeof errorData === "string" ? errorData : errorData.message || errorData.error || "Something went wrong.";
-                setCustomError(message);
-            } else if (error.request) {
-                setCustomError("No response from the server.");
-            } else {
-                setCustomError(error.message || "Unexpected error occurred.");
-            }
+            const msg = error.response?.data?.message || error.response?.data?.error || error.message || "Something went wrong.";
+            setCustomError(msg);
         }
     };
 
-    const DeleteUser = async (userId) => {
+    const DeleteUser = async (id) => {
         try {
-            const response = await axiosInstance.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/${userId}`, {
+            const res = await axiosInstance.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/${id}`, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
 
-            if (response.data.status === "success") {
+            if (res.data.status === "success") {
                 fetchUserData();
                 setModalStatus("success");
                 setShowModal(true);
             } else {
                 setModalStatus("failed");
                 setShowModal(true);
-                return { success: false, error: "Unexpected response from server." };
             }
         } catch (error) {
-            console.error("Error deleting user:", error);
             toast.error(error.response?.data?.message || "Failed to delete user.");
         }
     };
 
-    const UpdateUser = async (user, values) => {
+    const UpdateUser = async (id, values) => {
         try {
-            const dataToSend = {
-                FirstName: values.FirstName || "",
-                LastName: values.LastName || "",
-                username: values.username || "",
-                email: values.email || "",
-                role: values.role || "",
-                address: values.address || "",
-                phoneNumber: values.phoneNumber || "",
-                dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth).toISOString().slice(0, 10) : "", // Fix flickering
-                gender: values.gender || "",
-                avatar: values.avatar || "",
-                zone: values.zone || "",
+            const payload = {
+                ...values,
+                dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth).toISOString().slice(0, 10) : "",
             };
 
-            if (values.password) {
-                dataToSend.password = values.password;
-            }
-
-            const response = await axiosInstance.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/${user}`, dataToSend, {
+            const res = await axiosInstance.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/${id}`, payload, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
-            if (response.data && response.data.status === "success") {
-                fetchUserData();
+
+            if (res.data?.status === "success") {
+                setProfile((prev) => {
+                    const updated = [...prev];
+                    updated[0] = { ...updated[0], ...res.data.data };
+                    return updated;
+                });
+
+                   setUsers((prevUsers) => prevUsers.map((u) => (u._id === res.data.data._id ? { ...u, ...res.data.data } : u)));
+
                 setModalStatus("success");
                 setShowModal(true);
             } else {
                 setModalStatus("failed");
                 setShowModal(true);
-                return { success: false, error: "Unexpected response from server." };
             }
         } catch (error) {
-            if (error.response && error.response.data) {
-                const errorData = error.response.data;
-                const message = typeof errorData === "string" ? errorData : errorData.message || errorData.error || "Something went wrong.";
-                setCustomError(message);
-            } else if (error.request) {
-                // The request was made but no response was received
-                setCustomError("No response from the server.");
-            } else {
-                // Something happened in setting up the request
-                setCustomError(error.message || "Unexpected error occurred.");
+            const msg = error.response?.data?.message || error.response?.data?.error || error.message || "Something went wrong.";
+            setCustomError(msg);
+        }
+    };
+
+    const UpdateUserProfile = async (id, values) => {
+        try {
+            if (!values.avatar || !(values.avatar instanceof File)) {
+                throw new Error("No valid avatar file provided.");
             }
+
+            const formData = new FormData();
+            formData.append("avatar", values.avatar);
+
+            const res = await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/ProfilePicture/${id}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            if (res.data?.status === "success") {
+                setProfile((prev) => {
+                    const updated = [...prev];
+                    updated[0] = { ...updated[0], avatar: res.data.data.avatar };
+                    return updated;
+                });
+
+                             
+
+                setModalStatus("success");
+                setShowModal(true);
+                return { success: true };
+            } else {
+                setModalStatus("failed");
+                setShowModal(true);
+                return { success: false };
+            }
+        } catch (error) {
+            const msg = error.response?.data?.message || error.response?.data?.error || error.message || "Something went wrong.";
+            setCustomError(msg);
+            return { success: false, error: msg };
         }
     };
 
@@ -222,6 +255,9 @@ export const UserDisplayProvider = ({ children }) => {
                 DeleteUser,
                 UpdateUser,
                 isParent,
+                fetchProfileData,
+                isProfile,
+                UpdateUserProfile,
             }}
         >
             {children}

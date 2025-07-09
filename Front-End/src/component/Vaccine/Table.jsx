@@ -1,10 +1,11 @@
 import React, { useState, useContext, useMemo, useEffect } from "react";
 import { VaccineDisplayContext } from "../../contexts/VaccineContext/VaccineContext"; // <- AYUSIN ITO KUNG MALI
 import { PencilIcon, TrashIcon, Plus } from "lucide-react";
-import UserFormModal from "../Vaccine/AddVacine"; 
+import UserFormModal from "../Vaccine/AddVacine";
 import UpdateFormModal from "../Vaccine/UpdateStock";
-import DeleteForm from "../Vaccine/DeleteStocks"; 
+import DeleteForm from "../Vaccine/DeleteStocks";
 import StatusVerification from "../../ReusableFolder/StatusModal";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -17,6 +18,7 @@ const formatDate = (dateString) => {
 };
 
 function VaccineTable() {
+    const { role } = useContext(AuthContext);
     const [selectedVaccine, setSelectedVaccine] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -196,18 +198,18 @@ function VaccineTable() {
                         >
                             Show:
                         </label>
-           <select
-  id="itemsPerPage"
-  value={itemsPerPage}
-  onChange={handleItemsPerPageChange}
-  className="input input-xs w-20 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-  aria-label="Items per page"
->
-  <option value={5}>5</option>
-  <option value={10}>10</option>
-  <option value={20}>20</option>
-  <option value={50}>50</option>
-</select>
+                        <select
+                            id="itemsPerPage"
+                            value={itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                            className="input input-xs w-20 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                            aria-label="Items per page"
+                        >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                        </select>
 
                         <span className="text-sm text-gray-700 dark:text-gray-300">vaccines per page</span>
                     </div>
@@ -287,13 +289,15 @@ function VaccineTable() {
                                                     >
                                                         <PencilIcon className="h-4 w-4" />
                                                     </button>
-                                                    <button
-                                                        onClick={() => openDeleteModal(item)}
-                                                        className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
-                                                        title="Delete Stock"
-                                                    >
-                                                        <TrashIcon className="h-4 w-4" />
-                                                    </button>
+                                                    {role !== "BHW" && (
+                                                        <button
+                                                            onClick={() => openDeleteModal(item)}
+                                                            className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+                                                            title="Delete Stock"
+                                                        >
+                                                            <TrashIcon className="h-4 w-4" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -338,12 +342,15 @@ function VaccineTable() {
                                         >
                                             <PencilIcon className="h-4 w-4" />
                                         </button>
-                                        <button
-                                            onClick={() => openDeleteModal(item)}
-                                            className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
-                                        >
-                                            <TrashIcon className="h-4 w-4" />
-                                        </button>
+                                        {role !== "BHW" && (
+                                            <button
+                                                onClick={() => openDeleteModal(item)}
+                                                className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+                                                title="Delete Stock"
+                                            >
+                                                <TrashIcon className="h-4 w-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             ))

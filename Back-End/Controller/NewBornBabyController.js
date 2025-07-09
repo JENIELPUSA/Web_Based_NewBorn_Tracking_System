@@ -3,12 +3,24 @@ const NewBaby = require("../Models/NewBornmodel");
 const CustomError = require("./../Utils/CustomError");
 const Apifeatures = require("./../Utils/ApiFeatures");
 const mongoose = require("mongoose");
-const AuditLog=require("./../Models/LogAndAudit")
+const AuditLog = require("./../Models/LogAndAudit");
 const getClientIp = require("./../Utils/getClientIp");
-const PDFDocument = require('pdfkit');
+const PDFDocument = require("pdfkit");
+const VaccineRecord = require("./../Models/VaccinationRecord");
+const AssignVaccine = require("./../Models/AssignedVaccineSchema");
+const Checkup = require("./../Models/CheckupRecords");
+const Profilling = require("./../Models/ProfillingSchema");
 
 exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
-  const { firstName, lastName, dateOfBirth, gender, birthWeight, motherName, birthHeight } = req.body;
+  const {
+    firstName,
+    lastName,
+    dateOfBirth,
+    gender,
+    birthWeight,
+    motherName,
+    birthHeight,
+  } = req.body;
   const ipAddress = getClientIp(req); // get client IP
   const userId = req.user._id; // the admin or user creating this record
 
@@ -50,7 +62,7 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
     { $unwind: "$addedBy" },
     {
       $lookup: {
-        from: "users",
+        from: "parents",
         localField: "motherName",
         foreignField: "_id",
         as: "motherName",
@@ -112,7 +124,6 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
   });
 });
 
-
 exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
   // Apply filters, sorting, limiting, and pagination
   const features = new Apifeatures(NewBaby.find(), req.query)
@@ -146,7 +157,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: "users",
+        from: "parents",
         localField: "motherName",
         foreignField: "_id",
         as: "motherName",
@@ -158,7 +169,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         firstName: 1,
         middleName: 1,
         lastName: 1,
-        extensionName:1,
+        extensionName: 1,
         dateOfBirth: {
           $dateToString: {
             format: "%b %d %Y", // Format date as 'Jan 13 2025'
@@ -171,7 +182,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         motherName: {
           $concat: ["$motherName.FirstName", " ", "$motherName.LastName"],
         },
-        motherID:"$motherName._id",
+        motherID: "$motherName._id",
         address: {
           $concat: ["$motherName.address"],
         },
@@ -179,7 +190,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
           $concat: ["$motherName.phoneNumber"],
         },
         zone: {
-          $concat: ["$motherName.zone"]
+          $concat: ["$motherName.zone"],
         },
         createdAt: 1,
         addedByName: {
@@ -215,7 +226,10 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
   ]);
 
   // If no data found, return 0 for male and female counts
-  const resultData = result.length > 0 ? result[0] : { totalMale: 0, totalFemale: 0, totalRecords: 0, data: [] };
+  const resultData =
+    result.length > 0
+      ? result[0]
+      : { totalMale: 0, totalFemale: 0, totalRecords: 0, data: [] };
 
   res.status(200).json({
     status: "success",
@@ -226,12 +240,25 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
   });
 });
 
-
 exports.deletedSpecificData = AsyncErrorHandler(async (req, res, next) => {
-  const ipAddress = getClientIp(req); // Get client IP
-  const userId = req.user._id;        // Authenticated user
+  const ipAddress = getClientIp(req); 
+  const userId = req.user._id; 
 
-  // Find the record before deleting to get details for logging
+  const [hasVaccineRecord, hasAssignVaccine, hasCheckup, hasProfilling] =
+    await Promise.all([
+      VaccineRecord.exists({ newborn: req.params.id }),
+      AssignVaccine.exists({ newborn: req.params.id }),
+      Checkup.exists({ newborn: req.params.id }),
+      Profilling.exists({ newborn_id: req.params.id }),
+    ]);
+
+  if (hasVaccineRecord || hasAssignVaccine || hasCheckup || hasProfilling) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Cannot delete Newborn: there are existing related records.",
+    });
+  }
+
   const deletedData = await NewBaby.findById(req.params.id);
 
   if (!deletedData) {
@@ -252,7 +279,9 @@ exports.deletedSpecificData = AsyncErrorHandler(async (req, res, next) => {
     targetId: deletedData._id,
     description: `Deleted newborn record for ${deletedData.firstName} ${deletedData.lastName}`,
     details: {
-      fullName: `${deletedData.firstName} ${deletedData.middleName || ""} ${deletedData.lastName}`,
+      fullName: `${deletedData.firstName} ${deletedData.middleName || ""} ${
+        deletedData.lastName
+      }`,
       gender: deletedData.gender,
       dateOfBirth: deletedData.dateOfBirth,
       birthWeight: deletedData.birthWeight,
@@ -270,14 +299,8 @@ exports.deletedSpecificData = AsyncErrorHandler(async (req, res, next) => {
 });
 
 exports.UpdateBabyData = AsyncErrorHandler(async (req, res, next) => {
-  const {
-    firstName,
-    lastName,
-    dateOfBirth,
-    gender,
-    birthWeight,
-    motherName,
-  } = req.body;
+  const { firstName, lastName, dateOfBirth, gender, birthWeight, motherName } =
+    req.body;
   const missingFields = [];
 
   if (!firstName) missingFields.push("First Name");
@@ -326,7 +349,7 @@ exports.UpdateBabyData = AsyncErrorHandler(async (req, res, next) => {
     { $unwind: { path: "$addedBy", preserveNullAndEmptyArrays: true } },
     {
       $lookup: {
-        from: "users",
+        from: "parents",
         localField: "motherName",
         foreignField: "_id",
         as: "motherName",
@@ -429,7 +452,7 @@ exports.DisplayGraph = AsyncErrorHandler(async (req, res, next) => {
       totalFemale: 0,
       totalRecords: 0,
       topBabies: [],
-      message: 'No newborn profile data found for the selected criteria.'
+      message: "No newborn profile data found for the selected criteria.",
     });
   }
 
@@ -453,7 +476,7 @@ exports.DisplayGraph = AsyncErrorHandler(async (req, res, next) => {
     },
     {
       $lookup: {
-        from: "users",
+        from: "parents",
         localField: "motherName",
         foreignField: "_id",
         as: "motherName",
@@ -524,16 +547,19 @@ exports.DisplayGraph = AsyncErrorHandler(async (req, res, next) => {
       },
     },
     {
-        $project: {
-            totalMale: 1,
-            totalFemale: 1,
-            totalRecords: 1,
-            topBabies: { $slice: ["$topBabies", 10] },
-        },
+      $project: {
+        totalMale: 1,
+        totalFemale: 1,
+        totalRecords: 1,
+        topBabies: { $slice: ["$topBabies", 10] },
+      },
     },
   ]);
 
-  const resultData = result.length > 0 ? result[0] : { totalMale: 0, totalFemale: 0, totalRecords: 0, topBabies: [] };
+  const resultData =
+    result.length > 0
+      ? result[0]
+      : { totalMale: 0, totalFemale: 0, totalRecords: 0, topBabies: [] };
 
   const topBabiesFormatted = resultData.topBabies.map((baby, index) => ({
     number: index + 1,
@@ -552,297 +578,383 @@ exports.DisplayGraph = AsyncErrorHandler(async (req, res, next) => {
   });
 });
 
-
-
 exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
-    try {
-        const { from, to } = req.query; 
-        const fromDate = new Date(from);
-        let toDate = new Date(to);
-        if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-            return next(new CustomError('Invalid date format. Please use ISO 8601 format (YYYY-MM-DD).', 400));
-        }
-
-        toDate.setHours(23, 59, 59, 999);
-
-        const aggregationResult = await NewBaby.aggregate([
-            {
-                $match: {
-                    dateOfBirth: { $gte: fromDate, $lte: toDate },
-                },
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "addedBy",
-                    foreignField: "_id",
-                    as: "addedBy",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$addedBy",
-                    preserveNullAndEmptyArrays: true,
-                },
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "motherName", 
-                    foreignField: "_id",
-                    as: "motherDetails", 
-                },
-            },
-            {
-                $unwind: {
-                    path: "$motherDetails",
-                    preserveNullAndEmptyArrays: true, 
-                }
-            },
-            {
-                $project: {
-                    firstName: 1,
-                    middleName: 1,
-                    lastName: 1,
-                    newbornName: {
-                        $concat: ["$firstName", " ", "$middleName", " ", "$lastName"],
-                    },
-                    dateOfBirth: {
-                        $dateToString: {
-                            format: "%b %d, %Y",
-                            date: "$dateOfBirth",
-                        },
-                    },
-                    gender: 1,
-                    birthWeight: { $concat: [{ $toString: "$birthWeight" }, " kg"] },
-                    birthHeight: { $concat: [{ $toString: "$birthHeight" }, " cm"] },
-                    motherName: {
-                        $cond: {
-                            if: { $eq: [{ $type: "$motherDetails" }, "object"] },
-                            then: { $concat: ["$motherDetails.FirstName", " ", "$motherDetails.LastName"] }, // Assuming 'firstName' and 'lastName' in User model
-                            else: "Unknown",
-                        },
-                    },
-                    motherPhoneNumber: {
-                        $cond: {
-                            if: { $eq: [{ $type: "$motherDetails" }, "object"] },
-                            then: "$motherDetails.phoneNumber",
-                            else: "N/A",
-                        },
-                    },
-                    motherAddressZone: {
-                        $cond: {
-                            if: { $eq: [{ $type: "$motherDetails" }, "object"] },
-                            then: { $concat: ["$motherDetails.address", ", ", "$motherDetails.zone"] },
-                            else: "N/A",
-                        },
-                    },
-                    addedByName: {
-                        $cond: {
-                            if: { $eq: [{ $type: "$addedBy" }, "object"] },
-                            then: { $concat: ["$addedBy.FirstName", " ", "$addedBy.LastName"] }, // Assuming 'firstName' and 'lastName' in User model
-                            else: "Unknown",
-                        },
-                    },
-                    createdAt: 1,
-                },
-            },
-            { $sort: { newbornName: 1 } },
-            {
-                $group: {
-                    _id: null,
-                    totalMale: {
-                        $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] },
-                    },
-                    totalFemale: {
-                        $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] },
-                    },
-                    totalRecords: { $sum: 1 },
-                    data: { $push: "$$ROOT" },
-                },
-            },
-        ]);
-
-        const newborns = aggregationResult.length > 0 ? aggregationResult[0].data : [];
-
-        if (!newborns || newborns.length === 0) {
-            return next(new CustomError('No newborn profile data found for the selected date range.', 404));
-        }
-
-        // --- PDF Document Setup ---
-        const doc = new PDFDocument({ layout: 'landscape', margin: 30 });
-
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=newborn_profile_report_${from}_to_${to}.pdf`);
-
-        doc.pipe(res);
-
-        // --- Helper Function to Draw Table ---
-        function drawTable(doc, data, headers, startY, startX, colWidths, options = {}) {
-            let y = startY;
-            let x = startX;
-            const cellPadding = options.cellPadding || 5;
-            const headerFillColor = options.headerFillColor || '#CCCCCC';
-            const rowFillColor1 = options.rowFillColor1 || '#F0F0F0';
-            const rowFillColor2 = options.rowFillColor2 || '#FFFFFF';
-            const textColor = options.textColor || '#000000';
-            const headerFontSize = options.headerFontSize || 10;
-            const rowFontSize = options.rowFontSize || 9;
-            const borderWidth = options.borderWidth || 0.5;
-
-            doc.lineWidth(borderWidth);
-            doc.strokeColor(textColor);
-
-            // Draw Headers
-            doc.font('Helvetica-Bold').fontSize(headerFontSize);
-            doc.fillColor(headerFillColor).rect(x, y, colWidths.reduce((a, b) => a + b, 0), 25).fill();
-            doc.fillColor(textColor);
-
-            let currentHeaderX = x;
-            headers.forEach((header, i) => {
-                doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
-                    width: colWidths[i] - 2 * cellPadding,
-                    align: 'left',
-                    lineBreak: true
-                });
-                currentHeaderX += colWidths[i];
-            });
-            y += 25;
-
-            doc.font('Helvetica').fontSize(rowFontSize);
-
-            // Draw Data Rows
-            data.forEach((row, rowIndex) => {
-                let maxRowHeight = 0;
-                // Calculate max row height based on content
-                headers.forEach((header, i) => {
-                    const value = row[header] !== undefined && row[header] !== null ? row[header].toString() : 'N/A';
-                    const textHeight = doc.heightOfString(value, {
-                        width: colWidths[i] - 2 * cellPadding,
-                        lineBreak: true
-                    });
-                    maxRowHeight = Math.max(maxRowHeight, textHeight + 2 * cellPadding);
-                });
-
-                // Check for new page before drawing a row
-                if (y + maxRowHeight > doc.page.height - doc.page.margins.bottom) {
-                    doc.addPage();
-                    y = doc.page.margins.top;
-                    currentHeaderX = x;
-                    doc.font('Helvetica-Bold').fontSize(headerFontSize);
-                    doc.fillColor(headerFillColor).rect(x, y, colWidths.reduce((a, b) => a + b, 0), 25).fill();
-                    doc.fillColor(textColor);
-                    headers.forEach((header, i) => {
-                        doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
-                            width: colWidths[i] - 2 * cellPadding,
-                            align: 'left',
-                            lineBreak: true
-                        });
-                        currentHeaderX += colWidths[i];
-                    });
-                    y += 25;
-                    doc.font('Helvetica').fontSize(rowFontSize);
-                }
-
-                const fillColor = rowIndex % 2 === 0 ? rowFillColor1 : rowFillColor2;
-                doc.fillColor(fillColor).rect(x, y, colWidths.reduce((a, b) => a + b, 0), maxRowHeight).fill();
-                doc.fillColor(textColor);
-
-                let currentRowX = x;
-                headers.forEach((header, i) => {
-                    const value = row[header] !== undefined && row[header] !== null ? row[header].toString() : 'N/A';
-                    doc.rect(currentRowX, y, colWidths[i], maxRowHeight).stroke();
-                    doc.text(value, currentRowX + cellPadding, y + cellPadding, {
-                        width: colWidths[i] - 2 * cellPadding,
-                        align: 'left',
-                        valign: 'top',
-                        lineBreak: true
-                    });
-                    currentRowX += colWidths[i];
-                });
-                y += maxRowHeight;
-            });
-            return y;
-        }
-
-        // --- Helper Function to Add Page Numbers ---
-        function addPageNumbers(doc) {
-            let pages = doc.bufferedPageRange(); // Get total pages after content is added
-            for (let i = 0; i < pages.count; i++) {
-                doc.switchToPage(i);
-                let oldBottomMargin = doc.page.margins.bottom;
-                doc.page.margins.bottom = 0; // Temporarily remove bottom margin to write in the footer
-                doc.font('Helvetica').fontSize(9).text(
-                    `Page ${i + 1} of ${pages.count}`,
-                    0,
-                    doc.page.height - oldBottomMargin / 2, // Position in the center of the original bottom margin
-                    { align: 'center' }
-                );
-                doc.page.margins.bottom = oldBottomMargin; // Restore bottom margin
-            }
-        }
-
-        // --- PDF Header Content ---
-        doc.font('Helvetica-Bold').fontSize(18).text('Newborn Profile Report', { align: 'center' });
-        doc.font('Helvetica').fontSize(12).text(`Date Range: ${from} to ${to}`, { align: 'center' });
-        doc.moveDown(1.5);
-
-        // --- Main Profile Data Table (Overview) ---
-        const mainTableHeaders = [
-            'Newborn Name',
-            'DoB',
-            'Gender',
-            'Birth Weight',
-            'Birth Height',
-            'Mother Name',
-            'Mother Phone',
-            'Mother Address'
-        ];
-
-        const totalPageContentWidth = doc.page.width - 2 * doc.page.margins.left;
-        const mainColWidths = [
-            totalPageContentWidth * 0.16, // Newborn Name
-            totalPageContentWidth * 0.08, // DoB
-            totalPageContentWidth * 0.07, // Gender
-            totalPageContentWidth * 0.08, // Birth Weight
-            totalPageContentWidth * 0.14, // Birth Height
-            totalPageContentWidth * 0.15, // Mother Name
-            totalPageContentWidth * 0.10, // Mother Phone
-            totalPageContentWidth * 0.22, // Mother Address
-        ];
-
-        const mainTableData = newborns.map(profile => ({
-            'Newborn Name': profile.newbornName || 'N/A',
-            'DoB': profile.dateOfBirth || 'N/A',
-            'Gender': profile.gender || 'N/A',
-            'Birth Weight': profile.birthWeight || 'N/A',
-            'Birth Height': profile.birthHeight || 'N/A',
-            'Mother Name': profile.motherName || 'N/A',
-            'Mother Phone': profile.motherPhoneNumber || 'N/A',
-            'Mother Address': profile.motherAddressZone || 'N/A'
-        }));
-
-        doc.font('Helvetica-Bold').fontSize(14).text('Newborn Profiles Overview:', { underline: true, align: 'left' });
-        doc.font('Helvetica').moveDown(0.5);
-
-        let currentY = drawTable(doc, mainTableData, mainTableHeaders, doc.y, doc.page.margins.left, mainColWidths, {
-            headerFillColor: '#ADD8E6',
-            rowFillColor1: '#E0FFFF',
-            rowFillColor2: '#F5FFFA',
-            headerFontSize: 11,
-            rowFontSize: 10
-        });
-        doc.moveDown(1.5);
-
-        // Add page numbers to the document after all content is added
-        addPageNumbers(doc);
-
-        // Finalize the PDF document
-        doc.end();
-    } catch (error) {
-        console.error('Error generating newborn profile PDF:', error);
-        if (!res.headersSent) {
-            res.status(500).json({ message: 'Failed to generate PDF', error: error.message });
-        }
+  try {
+    const { from, to } = req.query;
+    const fromDate = new Date(from);
+    let toDate = new Date(to);
+    if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+      return next(
+        new CustomError(
+          "Invalid date format. Please use ISO 8601 format (YYYY-MM-DD).",
+          400
+        )
+      );
     }
+
+    toDate.setHours(23, 59, 59, 999);
+
+    const aggregationResult = await NewBaby.aggregate([
+      {
+        $match: {
+          dateOfBirth: { $gte: fromDate, $lte: toDate },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "addedBy",
+          foreignField: "_id",
+          as: "addedBy",
+        },
+      },
+      {
+        $unwind: {
+          path: "$addedBy",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "parents",
+          localField: "motherName",
+          foreignField: "_id",
+          as: "motherDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$motherDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          firstName: 1,
+          middleName: 1,
+          lastName: 1,
+          newbornName: {
+            $concat: ["$firstName", " ", "$middleName", " ", "$lastName"],
+          },
+          dateOfBirth: {
+            $dateToString: {
+              format: "%b %d, %Y",
+              date: "$dateOfBirth",
+            },
+          },
+          gender: 1,
+          birthWeight: { $concat: [{ $toString: "$birthWeight" }, " kg"] },
+          birthHeight: { $concat: [{ $toString: "$birthHeight" }, " cm"] },
+          motherName: {
+            $cond: {
+              if: { $eq: [{ $type: "$motherDetails" }, "object"] },
+              then: {
+                $concat: [
+                  "$motherDetails.FirstName",
+                  " ",
+                  "$motherDetails.LastName",
+                ],
+              }, // Assuming 'firstName' and 'lastName' in User model
+              else: "Unknown",
+            },
+          },
+          motherPhoneNumber: {
+            $cond: {
+              if: { $eq: [{ $type: "$motherDetails" }, "object"] },
+              then: "$motherDetails.phoneNumber",
+              else: "N/A",
+            },
+          },
+          motherAddressZone: {
+            $cond: {
+              if: { $eq: [{ $type: "$motherDetails" }, "object"] },
+              then: {
+                $concat: [
+                  "$motherDetails.address",
+                  ", ",
+                  "$motherDetails.zone",
+                ],
+              },
+              else: "N/A",
+            },
+          },
+          addedByName: {
+            $cond: {
+              if: { $eq: [{ $type: "$addedBy" }, "object"] },
+              then: {
+                $concat: ["$addedBy.FirstName", " ", "$addedBy.LastName"],
+              }, // Assuming 'firstName' and 'lastName' in User model
+              else: "Unknown",
+            },
+          },
+          createdAt: 1,
+        },
+      },
+      { $sort: { newbornName: 1 } },
+      {
+        $group: {
+          _id: null,
+          totalMale: {
+            $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] },
+          },
+          totalFemale: {
+            $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] },
+          },
+          totalRecords: { $sum: 1 },
+          data: { $push: "$$ROOT" },
+        },
+      },
+    ]);
+
+    const newborns =
+      aggregationResult.length > 0 ? aggregationResult[0].data : [];
+
+    if (!newborns || newborns.length === 0) {
+      return next(
+        new CustomError(
+          "No newborn profile data found for the selected date range.",
+          404
+        )
+      );
+    }
+
+    // --- PDF Document Setup ---
+    const doc = new PDFDocument({ layout: "landscape", margin: 30 });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=newborn_profile_report_${from}_to_${to}.pdf`
+    );
+
+    doc.pipe(res);
+
+    // --- Helper Function to Draw Table ---
+    function drawTable(
+      doc,
+      data,
+      headers,
+      startY,
+      startX,
+      colWidths,
+      options = {}
+    ) {
+      let y = startY;
+      let x = startX;
+      const cellPadding = options.cellPadding || 5;
+      const headerFillColor = options.headerFillColor || "#CCCCCC";
+      const rowFillColor1 = options.rowFillColor1 || "#F0F0F0";
+      const rowFillColor2 = options.rowFillColor2 || "#FFFFFF";
+      const textColor = options.textColor || "#000000";
+      const headerFontSize = options.headerFontSize || 10;
+      const rowFontSize = options.rowFontSize || 9;
+      const borderWidth = options.borderWidth || 0.5;
+
+      doc.lineWidth(borderWidth);
+      doc.strokeColor(textColor);
+
+      // Draw Headers
+      doc.font("Helvetica-Bold").fontSize(headerFontSize);
+      doc
+        .fillColor(headerFillColor)
+        .rect(
+          x,
+          y,
+          colWidths.reduce((a, b) => a + b, 0),
+          25
+        )
+        .fill();
+      doc.fillColor(textColor);
+
+      let currentHeaderX = x;
+      headers.forEach((header, i) => {
+        doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
+          width: colWidths[i] - 2 * cellPadding,
+          align: "left",
+          lineBreak: true,
+        });
+        currentHeaderX += colWidths[i];
+      });
+      y += 25;
+
+      doc.font("Helvetica").fontSize(rowFontSize);
+
+      // Draw Data Rows
+      data.forEach((row, rowIndex) => {
+        let maxRowHeight = 0;
+        // Calculate max row height based on content
+        headers.forEach((header, i) => {
+          const value =
+            row[header] !== undefined && row[header] !== null
+              ? row[header].toString()
+              : "N/A";
+          const textHeight = doc.heightOfString(value, {
+            width: colWidths[i] - 2 * cellPadding,
+            lineBreak: true,
+          });
+          maxRowHeight = Math.max(maxRowHeight, textHeight + 2 * cellPadding);
+        });
+
+        // Check for new page before drawing a row
+        if (y + maxRowHeight > doc.page.height - doc.page.margins.bottom) {
+          doc.addPage();
+          y = doc.page.margins.top;
+          currentHeaderX = x;
+          doc.font("Helvetica-Bold").fontSize(headerFontSize);
+          doc
+            .fillColor(headerFillColor)
+            .rect(
+              x,
+              y,
+              colWidths.reduce((a, b) => a + b, 0),
+              25
+            )
+            .fill();
+          doc.fillColor(textColor);
+          headers.forEach((header, i) => {
+            doc.text(header, currentHeaderX + cellPadding, y + cellPadding, {
+              width: colWidths[i] - 2 * cellPadding,
+              align: "left",
+              lineBreak: true,
+            });
+            currentHeaderX += colWidths[i];
+          });
+          y += 25;
+          doc.font("Helvetica").fontSize(rowFontSize);
+        }
+
+        const fillColor = rowIndex % 2 === 0 ? rowFillColor1 : rowFillColor2;
+        doc
+          .fillColor(fillColor)
+          .rect(
+            x,
+            y,
+            colWidths.reduce((a, b) => a + b, 0),
+            maxRowHeight
+          )
+          .fill();
+        doc.fillColor(textColor);
+
+        let currentRowX = x;
+        headers.forEach((header, i) => {
+          const value =
+            row[header] !== undefined && row[header] !== null
+              ? row[header].toString()
+              : "N/A";
+          doc.rect(currentRowX, y, colWidths[i], maxRowHeight).stroke();
+          doc.text(value, currentRowX + cellPadding, y + cellPadding, {
+            width: colWidths[i] - 2 * cellPadding,
+            align: "left",
+            valign: "top",
+            lineBreak: true,
+          });
+          currentRowX += colWidths[i];
+        });
+        y += maxRowHeight;
+      });
+      return y;
+    }
+
+    // --- Helper Function to Add Page Numbers ---
+    function addPageNumbers(doc) {
+      let pages = doc.bufferedPageRange(); // Get total pages after content is added
+      for (let i = 0; i < pages.count; i++) {
+        doc.switchToPage(i);
+        let oldBottomMargin = doc.page.margins.bottom;
+        doc.page.margins.bottom = 0; // Temporarily remove bottom margin to write in the footer
+        doc
+          .font("Helvetica")
+          .fontSize(9)
+          .text(
+            `Page ${i + 1} of ${pages.count}`,
+            0,
+            doc.page.height - oldBottomMargin / 2, // Position in the center of the original bottom margin
+            { align: "center" }
+          );
+        doc.page.margins.bottom = oldBottomMargin; // Restore bottom margin
+      }
+    }
+
+    // --- PDF Header Content ---
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(18)
+      .text("Newborn Profile Report", { align: "center" });
+    doc
+      .font("Helvetica")
+      .fontSize(12)
+      .text(`Date Range: ${from} to ${to}`, { align: "center" });
+    doc.moveDown(1.5);
+
+    // --- Main Profile Data Table (Overview) ---
+    const mainTableHeaders = [
+      "Newborn Name",
+      "DoB",
+      "Gender",
+      "Birth Weight",
+      "Birth Height",
+      "Mother Name",
+      "Mother Phone",
+      "Mother Address",
+    ];
+
+    const totalPageContentWidth = doc.page.width - 2 * doc.page.margins.left;
+    const mainColWidths = [
+      totalPageContentWidth * 0.16, // Newborn Name
+      totalPageContentWidth * 0.08, // DoB
+      totalPageContentWidth * 0.07, // Gender
+      totalPageContentWidth * 0.08, // Birth Weight
+      totalPageContentWidth * 0.14, // Birth Height
+      totalPageContentWidth * 0.15, // Mother Name
+      totalPageContentWidth * 0.1, // Mother Phone
+      totalPageContentWidth * 0.22, // Mother Address
+    ];
+
+    const mainTableData = newborns.map((profile) => ({
+      "Newborn Name": profile.newbornName || "N/A",
+      DoB: profile.dateOfBirth || "N/A",
+      Gender: profile.gender || "N/A",
+      "Birth Weight": profile.birthWeight || "N/A",
+      "Birth Height": profile.birthHeight || "N/A",
+      "Mother Name": profile.motherName || "N/A",
+      "Mother Phone": profile.motherPhoneNumber || "N/A",
+      "Mother Address": profile.motherAddressZone || "N/A",
+    }));
+
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(14)
+      .text("Newborn Profiles Overview:", { underline: true, align: "left" });
+    doc.font("Helvetica").moveDown(0.5);
+
+    let currentY = drawTable(
+      doc,
+      mainTableData,
+      mainTableHeaders,
+      doc.y,
+      doc.page.margins.left,
+      mainColWidths,
+      {
+        headerFillColor: "#ADD8E6",
+        rowFillColor1: "#E0FFFF",
+        rowFillColor2: "#F5FFFA",
+        headerFontSize: 11,
+        rowFontSize: 10,
+      }
+    );
+    doc.moveDown(1.5);
+
+    // Add page numbers to the document after all content is added
+    addPageNumbers(doc);
+
+    // Finalize the PDF document
+    doc.end();
+  } catch (error) {
+    console.error("Error generating newborn profile PDF:", error);
+    if (!res.headersSent) {
+      res
+        .status(500)
+        .json({ message: "Failed to generate PDF", error: error.message });
+    }
+  }
 });

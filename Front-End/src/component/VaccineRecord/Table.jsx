@@ -4,8 +4,7 @@ import { PencilIcon, TrashIcon, BabyIcon, Plus } from "lucide-react";
 import { motion } from "framer-motion"; // Idagdag ang motion import
 import AddNewBornForm from "../VaccineRecord/AddForm"; // <- AYUSIN ITO KUNG MALI
 import StatusVerification from "../../ReusableFolder/StatusModal"; // <- AYUSIN ITO KUNG MALI
-import DisplayVaccine from "../AssignVaccine/DisplayVaccine"; // <- AYUSIN ITO KUNG MALI
-
+import { AuthContext } from "../../contexts/AuthContext";
 // Status badge color mapping
 const statusColors = {
     ontime: {
@@ -48,6 +47,7 @@ const formatDate = (dateString) => {
 };
 
 function VaccineRecordTable() {
+    const { role } = useContext(AuthContext);
     const { vaccineRecord, DeleteContext } = useContext(VaccineRecordDisplayContext);
     const [isVerification, setVerification] = useState(false);
     const [isAssignFormOpen, setAssignFormOpen] = useState(false);
@@ -171,12 +171,12 @@ function VaccineRecordTable() {
             <div className="card-header flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
                 <p className="card-title text-lg font-semibold text-gray-900 dark:text-white">Vaccination Records</p>
 
-                              <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                <div className="flex w-full flex-wrap items-center gap-4 md:w-auto">
                     {/* Search input */}
                     <input
                         type="text"
                         placeholder="Search users..."
-                        className="input input-sm flex-grow rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white min-w-[180px] md:min-w-0"
+                        className="input input-sm min-w-[180px] flex-grow rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:min-w-0"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -184,8 +184,13 @@ function VaccineRecordTable() {
                         }}
                     />
                     {/* Date filter inputs - Now uses flex-wrap to stack on small screens */}
-                    <div className="flex flex-wrap items-center gap-2 flex-grow-0">
-                        <label htmlFor="dateFrom" className="text-sm font-medium text-gray-700 dark:text-gray-300">From:</label>
+                    <div className="flex flex-grow-0 flex-wrap items-center gap-2">
+                        <label
+                            htmlFor="dateFrom"
+                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            From:
+                        </label>
                         <input
                             type="date"
                             id="dateFrom"
@@ -194,10 +199,15 @@ function VaccineRecordTable() {
                                 setDateFrom(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white w-32 md:w-auto"
+                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-auto"
                             title="Filter by 'Created At' date (From)"
                         />
-                        <label htmlFor="dateTo" className="text-sm font-medium text-gray-700 dark:text-gray-300">To:</label>
+                        <label
+                            htmlFor="dateTo"
+                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            To:
+                        </label>
                         <input
                             type="date"
                             id="dateTo"
@@ -206,13 +216,18 @@ function VaccineRecordTable() {
                                 setDateTo(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white w-32 md:w-auto"
+                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-auto"
                             title="Filter by 'Created At' date (To)"
                         />
                     </div>
                     {/* Page size selector */}
-                    <div className="flex items-center gap-2 flex-grow-0">
-                        <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700 dark:text-gray-300">Show:</label>
+                    <div className="flex flex-grow-0 items-center gap-2">
+                        <label
+                            htmlFor="itemsPerPage"
+                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            Show:
+                        </label>
                         <input
                             type="number"
                             id="itemsPerPage"
@@ -221,11 +236,11 @@ function VaccineRecordTable() {
                             onChange={handleItemsPerPageChange}
                             onBlur={handleItemsPerPageChange}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
+                                if (e.key === "Enter") {
                                     handleItemsPerPageChange(e);
                                 }
                             }}
-                            className="input input-xs w-16 text-center rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                            className="input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                             aria-label="Items per page"
                         />
                         <span className="text-sm text-gray-700 dark:text-gray-300">users per page</span>
@@ -270,7 +285,7 @@ function VaccineRecordTable() {
                                             <p className="capitalize text-gray-900 dark:text-white">Dose: {dose.doseNumber || "—"}</p>
                                             <p className="text-gray-900 dark:text-white">Remarks: {dose.remarks || "—"}</p>
                                             <p className="text-gray-900 dark:text-white">Administered By: {dose.administeredBy || "—"}</p>
-  
+
                                             <div className="mt-2 flex gap-2">
                                                 <StatusBadge status={dose.status} />
                                             </div>
@@ -281,12 +296,15 @@ function VaccineRecordTable() {
                                                 >
                                                     <PencilIcon className="h-4 w-4" />
                                                 </button>
-                                                <button
-                                                    onClick={() => handleDeleteAssign(dose._id, user._id)}
-                                                    className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
-                                                >
-                                                    <TrashIcon className="h-4 w-4" />
-                                                </button>
+                                                {role !== "BHW" && (
+                                                    <button
+                                                        onClick={() => handleDeleteAssign(dose._id, user._id)}
+                                                        className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+                                                        title="Delete"
+                                                    >
+                                                        <TrashIcon className="h-4 w-4" />
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -312,7 +330,7 @@ function VaccineRecordTable() {
                                 <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Remarks</th>
                                 <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Administered By</th>
                                 <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Dose Info</th>
-                                                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Actions</th>
+                                <th className="px-2 py-2 text-left text-gray-900 dark:text-white">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -383,13 +401,15 @@ function VaccineRecordTable() {
                                                     >
                                                         <PencilIcon className="h-4 w-4" />
                                                     </button>
-                                                    <button
-                                                        onClick={() => handleDeleteAssign(dose._id, user._id)}
-                                                        className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
-                                                        title="Delete"
-                                                    >
-                                                        <TrashIcon className="h-4 w-4" />
-                                                    </button>
+                                                    {role !== "BHW" && (
+                                                        <button
+                                                            onClick={() => handleDeleteAssign(dose._id, user._id)}
+                                                            className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+                                                            title="Delete"
+                                                        >
+                                                            <TrashIcon className="h-4 w-4" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -403,17 +423,25 @@ function VaccineRecordTable() {
                 {totalPages > 0 && (
                     <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 dark:border-gray-700 sm:flex-row">
                         <button
-                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
+                            className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
+                                currentPage === totalPages
+                                    ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
+                                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                            }`}
                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
                         >
                             Previous
                         </button>
-                        <span>
-                            Page {currentPage} of {totalPages} • {filteredRecord.length} records
+                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                            Page {currentPage} of {totalPages} • {filteredRecord.length} new borns
                         </span>
                         <button
-                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
+                            className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
+                                currentPage === totalPages
+                                    ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
+                                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                            }`}
                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}
                         >

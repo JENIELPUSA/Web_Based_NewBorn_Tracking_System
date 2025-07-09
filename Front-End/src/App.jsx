@@ -19,7 +19,9 @@ import ParentLayoutTable from "./component/ParentsComponent/ParentLayoutTable";
 import Brand from "./component/Brand/LayoutTable"
 import ParentLayoutFinals from "./component/ParentsComponent/ParentLayoutFinals";
 import ParentComponent from "./component/ParentsComponent/ParentComponent";
-import UnderMaintenance from "./component/UnderMaintenance";
+import Profile from "./component/User/Profile"
+import ParentDashboard from "./component/ParentDashboard/ParentDashboard";
+import ParentLayoutDashboard from "./component/ParentDashboard/ParentLayoutDashboar";
 
 function App() {
   const router = createBrowserRouter([
@@ -34,7 +36,7 @@ function App() {
     },
     {
       path: "/parent-dashboard",
-      element: <ParentComponent />,
+      element: <ParentLayoutDashboard />,
     },
     {
       path: "/parent-view",
@@ -87,7 +89,7 @@ function App() {
         },
         {
           path: "/dashboard/update-password",
-          element:<UnderMaintenance/>,
+          element:<Profile/>,
         },{
           path: "/dashboard/PDF-Report",
           element:<PdfReport/>,

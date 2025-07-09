@@ -249,7 +249,7 @@ function UserTable() {
                                             </div>
                                         )}
                                     </td>
-                                        <td className="p-3 align-top">{`${user.FirstName} ${user.LastName}`}</td>
+                                        <td className="p-3 align-top">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
                                     <td className="p-3 align-top">{user.email}</td>
                                     <td className="p-3 align-top capitalize">{user.role}</td>
                                     <td className="max-w-xs truncate p-3 align-top">{user.address || "N/A"}</td>

@@ -99,7 +99,7 @@ exports.createNewRecord = AsyncErrorHandler(async (req, res) => {
     { $unwind: "$vaccine" },
     {
       $lookup: {
-        from: "users",
+        from: "parents",
         localField: "newborn.motherName",
         foreignField: "_id",
         as: "mother",
@@ -232,7 +232,7 @@ exports.DisplayVaccinationRecord = async (req, res) => {
       // Lookup mother
       {
         $lookup: {
-          from: "users",
+          from: "parents",
           localField: "newborn.motherName",
           foreignField: "_id",
           as: "mother",
@@ -275,14 +275,14 @@ exports.DisplayVaccinationRecord = async (req, res) => {
               else: null,
             },
           },
-             "doses.DesignatedZone": {
+          "doses.DesignatedZone": {
             $cond: {
               if: { $ifNull: ["$doseAdmin", false] },
               then: "$doseAdmin.DesignatedZone",
               else: null,
             },
           },
-            "doses.email": {
+          "doses.email": {
             $cond: {
               if: { $ifNull: ["$doseAdmin", false] },
               then: "$doseAdmin.email",
@@ -306,9 +306,17 @@ exports.DisplayVaccinationRecord = async (req, res) => {
           doses: { $push: "$doses" },
           newbornName: {
             $first: {
-              $concat: ["$newborn.firstName", " ", "$newborn.lastName"],
+              $concat: [
+                "$newborn.firstName",
+                " ",
+                "$newborn.middleName",
+                " ",
+                "$newborn.lastName",
+                " ",
+                "$newborn.extensionName",
+              ],
             },
-          }, 
+          },
           dateOfBirth: { $first: "$newborn.dateOfBirth" },
           avatar: { $first: "$newborn.avatar" },
           gender: { $first: "$newborn.gender" },
@@ -332,7 +340,7 @@ exports.DisplayVaccinationRecord = async (req, res) => {
           recordId: "$_id",
           doses: 1, // This will include the dose data with separated full name and ID for administeredBy
           newbornName: 1,
-          gender:1,
+          gender: 1,
           avatar: 1,
           vaccineName: 1,
           dosage: 1,
@@ -340,13 +348,14 @@ exports.DisplayVaccinationRecord = async (req, res) => {
           motherName: 1,
           FullAddress: 1,
           newbornZone: 1,
-           dateOfBirth: {
-      $dateToString: {
-        format: "%Y-%m-%d",
-        date: "$dateOfBirth"
-      }
+          dateOfBirth: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$dateOfBirth",
+            },
+          },
         },
-      }},
+      },
     ]);
 
     res.status(200).json({ status: "success", data: records });
@@ -625,7 +634,7 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
     { $unwind: "$vaccine" },
     {
       $lookup: {
-        from: "users",
+        from: "parents",
         localField: "newborn.motherName",
         foreignField: "_id",
         as: "mother",
@@ -732,3 +741,302 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
     data: result,
   });
 });
+
+exports.DisplayNewbornData = async (req, res) => {
+  try {
+    const { newbornName, motherName, gender, FullAddress, dateOfBirth } =
+      req.query;
+
+    const records = await VaccineRecord.aggregate([
+      {
+        $lookup: {
+          from: "newborns",
+          localField: "newborn",
+          foreignField: "_id",
+          as: "newborn",
+        },
+      },
+      { $unwind: "$newborn" },
+      {
+        $lookup: {
+          from: "vaccines",
+          localField: "vaccine",
+          foreignField: "_id",
+          as: "vaccine",
+        },
+      },
+      { $unwind: "$vaccine" },
+      {
+        $lookup: {
+          from: "parents", // assuming mothers are in "parents" collection
+          localField: "newborn.motherName",
+          foreignField: "_id",
+          as: "mother",
+        },
+      },
+      { $unwind: "$mother" },
+      { $unwind: "$doses" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "doses.administeredBy",
+          foreignField: "_id",
+          as: "doseAdmin",
+        },
+      },
+      {
+        $unwind: { path: "$doseAdmin", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $addFields: {
+          processedDose: {
+            doseNumber: "$doses.doseNumber",
+            dateGiven: "$doses.dateGiven",
+            next_due_date: "$doses.next_due_date",
+            remarks: "$doses.remarks",
+            status: "$doses.status",
+            notified: "$doses.notified",
+            _id: "$doses._id",
+            administeredBy: {
+              $cond: {
+                if: { $ifNull: ["$doseAdmin", false] },
+                then: {
+                  $concat: ["$doseAdmin.FirstName", " ", "$doseAdmin.LastName"],
+                },
+                else: null,
+              },
+            },
+            administeredById: {
+              $cond: {
+                if: { $ifNull: ["$doseAdmin", false] },
+                then: "$doseAdmin._id",
+                else: null,
+              },
+            },
+            email: {
+              $cond: {
+                if: { $ifNull: ["$doseAdmin", false] },
+                then: "$doseAdmin.email",
+                else: null,
+              },
+            },
+            zone: {
+              $cond: {
+                if: { $ifNull: ["$doseAdmin", false] },
+                then: "$doseAdmin.zone",
+                else: null,
+              },
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          doses: { $push: "$processedDose" },
+          patientID: { $first: "$newborn._id" },
+          newbornName: {
+            $first: {
+              $trim: {
+                input: {
+                  $reduce: {
+                    input: [
+                      "$newborn.firstName",
+                      "$newborn.middleName",
+                      "$newborn.lastName",
+                      "$newborn.extensionName",
+                    ],
+                    initialValue: "",
+                    in: {
+                      $cond: [
+                        { $eq: ["$$value", ""] },
+                        "$$this",
+                        {
+                          $cond: [
+                            {
+                              $or: [
+                                { $eq: ["$$this", null] },
+                                { $eq: ["$$this", ""] },
+                              ],
+                            },
+                            "$$value",
+                            { $concat: ["$$value", " ", "$$this"] },
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          dateOfBirth: { $first: "$newborn.dateOfBirth" },
+          avatar: { $first: "$newborn.avatar" },
+          gender: { $first: "$newborn.gender" },
+          vaccineName: { $first: "$vaccine.name" },
+          dosage: { $first: "$vaccine.dosage" },
+          description: { $first: "$vaccine.description" },
+
+          // ✅ Full motherName with Middle and extensionName
+          motherName: {
+            $first: {
+              $trim: {
+                input: {
+                  $reduce: {
+                    input: [
+                      "$mother.FirstName",
+                      {
+                        $cond: {
+                          if: {
+                            $or: [
+                              { $eq: ["$mother.Middle", null] },
+                              { $eq: ["$mother.Middle", ""] },
+                            ],
+                          },
+                          then: "",
+                          else: "$mother.Middle",
+                        },
+                      },
+                      "$mother.LastName",
+                      {
+                        $cond: {
+                          if: {
+                            $or: [
+                              { $eq: ["$mother.extensionName", null] },
+                              { $eq: ["$mother.extensionName", ""] },
+                            ],
+                          },
+                          then: "",
+                          else: "$mother.extensionName",
+                        },
+                      },
+                    ],
+                    initialValue: "",
+                    in: {
+                      $cond: [
+                        { $eq: ["$$value", ""] },
+                        "$$this",
+                        {
+                          $cond: [
+                            { $eq: ["$$this", ""] },
+                            "$$value",
+                            { $concat: ["$$value", " ", "$$this"] },
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+
+          FullAddress: {
+            $first: {
+              $trim: {
+                input: {
+                  $reduce: {
+                    input: {
+                      $filter: {
+                        input: [
+                          {
+                            $cond: [
+                              {
+                                $and: [
+                                  { $ne: ["$mother.zone", null] },
+                                  { $ne: ["$mother.zone", ""] },
+                                ],
+                              },
+                              { $concat: ["ZONE ", "$mother.zone"] },
+                              null,
+                            ],
+                          },
+                          {
+                            $cond: [
+                              {
+                                $and: [
+                                  { $ne: ["$mother.address", null] },
+                                  { $ne: ["$mother.address", ""] },
+                                ],
+                              },
+                              "$mother.address",
+                              null,
+                            ],
+                          },
+                        ],
+                        as: "part",
+                        cond: { $ne: ["$$part", null] },
+                      },
+                    },
+                    initialValue: "",
+                    in: {
+                      $cond: [
+                        { $eq: ["$$value", ""] },
+                        "$$this",
+                        { $concat: ["$$value", ", ", "$$this"] },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+
+          newbornZone: { $first: "$mother.zone" },
+        },
+      },
+      {
+        $addFields: {
+          dateOfBirth: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$dateOfBirth",
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          ...(newbornName
+            ? { newbornName: { $regex: newbornName, $options: "i" } }
+            : {}),
+          ...(motherName
+            ? { motherName: { $regex: motherName, $options: "i" } }
+            : {}),
+          ...(gender ? { gender } : {}),
+          ...(FullAddress
+            ? { FullAddress: { $regex: FullAddress, $options: "i" } }
+            : {}),
+          ...(dateOfBirth ? { dateOfBirth } : {}),
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          recordId: "$_id",
+          patientID: 1,
+          doses: 1,
+          newbornName: 1,
+          gender: 1,
+          avatar: 1,
+          vaccineName: 1,
+          dosage: 1,
+          description: 1,
+          motherName: 1,
+          FullAddress: 1,
+          newbornZone: 1,
+          dateOfBirth: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      patientID: records.length > 0 ? records[0].patientID : null,
+      data: records,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Something went wrong." });
+  }
+};
