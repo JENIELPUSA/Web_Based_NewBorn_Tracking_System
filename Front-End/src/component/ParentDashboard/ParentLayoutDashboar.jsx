@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import ParentDashboard from "./ParentDashboard";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
 import GrowthTracker from "./GrowthTracker";
+import { motion } from "framer-motion";
 
 const Card = ({ title, children }) => {
     return (
@@ -36,7 +37,6 @@ const EmergencyInfo = () => {
                             className="mr-3 h-6 w-6 flex-shrink-0 text-red-500 dark:text-red-400"
                             fill="currentColor"
                             viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
                         >
                             <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.774a11.037 11.037 0 006.103 6.103l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
                         </svg>
@@ -121,7 +121,12 @@ const NotificationsCenter = () => {
 
 const ParentLayoutDashboard = () => {
     return (
-        <div className="font-inter min-h-screen bg-gray-100 p-4 text-gray-900 transition-colors duration-300 sm:p-6 lg:p-8 dark:bg-gray-900 dark:text-gray-100">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="font-inter min-h-screen bg-gray-100 p-4 text-gray-900 transition-colors duration-300 sm:p-6 lg:p-8 dark:bg-gray-900 dark:text-gray-100"
+        >
             <header className="mb-8 flex flex-col items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-lg sm:flex-row dark:border-gray-700 dark:bg-gray-800">
                 <h1 className="mb-4 text-3xl font-bold text-red-600 sm:mb-0 dark:text-red-400">Newborn Tracking Dashboard</h1>
             </header>
@@ -135,7 +140,7 @@ const ParentLayoutDashboard = () => {
                     <EmergencyInfo />
                 </div>
             </main>
-        </div>
+        </motion.div>
     );
 };
 

@@ -292,10 +292,6 @@ function NewBorn() {
                                             <p className="text-xs text-gray-500 dark:text-gray-400">Height</p>
                                             <p className="text-gray-800 dark:text-gray-200">{newBorn.birthHeight}</p>
                                         </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">Created At</p>
-                                            <p className="text-gray-800 dark:text-gray-200">{formatDate(newBorn.createdAt)}</p>
-                                        </div>
                                     </div>
 
                                     <div className="mt-3 flex justify-end gap-2">
@@ -333,11 +329,12 @@ function NewBorn() {
                                     <th className="p-3 text-left">#</th>
                                     <th className="p-3 text-left">Avatar</th>
                                     <th className="p-3 text-left">FullName</th>
+                                    <th className="p-3 text-left">Birth Date</th>
                                     <th className="p-3 text-left">Birth Weight</th>
                                     <th className="p-3 text-left">Birth Height</th>
+                                    <th className="p-3 text-left">Address</th>
                                     <th className="p-3 text-left">MotherName</th>
                                     <th className="p-3 text-left">AssignedBy</th>
-                                    <th className="p-3 text-left">Created At</th>
                                     <th className="p-3 text-left">
                                         <button
                                             onClick={handleAddClick}
@@ -386,11 +383,17 @@ function NewBorn() {
                                                 {newBorn.extensionName ? ` ${newBorn.extensionName}` : ""}
                                             </td>
 
+                                            <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.dateOfBirth}</td>
                                             <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.birthWeight}</td>
                                             <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.birthHeight}</td>
+                                            <td className="p-3 align-top text-gray-800 dark:text-gray-200">
+                                                {newBorn.zone ? `${newBorn.zone}, ` : ""}
+                                                {newBorn.fullAddress}
+                                            </td>
+
                                             <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.motherName}</td>
                                             <td className="p-3 align-top capitalize text-gray-800 dark:text-gray-200">{newBorn.addedByName}</td>
-                                            <td className="p-3 align-top text-gray-800 dark:text-gray-200">{formatDate(newBorn.createdAt)}</td>
+   
                                             <td className="p-3 align-top">
                                                 <div className="flex gap-2">
                                                     <button

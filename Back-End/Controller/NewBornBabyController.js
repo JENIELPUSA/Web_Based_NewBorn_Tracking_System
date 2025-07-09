@@ -180,7 +180,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         birthWeight: 1,
         birthHeight: 1,
         motherName: {
-          $concat: ["$motherName.FirstName", " ", "$motherName.LastName"],
+          $concat: ["$motherName.FirstName", " ", "$motherName.Middle"," ", "$motherName.LastName"," ", "$motherName.extensionName"],
         },
         motherID: "$motherName._id",
         address: {
@@ -206,7 +206,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
           $concat: ["$firstName", " ", "$middleName", " ", "$lastName"], // Concatenate full name
         },
         fullAddress: {
-          $concat: ["$address"], // Concatenate zone and address
+          $concat: ["$motherName.address"],// Concatenate zone and address
         },
       },
     },
@@ -320,7 +320,7 @@ exports.UpdateBabyData = AsyncErrorHandler(async (req, res, next) => {
   const ipAddress = getClientIp(req); // Utility function
   const userId = req.user._id;
 
-  // 🔎 Fetch existing data before update for audit comparison
+  // Fetch existing data before update for audit comparison
   const existingData = await NewBaby.findById(req.params.id);
   if (!existingData) {
     return res.status(404).json({
