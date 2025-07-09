@@ -10,7 +10,7 @@ exports.createCheckup = AsyncErrorHandler(async (req, res) => {
     health_condition,
     notes,
     visitDate,
-    addedBy, // get this from req.body
+    addedBy,
   } = req.body;
 
   const missingFields = [];
@@ -18,7 +18,7 @@ exports.createCheckup = AsyncErrorHandler(async (req, res) => {
   if (!weight) missingFields.push("Weight");
   if (!height) missingFields.push("Height");
   if (!health_condition) missingFields.push("Health Condition");
-  if (!addedBy) missingFields.push("Added By"); // ✅ validation for addedBy
+  if (!addedBy) missingFields.push("Added By");
 
   if (missingFields.length > 0) {
     return res.status(400).json({
@@ -26,6 +26,7 @@ exports.createCheckup = AsyncErrorHandler(async (req, res) => {
     });
   }
 
+  // Create new record
   const newRecord = await CheckupRecord.create({
     newborn,
     weight,
@@ -33,9 +34,16 @@ exports.createCheckup = AsyncErrorHandler(async (req, res) => {
     health_condition,
     notes,
     visitDate: visitDate || new Date(),
-    addedBy, // use value from body
+    addedBy,
   });
 
+  // Find previous record (before current visitDate)
+  const previousRecord = await CheckupRecord.findOne({
+    newborn: newborn,
+    visitDate: { $lt: new Date(visitDate || Date.now()) },
+  }).sort({ visitDate: -1 });
+
+  // Populate with newborn & addedBy
   const populatedData = await CheckupRecord.aggregate([
     { $match: { _id: newRecord._id } },
     {
@@ -74,6 +82,8 @@ exports.createCheckup = AsyncErrorHandler(async (req, res) => {
             { $ifNull: ["$newborn.lastName", ""] },
           ],
         },
+        birthWeight: "$newborn.birthWeight",
+        birthHeight: "$newborn.birthHeight",
         dateOfBirth: "$newborn.dateOfBirth",
         gender: "$newborn.gender",
 
@@ -89,9 +99,24 @@ exports.createCheckup = AsyncErrorHandler(async (req, res) => {
     },
   ]);
 
+  const dataWithDiffs = {
+    ...populatedData[0],
+    currentWeight: newRecord.weight,
+    currentHeight: newRecord.height,
+    previousWeight: previousRecord ? previousRecord.weight : null,
+    previousHeight: previousRecord ? previousRecord.height : null,
+    weightDiff: previousRecord
+      ? newRecord.weight - previousRecord.weight
+      : null,
+    heightDiff: previousRecord
+      ? newRecord.height - previousRecord.height
+      : null,
+    isFromNewbornOnly: false, // optional, for frontend display logic
+  };
+
   res.status(201).json({
     status: "success",
-    data: populatedData[0],
+    data: dataWithDiffs,
   });
 });
 
@@ -187,7 +212,6 @@ exports.updateCheckup = AsyncErrorHandler(async (req, res) => {
     data: populatedData[0],
   });
 });
-
 
 exports.displayLatestCheckup = AsyncErrorHandler(async (req, res) => {
   const { newbornId } = req.params;
@@ -406,7 +430,6 @@ exports.displayAllCheckups = AsyncErrorHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteCheckup = AsyncErrorHandler(async (req, res, next) => {
   await CheckupRecord.findByIdAndDelete(req.params.id);
 
@@ -415,6 +438,3 @@ exports.deleteCheckup = AsyncErrorHandler(async (req, res, next) => {
     data: null,
   });
 });
-
-
-
