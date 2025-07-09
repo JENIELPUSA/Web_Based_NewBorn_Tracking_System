@@ -329,6 +329,7 @@ function NewBorn() {
                                     <th className="p-3 text-left">#</th>
                                     <th className="p-3 text-left">Avatar</th>
                                     <th className="p-3 text-left">FullName</th>
+                                    <th className="p-3 text-left">Gender</th>
                                     <th className="p-3 text-left">Birth Date</th>
                                     <th className="p-3 text-left">Birth Weight</th>
                                     <th className="p-3 text-left">Birth Height</th>
@@ -382,7 +383,7 @@ function NewBorn() {
                                                 {newBorn.fullName}
                                                 {newBorn.extensionName ? ` ${newBorn.extensionName}` : ""}
                                             </td>
-
+                                            <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.gender}</td>
                                             <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.dateOfBirth}</td>
                                             <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.birthWeight}</td>
                                             <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.birthHeight}</td>
@@ -393,7 +394,7 @@ function NewBorn() {
 
                                             <td className="p-3 align-top text-gray-800 dark:text-gray-200">{newBorn.motherName}</td>
                                             <td className="p-3 align-top capitalize text-gray-800 dark:text-gray-200">{newBorn.addedByName}</td>
-   
+
                                             <td className="p-3 align-top">
                                                 <div className="flex gap-2">
                                                     <button

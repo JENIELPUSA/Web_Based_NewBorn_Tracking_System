@@ -101,9 +101,7 @@ const NotificationsCenter = () => {
                             <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">{notif.date}</p>
                             <p
                                 className={`font-semibold ${
-                                    notif.priority === "critical"
-                                        ? "text-red-700 dark:text-red-300"
-                                        : "text-yellow-800 dark:text-yellow-300"
+                                    notif.priority === "critical" ? "text-red-700 dark:text-red-300" : "text-yellow-800 dark:text-yellow-300"
                                 }`}
                             >
                                 {notif.type}
@@ -125,17 +123,20 @@ const ParentLayoutDashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="font-inter min-h-screen bg-gray-100 p-4 text-gray-900 transition-colors duration-300 sm:p-6 lg:p-8 dark:bg-gray-900 dark:text-gray-100"
+            className="font-inter min-h-screen bg-gray-100 p-4 text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100 sm:p-6 lg:p-8"
         >
-            <header className="mb-8 flex flex-col items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-lg sm:flex-row dark:border-gray-700 dark:bg-gray-800">
-                <h1 className="mb-4 text-3xl font-bold text-red-600 sm:mb-0 dark:text-red-400">Newborn Tracking Dashboard</h1>
+            <header className="mb-8 flex flex-col items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 sm:flex-row">
+                <h1 className="mb-4 text-3xl font-bold text-red-600 dark:text-red-400 sm:mb-0">Newborn Tracking Dashboard</h1>
             </header>
-            <main className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div className="space-y-6 lg:col-span-2">
+            <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {/* Left & Center Section: GrowthTracker and ParentDashboard */}
+                <div className="space-y-6 md:col-span-2 lg:col-span-2">
                     <GrowthTracker />
                     <ParentDashboard />
                 </div>
-                <div className="space-y-6 lg:col-span-1">
+
+                {/* Right Section: NotificationsCenter and EmergencyInfo */}
+                <div className="space-y-6 md:col-span-2 lg:col-span-1">
                     <NotificationsCenter />
                     <EmergencyInfo />
                 </div>

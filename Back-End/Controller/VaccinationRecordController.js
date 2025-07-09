@@ -634,7 +634,7 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
     { $unwind: "$vaccine" },
     {
       $lookup: {
-        from: "parents",
+        from: "users",
         localField: "newborn.motherName",
         foreignField: "_id",
         as: "mother",
@@ -744,10 +744,24 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
 
 exports.DisplayNewbornData = async (req, res) => {
   try {
-    const { newbornName, motherName, gender, FullAddress, dateOfBirth } =
-      req.query;
+    let { newbornName, motherName, gender, FullAddress, dateOfBirth } = req.query;
 
-    const records = await VaccineRecord.aggregate([
+    const normalizeRegex = (value) =>
+      value?.replace(/\s+/g, "\\s+").trim(); 
+
+    const initialMatchStage = {};
+    if (gender) {
+      initialMatchStage.gender = gender;
+    }
+    let dateOfBirthQuery = null;
+    if (dateOfBirth) {
+      dateOfBirthQuery = new Date(dateOfBirth);
+      if (isNaN(dateOfBirthQuery.getTime())) {
+        return res.status(400).json({ status: "error", message: "Invalid dateOfBirth format." });
+      }
+    }
+
+    const pipeline = [
       {
         $lookup: {
           from: "newborns",
@@ -757,6 +771,13 @@ exports.DisplayNewbornData = async (req, res) => {
         },
       },
       { $unwind: "$newborn" },
+      // First $match stage for fields directly available after unwinding newborn
+      {
+        $match: {
+          ...(gender ? { "newborn.gender": gender } : {}),
+          ...(dateOfBirthQuery ? { "newborn.dateOfBirth": dateOfBirthQuery } : {}),
+        },
+      },
       {
         $lookup: {
           from: "vaccines",
@@ -768,14 +789,14 @@ exports.DisplayNewbornData = async (req, res) => {
       { $unwind: "$vaccine" },
       {
         $lookup: {
-          from: "parents", // assuming mothers are in "parents" collection
-          localField: "newborn.motherName",
+          from: "parents",
+          localField: "newborn.motherName", // Assuming newborn.motherName stores parent _id
           foreignField: "_id",
           as: "mother",
         },
       },
       { $unwind: "$mother" },
-      { $unwind: "$doses" },
+      { $unwind: { path: "$doses", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "users",
@@ -835,179 +856,126 @@ exports.DisplayNewbornData = async (req, res) => {
           _id: "$_id",
           doses: { $push: "$processedDose" },
           patientID: { $first: "$newborn._id" },
-          newbornName: {
-            $first: {
-              $trim: {
-                input: {
-                  $reduce: {
-                    input: [
-                      "$newborn.firstName",
-                      "$newborn.middleName",
-                      "$newborn.lastName",
-                      "$newborn.extensionName",
-                    ],
-                    initialValue: "",
-                    in: {
-                      $cond: [
-                        { $eq: ["$$value", ""] },
-                        "$$this",
-                        {
-                          $cond: [
-                            {
-                              $or: [
-                                { $eq: ["$$this", null] },
-                                { $eq: ["$$this", ""] },
-                              ],
-                            },
-                            "$$value",
-                            { $concat: ["$$value", " ", "$$this"] },
-                          ],
-                        },
-                      ],
-                    },
-                  },
-                },
-              },
-            },
-          },
-          dateOfBirth: { $first: "$newborn.dateOfBirth" },
+          newbornFirstName: { $first: "$newborn.firstName" }, // Keep individual name parts for full name construction
+          newbornMiddleName: { $first: "$newborn.middleName" },
+          newbornLastName: { $first: "$newborn.lastName" },
+          newbornExtensionName: { $first: "$newborn.extensionName" },
+          rawDateOfBirth: { $first: "$newborn.dateOfBirth" }, // Keep original date format for consistency
           avatar: { $first: "$newborn.avatar" },
           gender: { $first: "$newborn.gender" },
           vaccineName: { $first: "$vaccine.name" },
           dosage: { $first: "$vaccine.dosage" },
           description: { $first: "$vaccine.description" },
-
-          // ✅ Full motherName with Middle and extensionName
-          motherName: {
-            $first: {
-              $trim: {
-                input: {
-                  $reduce: {
-                    input: [
-                      "$mother.FirstName",
-                      {
-                        $cond: {
-                          if: {
-                            $or: [
-                              { $eq: ["$mother.Middle", null] },
-                              { $eq: ["$mother.Middle", ""] },
-                            ],
-                          },
-                          then: "",
-                          else: "$mother.Middle",
-                        },
-                      },
-                      "$mother.LastName",
-                      {
-                        $cond: {
-                          if: {
-                            $or: [
-                              { $eq: ["$mother.extensionName", null] },
-                              { $eq: ["$mother.extensionName", ""] },
-                            ],
-                          },
-                          then: "",
-                          else: "$mother.extensionName",
-                        },
-                      },
-                    ],
-                    initialValue: "",
-                    in: {
-                      $cond: [
-                        { $eq: ["$$value", ""] },
-                        "$$this",
-                        {
-                          $cond: [
-                            { $eq: ["$$this", ""] },
-                            "$$value",
-                            { $concat: ["$$value", " ", "$$this"] },
-                          ],
-                        },
-                      ],
-                    },
-                  },
-                },
-              },
-            },
-          },
-
-          FullAddress: {
-            $first: {
-              $trim: {
-                input: {
-                  $reduce: {
-                    input: {
-                      $filter: {
-                        input: [
-                          {
-                            $cond: [
-                              {
-                                $and: [
-                                  { $ne: ["$mother.zone", null] },
-                                  { $ne: ["$mother.zone", ""] },
-                                ],
-                              },
-                              { $concat: ["ZONE ", "$mother.zone"] },
-                              null,
-                            ],
-                          },
-                          {
-                            $cond: [
-                              {
-                                $and: [
-                                  { $ne: ["$mother.address", null] },
-                                  { $ne: ["$mother.address", ""] },
-                                ],
-                              },
-                              "$mother.address",
-                              null,
-                            ],
-                          },
-                        ],
-                        as: "part",
-                        cond: { $ne: ["$$part", null] },
-                      },
-                    },
-                    initialValue: "",
-                    in: {
-                      $cond: [
-                        { $eq: ["$$value", ""] },
-                        "$$this",
-                        { $concat: ["$$value", ", ", "$$this"] },
-                      ],
-                    },
-                  },
-                },
-              },
-            },
-          },
-
-          newbornZone: { $first: "$mother.zone" },
+          motherFirstName: { $first: "$mother.FirstName" }, // Keep individual name parts
+          motherMiddleName: { $first: "$mother.Middle" },
+          motherLastName: { $first: "$mother.LastName" },
+          motherExtensionName: { $first: "$mother.extensionName" },
+          motherZone: { $first: "$mother.zone" },
+          motherAddress: { $first: "$mother.address" },
         },
       },
+      // Project the full names and address AFTER grouping to apply match on them
       {
         $addFields: {
+          newbornName: {
+            $trim: {
+              input: {
+                $reduce: {
+                  input: [
+                    "$newbornFirstName",
+                    "$newbornMiddleName",
+                    "$newbornLastName",
+                    "$newbornExtensionName",
+                  ],
+                  initialValue: "",
+                  in: {
+                    $cond: [
+                      { $eq: ["$$value", ""] },
+                      "$$this",
+                      {
+                        $cond: [
+                          {
+                            $or: [
+                              { $eq: ["$$this", null] },
+                              { $eq: ["$$this", ""] },
+                            ],
+                          },
+                          "$$value",
+                          { $concat: ["$$value", " ", "$$this"] },
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+          motherName: {
+            $trim: {
+              input: {
+                $reduce: {
+                  input: [
+                    "$motherFirstName",
+                    "$motherMiddleName",
+                    "$motherLastName",
+                    "$motherExtensionName",
+                  ],
+                  initialValue: "",
+                  in: {
+                    $cond: [
+                      { $eq: ["$$value", ""] },
+                      "$$this",
+                      {
+                        $cond: [
+                          {
+                            $or: [
+                              { $eq: ["$$this", null] },
+                              { $eq: ["$$this", ""] },
+                            ],
+                          },
+                          "$$value",
+                          { $concat: ["$$value", " ", "$$this"] },
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+          FullAddress: {
+            $cond: [
+              {
+                $and: [
+                  { $ne: ["$motherZone", null] },
+                  { $ne: ["$motherZone", ""] },
+                  { $ne: ["$motherAddress", null] },
+                  { $ne: ["$motherAddress", ""] },
+                ],
+              },
+              {
+                $concat: ["$motherZone", ", ", "$motherAddress"],
+              },
+              "$motherAddress", // If zone is null/empty, just use address
+            ],
+          },
+          // Convert dateOfBirth to string for final output if needed, but not for matching if you intend to match dates
           dateOfBirth: {
             $dateToString: {
               format: "%Y-%m-%d",
-              date: "$dateOfBirth",
+              date: "$rawDateOfBirth",
             },
           },
         },
       },
+      // Second $match stage for the newly computed fields
       {
         $match: {
-          ...(newbornName
-            ? { newbornName: { $regex: newbornName, $options: "i" } }
-            : {}),
-          ...(motherName
-            ? { motherName: { $regex: motherName, $options: "i" } }
-            : {}),
-          ...(gender ? { gender } : {}),
-          ...(FullAddress
-            ? { FullAddress: { $regex: FullAddress, $options: "i" } }
-            : {}),
-          ...(dateOfBirth ? { dateOfBirth } : {}),
+          ...(newbornName ? { newbornName: { $regex: normalizeRegex(newbornName), $options: "i" } } : {}),
+          ...(motherName ? { motherName: { $regex: normalizeRegex(motherName), $options: "i" } } : {}),
+          ...(FullAddress ? { FullAddress: { $regex: normalizeRegex(FullAddress), $options: "i" } } : {}),
+          // dateOfBirth is now a string, so match it as a string
+          ...(dateOfBirth ? { dateOfBirth: dateOfBirth } : {}), // dateOfBirth from req.query is already a string
         },
       },
       {
@@ -1024,11 +992,13 @@ exports.DisplayNewbornData = async (req, res) => {
           description: 1,
           motherName: 1,
           FullAddress: 1,
-          newbornZone: 1,
+          newbornZone: "$motherZone", // Renaming for clarity if needed
           dateOfBirth: 1,
         },
       },
-    ]);
+    ];
+
+    const records = await VaccineRecord.aggregate(pipeline);
 
     res.status(200).json({
       status: "success",
@@ -1036,7 +1006,8 @@ exports.DisplayNewbornData = async (req, res) => {
       data: records,
     });
   } catch (err) {
-    console.error(err);
+    console.error("DisplayNewbornData Error:", err);
     res.status(500).json({ status: "error", message: "Something went wrong." });
   }
 };
+

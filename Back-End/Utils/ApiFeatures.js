@@ -1,4 +1,3 @@
-// ApiFeatures.js
 const mongoose = require('mongoose'); 
 class Apifeatures {
   constructor(query, queryString) {
