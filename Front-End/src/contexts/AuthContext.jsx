@@ -47,9 +47,13 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("userId", userId); // Save ID
         localStorage.setItem("fullName", fullName);
         localStorage.setItem("Designatedzone", Designatedzone);
+        localStorage.setItem("authToken", token);
+        
+
 
         // Set the token in global axios headers
         axios.defaults.headers["Authorization"] = `Bearer ${token}`;
+
 
         // Update the context
         setFullName(fullName)
@@ -84,7 +88,7 @@ const logout = () => {
   localStorage.removeItem("maintenanceRequests");
   localStorage.removeItem("maintenanceData");
   localStorage.removeItem("maintenanceLabels");
-
+   localStorage.removeItem("authToken");
   setAuthToken(null);
   setRole(null);
   setUserID(null);

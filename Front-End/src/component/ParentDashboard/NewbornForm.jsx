@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-const NewbornForm = ({ onSave, onAddNewborn, theme }) => {
-    // Accept theme prop
+const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
     const [newbornName, setName] = useState("");
     const [dateOfBirth, setBirthDate] = useState("");
     const [gender, setGender] = useState("");
@@ -42,8 +41,9 @@ const NewbornForm = ({ onSave, onAddNewborn, theme }) => {
     };
 
     return (
-        <div className={`mb-8 rounded-lg p-6 shadow-inner transition-colors duration-300 ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"} `}>
-            <h3 className={`mb-4 text-2xl font-bold ${theme === "dark" ? "text-gray-100" : "text-gray-700"}`}>Add Newborn</h3>
+        // Apply dark mode classes directly
+        <div className="mb-8 rounded-lg p-6 shadow-inner transition-colors duration-300 bg-gray-50 dark:bg-gray-700">
+            <h3 className="mb-4 text-2xl font-bold text-gray-700 dark:text-gray-100">Add Newborn</h3>
             <form
                 onSubmit={handleSubmit}
                 className="grid grid-cols-1 gap-4 md:grid-cols-2"
@@ -51,7 +51,7 @@ const NewbornForm = ({ onSave, onAddNewborn, theme }) => {
                 <div>
                     <label
                         htmlFor="name"
-                        className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Name
                     </label>
@@ -61,14 +61,14 @@ const NewbornForm = ({ onSave, onAddNewborn, theme }) => {
                         value={newbornName}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Clint ALDOUS Amistoso Jr"
-                        className={`mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 ${theme === "dark" ? "border-gray-600 bg-gray-800 text-gray-100" : "border-gray-300 bg-white text-gray-800"} `}
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                         required
                     />
                 </div>
                 <div>
                     <label
                         htmlFor="birthDate"
-                        className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Date of Birth
                     </label>
@@ -77,14 +77,14 @@ const NewbornForm = ({ onSave, onAddNewborn, theme }) => {
                         id="birthDate"
                         value={dateOfBirth}
                         onChange={(e) => setBirthDate(e.target.value)}
-                        className={`mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 ${theme === "dark" ? "border-gray-600 bg-gray-800 text-gray-100" : "border-gray-300 bg-white text-gray-800"} `}
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                         required
                     />
                 </div>
                 <div>
                     <label
                         htmlFor="parentName"
-                        className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Mother's Name
                     </label>
@@ -94,14 +94,14 @@ const NewbornForm = ({ onSave, onAddNewborn, theme }) => {
                         value={motherName}
                         onChange={(e) => setParentName(e.target.value)}
                         placeholder="e.g. Maria Santos"
-                        className={`mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 ${theme === "dark" ? "border-gray-600 bg-gray-800 text-gray-100" : "border-gray-300 bg-white text-gray-800"} `}
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                         required
                     />
                 </div>
                 <div>
                     <label
                         htmlFor="address"
-                        className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Full Address
                     </label>
@@ -111,14 +111,14 @@ const NewbornForm = ({ onSave, onAddNewborn, theme }) => {
                         value={FullAddress}
                         onChange={(e) => setAddress(e.target.value)}
                         placeholder="e.g. ZONE 9 123 Mabini St Manila or 123 Mabini St Manila "
-                        className={`mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 ${theme === "dark" ? "border-gray-600 bg-gray-800 text-gray-100" : "border-gray-300 bg-white text-gray-800"} `}
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                         required
                     />
                 </div>
                 <div className="col-span-1 md:col-span-2">
                     <label
                         htmlFor="gender"
-                        className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Gender
                     </label>
@@ -126,7 +126,7 @@ const NewbornForm = ({ onSave, onAddNewborn, theme }) => {
                         id="gender"
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
-                        className={`mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 ${theme === "dark" ? "border-gray-600 bg-gray-800 text-gray-100" : "border-gray-300 bg-white text-gray-800"} `}
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                         required
                     >
                         <option value="">Select Gender</option>

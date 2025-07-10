@@ -68,8 +68,6 @@ export const NotificationDisplayProvider = ({ children }) => {
             viewer.user?.toString?.() === userId?.toString()
         )
       );
-
-      console.log("🔔 Filtered Notifications:", filtered);
       setNotification(filtered);
     } catch (error) {
       console.error("❌ Error fetching notifications:", error);

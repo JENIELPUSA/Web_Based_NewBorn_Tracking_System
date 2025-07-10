@@ -12,6 +12,7 @@ function ParentDashboard() {
   const [messageType, setMessageType] = useState('success');
   const [isDropZoneHovered, setIsDropZoneHovered] = useState(false);
 
+  // Theme state and logic remains the same as it controls the 'dark' class on <html>
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme ? savedTheme : 'light';
@@ -127,15 +128,13 @@ function ParentDashboard() {
   }, [newborns, selectedNewborn]);
 
   return (
-    <div className={`font-inter flex flex-col items-center transition-colors duration-300`}>
+    <div className="font-inter flex flex-col items-center transition-colors duration-300">
       <MessageBox message={message} type={messageType} onClose={closeMessage} />
       <main
-        className={`w-full shadow-md rounded-xl p-6 transition-colors duration-300 ${
-          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-        }`}
+        className="w-full shadow-md rounded-xl p-6 transition-colors duration-300 bg-white dark:bg-gray-800"
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className={`text-3xl font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+          <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-200">
             Our Newborns
           </h2>
           <button
@@ -149,10 +148,10 @@ function ParentDashboard() {
           </button>
         </div>
 
-        {showForm && <NewbornForm onSave={() => setShowForm(false)} onAddNewborn={addNewborn} theme={theme} />}
+        {showForm && <NewbornForm onSave={() => setShowForm(false)} onAddNewborn={addNewborn} />} {/* Remove theme prop */}
 
         {!showForm && newborns.length === 0 && (
-          <div className={`text-center text-xl py-10 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className="text-center text-xl py-10 text-gray-500 dark:text-gray-400">
             No newborns registered yet. Add one!
           </div>
         )}
@@ -166,16 +165,14 @@ function ParentDashboard() {
                 onDrop={handleDropNewborn}
                 className={`max-w-2xl mx-auto p-6 mb-8 border-4 border-dashed rounded-xl text-center transition-all ${
                   isDropZoneHovered
-                    ? 'border-blue-500 bg-blue-50'
-                    : theme === 'dark'
-                    ? 'border-gray-600 bg-gray-700'
-                    : 'border-gray-300 bg-gray-50'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/50' // Added dark mode for hovered state
+                    : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700'
                 }`}
               >
-                <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+                <p className="text-xl font-bold mb-2 text-gray-700 dark:text-gray-200">
                   Drag Newborn Card Here
                 </p>
-                <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p className="text-gray-600 dark:text-gray-300">
                   To view full details and vaccination schedule
                 </p>
               </div>
@@ -201,7 +198,6 @@ function ParentDashboard() {
             onAddVaccine={addVaccine}
             onUpdateVaccineStatus={updateVaccineStatus}
             onDeleteVaccine={deleteVaccine}
-            theme={theme}
           />
         )}
       </main>
