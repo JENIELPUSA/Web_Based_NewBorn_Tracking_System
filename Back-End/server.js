@@ -35,72 +35,93 @@ const io = socketIo(server, {
 
 app.set("io", io);
 
-let messageCount = 0;
+global.connectedUsers = {}; // userId: { socketId, role }
 
 io.on("connection", (socket) => {
-  console.log(` User connected: ${socket.id}`);
+  console.log(`✅ User connected: ${socket.id}`);
 
+  // Register user with role
   socket.on("register-user", ({ userId, role }) => {
-    console.log(`Registered user: ${userId} with role: ${role}`);
+    if (userId && role) {
+      global.connectedUsers[userId] = { socketId: socket.id, role };
+      console.log(`👤 Registered user: ${userId} (${role})`);
+    }
   });
 
+  // Mark all notifications as read
   socket.on("markAllNotificationsRead", async ({ userId }) => {
     try {
       await Notification.updateMany(
-        { recipient: userId, status: "pending" },
-        { $set: { status: "read" } }
+        { "viewers.user": userId },
+        { $set: { "viewers.$.isRead": true } }
       );
-      io.emit("notificationCountReset", { userId, count: 0 });
+      io.to(socket.id).emit("notificationCountReset", { userId, count: 0 });
     } catch (error) {
       console.error("Error updating notifications:", error.message);
     }
   });
 
-  socket.on("unvaccinated-alert", (data) => {
-    console.log("Unvaccinated alert received:", data);
-    io.emit("unvaccinated-alert", data);
-  });
-
-  socket.on("send-vaccine-notification", ({types_of_message, message }) => {
-    console.log(`Vaccine notification: ${message}`);
-
+  // Broadcast only to admins, BHWs, or mother
+  socket.on("send-vaccine-notification", ({ types_of_message, message }) => {
     const payload = {
       types_of_message,
       message,
       timestamp: new Date(),
     };
 
-    io.emit("vaccineNotification", payload);
-  });
-
-  socket.on("markAsRead", async ({ notificationId, userId }) => {
-  try {
-    const notif = await Notification.findById(notificationId);
-    if (!notif.readBy.includes(userId)) {
-      notif.readBy.push(userId);
+    for (const userId in global.connectedUsers) {
+      const { socketId, role } = global.connectedUsers[userId];
+      if (["Admin", "BHW", "Mother"].includes(role)) {
+        io.to(socketId).emit("vaccineNotification", payload);
+        console.log(`Sent to ${role}: ${userId}`);
+      }
     }
+  });
 
-    notif.status = "read"; 
-    await notif.save();
-  } catch (err) {
-    console.error("Error marking notification as read", err);
-  }
-});
+  // Unvaccinated alert broadcast
+  socket.on("unvaccinated-alert", (data) => {
+    console.log("Unvaccinated alert received:", data);
+    io.emit("unvaccinated-alert", data);
+  });
 
+  // Mark individual notification as read
+  socket.on("markAsRead", async ({ notificationId, userId }) => {
+    try {
+      const notif = await Notification.findById(notificationId);
+      if (notif) {
+        const viewer = notif.viewers.find((v) => v.user.toString() === userId);
+        if (viewer && !viewer.isRead) {
+          viewer.isRead = true;
+          await notif.save();
+        }
+      }
+    } catch (err) {
+      console.error("Error marking notification as read", err);
+    }
+  });
 
+  // Refresh UI
   socket.on("RefreshData", () => {
-    console.log("RefreshData triggered");
-    io.emit("refreshRequests"); 
+    io.emit("refreshRequests");
   });
 
+  // Clear notification count
   socket.on("clearNotifications", () => {
-    console.log("Notifications cleared");
-    io.emit("notificationCountReset", { count: 0 }); 
+    io.emit("notificationCountReset", { count: 0 });
   });
+
+  // Handle disconnect
   socket.on("disconnect", () => {
-    console.log(`User disconnected: ${socket.id}`);
+    for (const userId in global.connectedUsers) {
+      if (global.connectedUsers[userId].socketId === socket.id) {
+        delete global.connectedUsers[userId];
+        break;
+      }
+    }
   });
 });
+
+
 
 mongoose
   .connect(process.env.CONN_STR, {

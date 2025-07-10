@@ -5,16 +5,17 @@ const Notification = require("../Models/NotificationSchema");
 const User = require("../Models/usermodel");
 const sendEmail = require("../Utils/email");
 
-const checkAllVaccinesAreUnvaccinated = async (newbornId, io) => {
+const checkAllVaccinesAreUnvaccinated = async (newbornId, socket) => {
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleString();
 
   try {
-    // 1. Kunin lahat ng assigned vaccines para sa newborn na ito (na hindi pa notified)
     const assignedVaccines = await AssignedVaccine.find({
       newborn: newbornId,
       notified: false,
-    }).populate("vaccine");
+    })
+      .populate("vaccine")
+      .populate("newborn");
 
     if (assignedVaccines.length === 0) return;
 
@@ -32,67 +33,80 @@ const checkAllVaccinesAreUnvaccinated = async (newbornId, io) => {
       }
     }
 
-    // 4. Kung hindi lahat ay may zero dose, huwag mag-notify
     if (!allVaccinesHaveZeroDoses) return;
 
-    // 5. Kung umabot dito, ibig sabihin lahat ay walang dose
     const newborn = await Newborn.findById(newbornId).populate("motherName");
-
     if (!newborn) return;
 
     const fullName = `${newborn.firstName} ${newborn.lastName}`;
-    const notificationMessage = `Alert: The child ${fullName} has not received any vaccinations.`;
+    const notificationMessage = `⚠️ Alert: The child ${fullName} has not received any vaccinations.`;
+    const motherEmail = newborn?.motherName?.email || "";
+    const motherZone = newborn?.motherName?.zone || "";
 
-    // 6. I-check kung may existing notification
+    // Check if notification already exists
     const existingNotification = await Notification.findOne({
       newborn: newbornId,
       type: "unvaccinated_alert",
     });
-
     if (existingNotification) return;
 
-    // 7. Hanapin users sa parehong zone ng nanay
-    const motherEmail = newborn?.motherName?.email || "";
-    const motherZone = newborn?.motherName?.zone || "";
+    // Find Admins and BHWs
+    const adminUsers = await User.find({ role: "Admin" }, "_id email");
+    const bhwUsers = await User.find(
+      { role: "BHW", Designatedzone: motherZone },
+      "_id email"
+    );
 
-    const usersInSameZone = await User.find({ Designatedzone: motherZone });
-    const userEmails = usersInSameZone.map((u) => u.email);
+    const allRecipients = [...adminUsers, ...bhwUsers];
+    const viewerIds = allRecipients.map((user) => user._id);
+    const userEmails = allRecipients.map((user) => user.email);
     if (motherEmail) userEmails.push(motherEmail);
 
+    // Save notification
     await Notification.create({
       message: notificationMessage,
       newborn: newbornId,
       types_of_message: "Unvaccinated Alert",
       type: "unvaccinated_alert",
+      viewers: viewerIds.map((id) => ({
+        user: id,
+        isRead: false,
+        viewedAt: null,
+      })),
     });
 
+    // Mark as notified
     await AssignedVaccine.updateMany(
       { newborn: newbornId, notified: false },
       { $set: { notified: true } }
     );
 
+    // Send email
     try {
       await sendEmail({
         email: userEmails,
         subject: "Unvaccinated Child Alert",
         text: notificationMessage,
       });
-      console.log("Email sent to:", userEmails.join(", "));
+      console.log("📧 Email sent to:", userEmails.join(", "));
     } catch (emailError) {
-      console.error("Email sending failed:", emailError);
+      console.error("❌ Email sending failed:", emailError);
     }
 
-    // 11. Magpadala ng socket notification
-    io.emit("unvaccinated-alert", {
-      message: notificationMessage,
-      status: "pending",
-      newbornId: newborn._id,
-      createdAt: formattedDate,
-    });
+    // ✅ Client-side emit
+    if (socket && socket.connected) {
+      socket.emit("unvaccinated-alert", {
+        message: notificationMessage,
+        status: "pending",
+        newbornId: newborn._id,
+        createdAt: formattedDate,
+      });
+      console.log("📨 Alert emitted via socket client");
+    }
 
-    console.log("Alert sent for completely unvaccinated child:", fullName);
+    console.log("✅ Alert sent for completely unvaccinated child:", fullName);
   } catch (error) {
-    console.error("Error in checkAllVaccinesAreUnvaccinated:", error);
+    console.error("❌ Error in checkAllVaccinesAreUnvaccinated:", error);
   }
 };
 

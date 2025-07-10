@@ -24,6 +24,7 @@ const checkAllVaccinesCompleted = async (newbornId, io) => {
 
     let allCompleted = true;
     let alreadyMarkedComplete = true;
+    let hasOverdose = false;
     const completedVaccineNames = [];
 
     for (const assigned of assignedVaccines) {
@@ -34,6 +35,13 @@ const checkAllVaccinesCompleted = async (newbornId, io) => {
 
       const dosesGiven = record?.doses?.length || 0;
 
+      // ✅ Check for overdose
+      if (dosesGiven > assigned.totalDoses) {
+        hasOverdose = true;
+        console.log(`❌ Overdose detected for ${assigned.vaccine.name} - ${dosesGiven} > ${assigned.totalDoses}`);
+        break;
+      }
+
       if (dosesGiven < assigned.totalDoses) {
         allCompleted = false;
         break;
@@ -41,6 +49,11 @@ const checkAllVaccinesCompleted = async (newbornId, io) => {
         completedVaccineNames.push(assigned.vaccine.name);
         if (!assigned.sentComplete) alreadyMarkedComplete = false;
       }
+    }
+
+    if (hasOverdose) {
+      console.log(`🚫 Completion notification blocked for newborn ${newbornId} due to overdose.`);
+      return;
     }
 
     if (allCompleted && !alreadyMarkedComplete) {
@@ -52,19 +65,18 @@ const checkAllVaccinesCompleted = async (newbornId, io) => {
 
       const fullName = `${newborn.firstName} ${newborn.lastName}`;
       const vaccineList = completedVaccineNames.join(", ");
-      const notificationMessage = `All vaccines are complete for ${fullName}. The completed vaccines are: ${vaccineList}.`;
+      const notificationMessage = `✅ All vaccines are complete for ${fullName}. Completed vaccines: ${vaccineList}.`;
       const motherEmail = newborn?.motherName?.email;
       const motherZone = newborn?.motherName?.zone;
 
-      console.log("Mother's Email:", motherEmail);
-      console.log("Mother's Zone:", motherZone);
+      const adminUsers = await User.find({ role: "Admin" }, "_id email");
+      const bhwUsers = await User.find({ role: "BHW", Designatedzone: motherZone }, "_id email");
 
-      const bhwUsers = await User.find({ Designatedzone: motherZone });
-      const adminUsers = await User.find({ role: "Admin" });
-
-      const allRecipients = [...bhwUsers, ...adminUsers];
+      const allRecipients = [...adminUsers, ...bhwUsers];
+      const viewerIds = allRecipients.map((user) => user._id);
       const emails = allRecipients.map((user) => user.email);
-      if (motherEmail) emails.push(motherEmail); // Add mother's email
+
+      if (motherEmail) emails.push(motherEmail);
 
       const existingNotification = await Notification.findOne({
         newborn: newbornId,
@@ -72,12 +84,18 @@ const checkAllVaccinesCompleted = async (newbornId, io) => {
       });
 
       if (!existingNotification) {
-        await Notification.create({
-          message: notificationMessage,
+        const saved = await Notification.create({
           newborn: newbornId,
-          types_of_message: "Check Completed",
           type: "vaccine_completion",
+          message: notificationMessage,
+          viewers: viewerIds.map((id) => ({
+            user: id,
+            isRead: false,
+            viewedAt: null,
+          })),
         });
+
+        console.log("📥 Notification saved to DB:", saved._id);
 
         try {
           await sendEmail({
@@ -96,18 +114,24 @@ const checkAllVaccinesCompleted = async (newbornId, io) => {
         { $set: { sentComplete: true } }
       );
 
-      io.emit("all-vaccines-completed", {
-        message: notificationMessage,
-        status: "pending",
-        newbornId: newborn._id,
-        createdAt: formattedDate,
-      });
-
-      console.log(" All vaccines completed for newborn:", fullName);
+      // 🔔 Emit via socket if connected
+      if (io && global.connectedUsers) {
+        viewerIds.forEach((userId) => {
+          const user = global.connectedUsers[userId.toString()];
+          if (user && user.socketId) {
+            io.to(user.socketId).emit("all-vaccines-completed", {
+              message: notificationMessage,
+              status: "pending",
+              newbornId: newborn._id,
+              createdAt: formattedDate,
+            });
+            console.log(`📨 Sent socket notification to user ${userId}`);
+          }
+        });
+      }
     }
-
   } catch (error) {
-    console.error("Error in checkAllVaccinesCompleted:", error);
+    console.error("❌ Error in checkAllVaccinesCompleted:", error);
   }
 };
 

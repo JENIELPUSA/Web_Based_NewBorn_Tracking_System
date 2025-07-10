@@ -65,6 +65,9 @@ const VaccinationCalendar = () => {
                         const key = `${entry.newbornName}_${entry.vaccineName}`;
                         const isLatestDue = dueDateStr && dueDateStr === latestDueMap[key];
 
+                        // Determine if the current dose item is for a 'next_due_date'
+                        const isNextDueDateEntry = dose.next_due_date && isSameDay(parseISO(dose.next_due_date), date);
+
                         return {
                             newbornName: entry.newbornName,
                             vaccineName: entry.vaccineName,
@@ -72,7 +75,8 @@ const VaccinationCalendar = () => {
                             status: dose.status,
                             remarks: dose.remarks,
                             administeredBy: dose.administeredBy,
-                            isDue: isLatestDue && isSameDay(parseISO(dose.next_due_date), date),
+                            isDue: isLatestDue && isNextDueDateEntry, // Use isNextDueDateEntry here
+                            isDateGiven: dose.dateGiven && isSameDay(parseISO(dose.dateGiven), date), // Add this to differentiate
                         };
                     })
             );
@@ -192,7 +196,8 @@ const VaccinationCalendar = () => {
                                             : "bg-yellow-500"
                                     }`}
                                 >
-                                    {dose.vaccineName} (D{dose.doseNumber}) {dose.isDue ? "📌" : ""}
+                                    {/* Conditionally display dose number based on whether it's a 'next_due_date' */}
+                                    {dose.vaccineName} {dose.isDue ? "" : `(D${dose.doseNumber})`} {dose.isDue ? "📌" : ""}
                                 </div>
                             ))}
                             {doses.length > 2 && (
@@ -248,26 +253,36 @@ const VaccinationCalendar = () => {
                             <div className="text-sm text-gray-800 dark:text-gray-200">
                                 <span className="font-medium">Vaccine:</span> {item.vaccineName}
                             </div>
-                            <div className="text-sm text-gray-800 dark:text-gray-200">
-                                <span className="font-medium">Dose:</span> {item.doseNumber}
-                            </div>
-                            <div className="text-sm text-gray-800 dark:text-gray-200">
-                                <span className="font-medium">Status:</span>
-                                <span
-                                    className={`ml-1 rounded px-1 py-0.5 text-sm ${
-                                        item.status === "On-Time"
-                                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                            : item.status === "Missed"
-                                            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                                    }`}
-                                >
-                                    {item.status}
-                                </span>
-                            </div>
-                            <div className="text-sm text-gray-700 dark:text-gray-300">
-                                <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
-                            </div>
+                            {/* Conditional rendering for Dose, Status, and AssignedBy */}
+                            {!item.isDue && ( // Only show if NOT a next_due_date entry
+                                <>
+                                    <div className="text-sm text-gray-800 dark:text-gray-200">
+                                        <span className="font-medium">Dose:</span> {item.doseNumber}
+                                    </div>
+                                    <div className="text-sm text-gray-800 dark:text-gray-200">
+                                        <span className="font-medium">Status:</span>
+                                        <span
+                                            className={`ml-1 rounded px-1 py-0.5 text-sm ${
+                                                item.status === "On-Time"
+                                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                                    : item.status === "Missed"
+                                                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                                    : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                            }`}
+                                        >
+                                            {item.status}
+                                        </span>
+                                    </div>
+                                    <div className="text-sm text-gray-700 dark:text-gray-300">
+                                        <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
+                                    </div>
+                                </>
+                            )}
+                            {item.isDue && ( // Show "Due Date" if it's a next_due_date entry
+                                <div className="text-sm text-red-500 dark:text-red-400 font-medium">
+                                    Next Due Date!
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -324,26 +339,36 @@ const VaccinationCalendar = () => {
                                         <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
                                             <span className="font-medium">Vaccine:</span> {item.vaccineName}
                                         </div>
-                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
-                                            <span className="font-medium">Dose:</span> {item.doseNumber}
-                                        </div>
-                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
-                                            <span className="font-medium">Status:</span>
-                                            <span
-                                                className={`ml-1 rounded px-1 py-0.5 xs:text-xs lg:text-sm sm:text-sm ${
-                                                    item.status === "On-Time"
-                                                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                                        : item.status === "Missed"
-                                                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                                                }`}
-                                            >
-                                                {item.status}
-                                            </span>
-                                        </div>
-                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-700 dark:text-gray-300">
-                                            <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
-                                        </div>
+                                        {/* Conditional rendering for Dose, Status, and AssignedBy */}
+                                        {!item.isDue && ( // Only show if NOT a next_due_date entry
+                                            <>
+                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
+                                                    <span className="font-medium">Dose:</span> {item.doseNumber}
+                                                </div>
+                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
+                                                    <span className="font-medium">Status:</span>
+                                                    <span
+                                                        className={`ml-1 rounded px-1 py-0.5 xs:text-xs lg:text-sm sm:text-sm ${
+                                                            item.status === "On-Time"
+                                                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                                                : item.status === "Missed"
+                                                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                                        }`}
+                                                    >
+                                                        {item.status}
+                                                    </span>
+                                                </div>
+                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-700 dark:text-gray-300">
+                                                    <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
+                                                </div>
+                                            </>
+                                        )}
+                                        {item.isDue && ( // Show "Next Due Date!" if it's a next_due_date entry
+                                            <div className="xs:text-xs lg:text-sm sm:text-sm text-red-500 dark:text-red-400 font-medium">
+                                                Next Due Date!
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>

@@ -1,22 +1,27 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const notifcationSchema = new mongoose.Schema({
-  message: String,
-  status: {
+const NotificationSchema = new mongoose.Schema({
+  message: {
     type: String,
-    enum: ['read', 'pending'],
-    default: 'pending' 
+    required: true,
   },
-  newborn: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Newborn", 
-    required: true
+  viewers: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      isRead: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
-   readBy: [{ 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "User" // Array to store the user IDs that have read the notification
-  }],
-  types_of_message:String
-}, { timestamps: true });
+});
 
-module.exports = mongoose.model("Notification", notifcationSchema);
+module.exports = mongoose.model("Notification", NotificationSchema);

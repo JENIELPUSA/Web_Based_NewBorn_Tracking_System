@@ -13,130 +13,113 @@ const socket = socketIO("https://web-based-newborn-tracking-system-server.onrend
   transports: ["websocket"],
 });
 
-socket.on("connect", () => {
-  console.log("Socket connected in cron job");
-});
-
+socket.on("connect", () => {});
 socket.on("connect_error", (err) => {
-  console.error("Socket connection error in cron job:", err);
   socket.connect();
 });
 
 cron.schedule("0 7 * * *", async () => {
-//cron.schedule("*/2 * * * *", async () => {
-  console.log("Cron job triggered");
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const oneDayAhead = new Date(today);
-  oneDayAhead.setDate(today.getDate() + 1);
-  oneDayAhead.setHours(23, 59, 59, 999);
+  const endOfTomorrow = new Date(tomorrow);
+  endOfTomorrow.setHours(23, 59, 59, 999);
 
   try {
-    const records = await VaccinationRecord.find({
-      "doses.next_due_date": { $lte: oneDayAhead },
-      "doses.notified": false,
-    })
+    const records = await VaccinationRecord.find()
       .populate({
         path: "newborn",
         populate: {
           path: "motherName",
-          model: "User",
+          model: "Parent",
         },
       })
-      .populate("vaccine")
-      .populate("doses.administeredBy");
-
-    console.log(`Found ${records.length} records with due doses`);
+      .populate("vaccine");
 
     for (const record of records) {
-      const zone = record?.newborn?.motherName?.zone;
+      const newborn = record.newborn;
+      const mother = newborn?.motherName;
 
-      const matchedUsers = await User.find({ Designatedzone: zone });
-
-      if (matchedUsers.length > 0) {
-        console.log(`Matched Users for Zone "${zone}":`);
-        matchedUsers.forEach(user => {
-          console.log(`- ${user.email}`);
-        });
-      } else {
-        console.log(` No users found with designatedZone: ${zone}`);
-      }
-
+      const fullName = `${newborn?.firstName} ${newborn?.lastName}`;
+      const zone = (mother?.zone || "").trim().toLowerCase();
 
       for (const dose of record.doses) {
-        if (dose.next_due_date && new Date(dose.next_due_date) <= oneDayAhead) {
+        if (!dose.next_due_date) {
+          continue;
+        }
 
-          if (socket.connected) {
-            sendSocketNotification(socket, record, dose);
-            console.log(` Notification sent for dose ${dose.doseNumber} of "${record.vaccine?.name}"`);
-          } else {
-            console.log("Socket not connected, cannot send notification");
+        const dueDate = new Date(dose.next_due_date);
+
+        if (dueDate >= tomorrow && dueDate <= endOfTomorrow) {
+          const adminUsers = await User.find({ role: "Admin" }, "_id email");
+
+          const bhwUsers = await User.find(
+            {
+              role: "BHW",
+              Designatedzone: { $regex: `^${zone}$`, $options: "i" },
+            },
+            "_id email Designatedzone"
+          );
+
+          if (bhwUsers.length > 0) {
+            bhwUsers.forEach((bhw) => {});
           }
 
-          const newNotification = await Notification.create({
-            message: `Reminder: Dose ${dose.doseNumber} of "${record.vaccine?.name}" for ${record.newborn?.firstName} ${record.newborn?.lastName} is due on ${new Date(dose.next_due_date).toLocaleDateString()}.`,
-            newborn: record.newborn?._id,
+          if (bhwUsers.length === 0) {
+          }
+
+          const allRecipients = [...adminUsers, ...bhwUsers];
+          const viewerIds = allRecipients.map((u) => u._id.toString());
+
+          if (mother?._id) {
+            viewerIds.push(mother._id.toString());
+          }
+
+          const emails = allRecipients.map((u) => u.email);
+          if (mother?.email) {
+            emails.push(mother.email);
+          }
+
+          const message = `💉 Reminder: Dose ${dose.doseNumber} of "${
+            record.vaccine?.name
+          }" for ${fullName} is due on ${dueDate.toLocaleDateString()}.`;
+          if (socket.connected) {
+            socket.emit("send-vaccine-notification", {
+              types_of_message: "Vaccine_due_date",
+              message,
+            });
+          } else {
+          }
+
+          const uniqueViewerIds = [...new Set(viewerIds)];
+
+          await Notification.create({
+            message,
+            newborn: newborn._id,
             types_of_message: "Vaccine_due_date",
+            type: "vaccine_due",
+            viewers: uniqueViewerIds.map((id) => ({
+              user: id,
+              isRead: false,
+              viewedAt: null,
+            })),
           });
-
-          console.log("Notification saved:", newNotification);
-          const emails = [
-            ...matchedUsers.map(user => user.email), 
-            record?.newborn?.motherName?.email,    
-          ];
-
-          const message = newNotification.message;
 
           try {
             await sendEmail({
-              email: emails, 
-              subject: 'New Notification',
+              email: emails,
+              subject: "Vaccine Dose Reminder",
               text: message,
             });
-
-            console.log(`Email sent to: ${emails.join(", ")}`);
-          } catch (error) {
-            console.error("Failed to send email", error);
-          }
-          dose.notified = true;
+          } catch (err) {}
         }
       }
-
-      // Save the record after updating doses
-      await record.save();
     }
 
-    // Update all doses that haven't been notified yet in the records
-   await VaccinationRecord.updateMany(
-  { "doses.notified": false }, // Filter: records with any dose not yet notified
-  {
-    $set: {
-      "doses.$[elem].notified": true // Update only those doses
-    }
-  },
-  {
-    arrayFilters: [{ "elem.notified": false }] // Apply only to doses with notified: false
-  }
-);
-
-    console.log("All doses marked as notified");
-
-    // Check unvaccinated newborns
     const allNewborns = await Newborn.find();
     for (const nb of allNewborns) {
       await checkAllVaccinesAreUnvaccinated(nb._id, socket);
     }
-  } catch (error) {
-    console.error("❗ Error in cron job:", error);
-  }
+  } catch (err) {}
 });
-
-// Function to send socket notification
-function sendSocketNotification(socket, record, dose) {
-  socket.emit("send-vaccine-notification", {
-    types_of_message: "Vaccine_due_date",
-    message: `Reminder: Dose ${dose.doseNumber} of "${record.vaccine?.name}" for ${record.newborn?.firstName} ${record.newborn?.lastName} is due on ${new Date(dose.next_due_date).toLocaleDateString()}.`,
-  });
-}

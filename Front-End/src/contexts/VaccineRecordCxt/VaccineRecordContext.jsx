@@ -47,24 +47,33 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 setVaccineRecord(vaccineData);
                 setCalendarData(vaccineData);
             } else if (role === "BHW") {
-                const filteredByZone = vaccineData.filter(
+                // ✅ Get all records from the same zone
+                const recordsInMyZone = vaccineData.filter(
                     (record) => record.newbornZone?.toLowerCase().trim() === Designatedzone?.toLowerCase().trim(),
                 );
-                const filteredRecords = filteredByZone
+
+                // ✅ From zone records, extract only those with doses administered by this BHW
+                const recordsWithMyDoses = recordsInMyZone
                     .map((record) => {
                         const bhwDoses = record.doses.filter((dose) => dose.administeredById === userId);
                         return bhwDoses.length > 0 ? { ...record, doses: bhwDoses } : null;
                     })
                     .filter((record) => record !== null);
-                setVaccineRecord(filteredRecords);
-                setCalendarData(filteredRecords);
+
+                // ✅ Calendar shows all from zone
+                setCalendarData(recordsInMyZone);
+
+                // ✅ Table shows only their own doses
+                setVaccineRecord(recordsWithMyDoses);
+
+                // ✅ Count vaccinations done by this BHW this month
                 const now = new Date();
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
                 const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
                 const vaccinatedThisMonthMap = new Map();
 
-                filteredRecords.forEach((record) => {
+                recordsWithMyDoses.forEach((record) => {
                     record.doses.forEach((dose) => {
                         const doseDate = new Date(dose.dateGiven);
                         if (doseDate >= startOfMonth && doseDate <= endOfMonth) {
@@ -88,6 +97,7 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 setFemale(totalFemale);
                 setTotalVacinated(totalVaccinated);
             } else {
+                // For other roles (if any), show all data
                 setVaccineRecord(vaccineData);
                 setCalendarData(vaccineData);
             }

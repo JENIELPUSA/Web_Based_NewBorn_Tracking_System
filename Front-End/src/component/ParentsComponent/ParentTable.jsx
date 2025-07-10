@@ -74,7 +74,7 @@ function ParentTable() {
     return (
         <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
             <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">User List</h2>
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Parent List</h2>
                 <div className="flex items-center gap-2">
                     {/* This search input is always visible */}
                     <input

@@ -11,6 +11,9 @@ export const Header = ({ collapsed, setCollapsed }) => {
   const { theme, setTheme } = useTheme();
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
   const {fetchNotification,pendingCount,notify}=useContext(NotificationDisplayContext)
+
+
+  console.log("NOTIFY",notify)
 const {userId}=useContext(AuthContext);
   const handleBellClick = () => {
     setIsNotificationDropdownOpen(!isNotificationDropdownOpen);
