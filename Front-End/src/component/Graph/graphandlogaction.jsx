@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { User } from "lucide-react";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { LogContext } from "../../contexts/LogAndAuditContext/LogAuditContext";
 import { useTheme } from "@/hooks/use-theme";
@@ -10,18 +10,14 @@ import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornCont
 function GraphAndLogAction() {
     const { LogData } = useContext(LogContext);
     const { theme } = useTheme();
-    const {isGraphData}=useContext(NewBornDisplayContext)
+    const { isGraphData } = useContext(NewBornDisplayContext);
     const defaultAvatar = "https://ui-avatars.com/api/?name=Unknown&background=888&color=fff";
 
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
 
-    const graphDataArray = Array.isArray(isGraphData)
-  ? isGraphData
-  : isGraphData
-    ? [isGraphData]
-    : [];
+    const graphDataArray = Array.isArray(isGraphData) ? isGraphData : isGraphData ? [isGraphData] : [];
     const monthlyWeight = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month) => {
         const total = graphDataArray
             .filter((baby) => baby.birthMonth === month)
@@ -43,7 +39,6 @@ function GraphAndLogAction() {
 
     return (
         <div className="grid grid-cols-1 gap-6 xs:px-2 sm:px-0 md:grid-cols-2 lg:grid-cols-7 lg:px-0">
-            {/* Overview Graph */}
             <div
                 className={`col-span-1 rounded-2xl p-6 backdrop-blur-lg md:col-span-2 lg:col-span-4 ${
                     theme === "light" ? "border border-slate-200 bg-white/70 shadow-lg" : "border border-slate-700 bg-slate-800/50 shadow-lg"
@@ -71,12 +66,12 @@ function GraphAndLogAction() {
                                 >
                                     <stop
                                         offset="5%"
-                                        stopColor="#ef4444"
+                                        stopColor="#3b82f6"
                                         stopOpacity={0.8}
                                     />
                                     <stop
                                         offset="95%"
-                                        stopColor="#ef4444"
+                                        stopColor="#3b82f6"
                                         stopOpacity={0.1}
                                     />
                                 </linearGradient>
@@ -89,8 +84,12 @@ function GraphAndLogAction() {
                                     boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                                     backdropFilter: "blur(12px)",
                                 }}
-                                formatter={(value) => [`${value} kg`, "Total Weight"]} // Adjusted to show kg
+                                formatter={(value) => [
+                                    <span style={{ color: "#3b82f6", fontWeight: 600 }}>{value} kg</span>,
+                
+                                ]}
                             />
+
                             <XAxis
                                 dataKey="name"
                                 strokeWidth={0}
@@ -100,15 +99,24 @@ function GraphAndLogAction() {
                                 dataKey="total"
                                 strokeWidth={0}
                                 tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8" }}
-                                tickFormatter={(value) => `${value} kg`} // Adjusted to show kg
+                                tickFormatter={(value) => `${value} kg`}
                             />
+                            {/* Area Graph (Blue) */}
                             <Area
                                 type="monotone"
                                 dataKey="total"
-                                stroke="#ef4444"
+                                stroke="#3b82f6"
                                 strokeWidth={2}
                                 fillOpacity={1}
                                 fill="url(#colorTotal)"
+                            />
+                            {/* Line Graph (Overlay) */}
+                            <Line
+                                type="monotone"
+                                dataKey="total"
+                                stroke="#1d4ed8"
+                                strokeWidth={2}
+                                dot={{ r: 3, fill: "#1d4ed8" }}
                             />
                         </AreaChart>
                     </ResponsiveContainer>

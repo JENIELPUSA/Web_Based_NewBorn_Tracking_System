@@ -57,7 +57,7 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
             )}
         >
             <div className="flex gap-x-3 p-3">
-                {!collapsed && <p className="text-lg font-medium text-slate-900 dark:text-slate-50">NEWBORN TRACKING SYSTEM</p>}
+                {!collapsed && <p className="text-lg font-medium text-slate-900">NEWBORN TRACKING SYSTEM</p>}
             </div>
             <div className="flex w-full flex-col gap-y-4 overflow-y-auto p-3 [scrollbar-width:_thin]">
                 {filteredNavbarLinks.map((navbarLink) => (
@@ -77,8 +77,8 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
                                         collapsed && "md:w-[45px]",
                                         "hover:bg-slate-100 hover:dark:bg-slate-800", // Hover state
                                         isActive // Check if link is active
-                                            ? "bg-red-500 text-white dark:bg-red-500" // Active state
-                                            : "text-slate-700 dark:text-slate-300", // Normal state
+                                            ? "bg-blue-500 text-white" // Active state
+                                            : "text-slate-700", // Normal state
                                     )
                                 }
                                 end // Add this prop for exact matching
@@ -99,8 +99,8 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
                     className={cn(
                         "sidebar-item mt-auto",
                         collapsed && "md:w-[45px]",
-                        "hover:bg-slate-100 hover:dark:bg-slate-800",
-                        "text-slate-700 dark:text-slate-300",
+                        "hover:bg-blue-400 ",
+                        "text-slate-700 ",
                     )}
                 >
                     <LogOut

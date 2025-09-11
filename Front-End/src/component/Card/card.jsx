@@ -84,7 +84,7 @@ const TotalNotExpired = stocks ? ((NotExpired / stocks) * 100).toFixed(1) + "%" 
                             <div className="flex items-center justify-center rounded-lg bg-blue-500/20 p-3">
                                 <Icon
                                     size={24}
-                                    className="text-red-500 dark:text-red-400"
+                                    className="text-blue-500 "
                                 />
                             </div>
                             <p className="card-title text-lg font-medium text-slate-800 dark:text-slate-200">{card.title}</p>
@@ -92,7 +92,7 @@ const TotalNotExpired = stocks ? ((NotExpired / stocks) * 100).toFixed(1) + "%" 
                         <div className="card-body mt-4">
                             <p className="text-3xl font-bold text-slate-900 dark:text-slate-50">{card.value}</p>
                             {card.percentage && (
-                                <span className="mt-2 flex items-center gap-x-2 text-sm text-red-600 dark:text-red-400">
+                                <span className="mt-2 flex items-center gap-x-2 text-sm text-blue-600">
                                     <TrendingUp size={18} />
                                     {card.percentage}
                                 </span>

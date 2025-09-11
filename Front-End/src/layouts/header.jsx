@@ -12,8 +12,6 @@ export const Header = ({ collapsed, setCollapsed }) => {
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
   const {fetchNotification,pendingCount,notify}=useContext(NotificationDisplayContext)
 
-
-  console.log("NOTIFY",notify)
 const {userId}=useContext(AuthContext);
   const handleBellClick = () => {
     setIsNotificationDropdownOpen(!isNotificationDropdownOpen);
@@ -52,14 +50,6 @@ socket.on("unvaccinated-alert", (data) => {
         </button>
       </div>
       <div className="flex items-center gap-x-3">
-        <button
-          className="btn-ghost size-10"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-        >
-          <Sun size={20} className="dark:hidden" />
-          <Moon size={20} className="hidden dark:block" />
-        </button>
-
         {/* Notification Bell */}
         <div className="relative">
           <button className="btn-ghost size-10" onClick={handleBellClick}>

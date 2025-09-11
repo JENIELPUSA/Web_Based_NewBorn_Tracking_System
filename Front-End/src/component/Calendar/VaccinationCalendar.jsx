@@ -116,7 +116,7 @@ const VaccinationCalendar = () => {
             <div className="flex space-x-2">
                 <button
                     onClick={handlePrevMonth}
-                    className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                    className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
                 >
                     ‹
                 </button>
@@ -132,7 +132,7 @@ const VaccinationCalendar = () => {
             </h2>
             <button
                 onClick={handleNextMonth}
-                className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
             >
                 ›
             </button>

@@ -79,7 +79,7 @@ export default function Login() {
                         />
                     </div>
 
-                    <h2 className="mb-6 text-center text-3xl font-extrabold tracking-wide text-red-600 shadow-md dark:text-red-400">
+                    <h2 className="mb-6 text-center text-3xl font-extrabold tracking-wide text-blue-600 shadow-md">
                         NEWBORN TRACKING SYSTEM
                     </h2>
 
@@ -118,7 +118,7 @@ export default function Login() {
                         <button
                             type="submit"
                             className={`flex w-full items-center justify-center gap-2 ${
-                                isLoading ? "cursor-not-allowed bg-red-400" : "bg-red-500 hover:bg-red-600"
+                                isLoading ? "cursor-not-allowed bg-blue-400" : "bg-blue-500 hover:bg-blue-600"
                             } rounded px-4 py-2 font-semibold text-white`}
                             disabled={isLoading}
                         >
@@ -129,7 +129,7 @@ export default function Login() {
                             <button
                                 type="button"
                                 onClick={() => setForgotModal(true)}
-                                className="text-sm text-red-600 hover:underline dark:text-red-400"
+                                className="text-sm text-blue-600 hover:underline"
                             >
                                 Forgot Password?
                             </button>

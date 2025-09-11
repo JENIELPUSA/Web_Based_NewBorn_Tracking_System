@@ -40,9 +40,9 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
     return (
         <div className="w-full max-w-xs transform rounded-2xl border border-gray-100 bg-white p-4 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl dark:border-gray-700 dark:bg-gray-800 dark:shadow-none sm:p-6">
             <div className="relative flex h-32 w-full items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-gray-600 dark:bg-gray-700 sm:h-36">
-                <span className="absolute left-2 top-2 rounded bg-red-600 px-2 py-0.5 text-xs font-bold tracking-wider text-white">PDF</span>
+                <span className="absolute left-2 top-2 rounded bg-blue-600 px-2 py-0.5 text-xs font-bold tracking-wider text-white">PDF</span>
                 <svg
-                    className="h-14 w-14 text-red-500 dark:text-red-400 sm:h-16 sm:w-16"
+                    className="h-14 w-14 text-blue-500 dark:text-red-400 sm:h-16 sm:w-16"
                     fill="currentColor"
                     viewBox="0 0 24 24"
                 >
@@ -93,7 +93,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
 
             <button
                 onClick={handleDownload}
-                className="mt-3 w-full rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-5 sm:text-sm flex items-center justify-center"
+                className="mt-3 w-full rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-5 sm:text-sm flex items-center justify-center"
                 disabled={loading} // Disable button while loading
             >
                 {loading ? (
@@ -118,7 +118,7 @@ function ReportsLayout() {
     return (
         <div className="flex min-h-screen flex-col">
             <main className="flex flex-grow flex-col items-center bg-gray-50 p-4 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100 sm:p-6 md:p-8 rounded-lg">
-                <div className="mb-8 w-full rounded-md bg-red-600 px-4 py-3 text-center text-white shadow-lg dark:bg-red-700">
+                <div className="mb-8 w-full rounded-md bg-blue-600 px-4 py-3 text-center text-white shadow-lg dark:bg-red-700">
                     <p className="text-base font-semibold sm:text-lg">Important Announcement: New Reports Available!</p>
                 </div>
 
