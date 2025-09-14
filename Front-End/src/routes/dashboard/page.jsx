@@ -24,14 +24,14 @@ const DashboardPage = () => {
 
     return role === "Admin" ? (
         <div className="flex flex-col gap-y-4">
-            <h1 className="title">Dashboard</h1>
+            <h1 className="title text-blue-500">Dashboard</h1>
             <Card />
             <LogActionAudit />
             <Footer />
         </div>
     ) : role === "BHW" ? (
         <div className="flex flex-col gap-y-4">
-            <h1 className="title">Dashboard</h1>
+            <h1 className="title text-blue-500">Dashboard</h1>
             <Card />
             <WeeklySchedule />
             <Footer />

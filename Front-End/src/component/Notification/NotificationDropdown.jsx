@@ -98,20 +98,20 @@ const NotificationDropdown = ({ notifications, onClose }) => {
     };
 
     return (
-        <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-md border border-gray-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
+        <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-md border border-gray-200 bg-white shadow-lg">
             <div className="p-4">
-                <h3 className="mb-3 text-lg font-bold dark:text-white">Notifications</h3>
+                <h3 className="mb-3 text-lg font-bold">Notifications</h3>
 
                 <ul className="max-h-64 space-y-2 overflow-y-auto text-sm">
                     {displayedNotifications.length === 0 ? (
-                        <li className="text-gray-500 dark:text-gray-300">No notifications</li>
+                        <li className="text-gray-500">No notifications</li>
                     ) : (
                         displayedNotifications.map((notif, index) => (
                             <li
                                 key={notif.id || notif._id || index}
                                 className={`break-words rounded-md border p-2 ${
-                                    notif.isRead ? "bg-gray-200 dark:bg-slate-700" : "bg-white dark:bg-slate-800"
-                                } border-gray-300 dark:border-gray-600 dark:text-gray-200`}
+                                    notif.isRead ? "bg-gray-200" : "bg-white"
+                                } border-gray-300`}
                                 onClick={() => handleNotificationClick(notif.id || notif._id)}
                             >
                                 <div className="flex items-center justify-between">
@@ -138,7 +138,7 @@ const NotificationDropdown = ({ notifications, onClose }) => {
                 {normalizedNotifications.length > 5 && !showAllNotifications && (
                     <div className="mt-4 text-center">
                         <button
-                            className="text-blue-600 hover:underline dark:text-blue-400"
+                            className="text-blue-600 hover:underline"
                             onClick={() => setShowAllNotifications(true)}
                         >
                             View All Notifications
@@ -149,7 +149,7 @@ const NotificationDropdown = ({ notifications, onClose }) => {
                 {showAllNotifications && (
                     <div className="mt-4 text-center">
                         <button
-                            className="text-blue-600 hover:underline dark:text-blue-400"
+                            className="text-blue-600 hover:underline"
                             onClick={() => {
                                 setShowAllNotifications(false);
                                 onClose();

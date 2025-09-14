@@ -11,11 +11,11 @@ export default function StatusModal({ isOpen, onClose, status = "success" }) {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.8 }}
         transition={{ duration: 0.3 }}
-        className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-xl max-w-md w-full relative text-center"
+        className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full relative text-center"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
         >
           ✕
         </button>
@@ -37,11 +37,11 @@ export default function StatusModal({ isOpen, onClose, status = "success" }) {
             {isSuccess ? "✅" : "❌"}
           </motion.div>
         </motion.div>
-        <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
+        <h2 className="text-2xl font-semibold mb-2 text-gray-900">
           {isSuccess ? "Successfully Accepted!" : "Action Failed!"}
         </h2>
 
-        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
+        <p className="text-gray-600 text-sm mb-6">
           {isSuccess
             ? "Your request has been successfully accepted and processed."
             : "Oops! Something went wrong. Please try again later."}

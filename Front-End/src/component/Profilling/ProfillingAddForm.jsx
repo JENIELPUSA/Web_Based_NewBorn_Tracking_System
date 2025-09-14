@@ -107,15 +107,15 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.9 }}
-                className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
+                className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg"
             >
                 <div className="mb-4 flex items-center justify-between border-b pb-2">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                    <h2 className="text-xl font-semibold text-gray-800">
                         {isUpdateMode ? "Update Newborn Profile" : "Add Newborn Profile"}
                     </h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700 dark:text-gray-300"
+                        className="text-gray-500 hover:text-gray-700"
                         aria-label="Close"
                     >
                         <X />
@@ -124,20 +124,20 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
 
                 <form className="grid grid-cols-1 gap-4">
                     {customError && (
-                        <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700 dark:bg-red-900 dark:text-red-200">
+                        <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">
                             {customError}
                         </div>
                     )}
 
                     {/* Newborn Dropdown */}
                     <div className="relative">
-                        <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Newborn Name</label>
+                        <label className="mb-1 block text-sm text-gray-600">Newborn Name</label>
                         <div
                             className={`flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm ${
                                 isUpdateMode
-                                    ? "cursor-not-allowed bg-gray-100 dark:bg-gray-700"
-                                    : "cursor-pointer bg-white dark:bg-gray-700"
-                            } text-gray-700 dark:border-gray-600 dark:text-gray-200`}
+                                    ? "cursor-not-allowed bg-gray-100"
+                                    : "cursor-pointer bg-white"
+                            } text-gray-700`}
                             onClick={() => {
                                 if (!isUpdateMode) setDropdownOpenNewborn(!dropdownOpenNewborn);
                             }}
@@ -147,7 +147,7 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                         </div>
 
                         {!isUpdateMode && dropdownOpenNewborn && (
-                            <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700">
+                            <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-300 bg-white shadow-lg">
                                 <div className="relative p-2">
                                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                                     <input
@@ -155,7 +155,7 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                                         placeholder="Search newborn..."
                                         value={searchNewborn}
                                         onChange={(e) => setSearchNewborn(e.target.value)}
-                                        className="w-full rounded-md border border-gray-300 bg-white py-1 pl-8 pr-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                        className="w-full rounded-md border border-gray-300 bg-white py-1 pl-8 pr-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         autoFocus
                                     />
                                 </div>
@@ -164,18 +164,18 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                                         filteredNewborns.map((nb) => (
                                             <li
                                                 key={nb._id}
-                                                className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                                className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                                                 onClick={() => handleSelectNewborn(nb)}
                                             >
                                                 <div className="text-sm font-medium">
                                                     {nb.firstName} {nb.middleName} {nb.lastName}
                                                 </div>
-                                                <div className="text-xs text-gray-500 dark:text-gray-300">Mother: {nb.motherName}</div>
-                                                <div className="text-xs text-gray-500 dark:text-gray-300">Address: {nb.address}</div>
+                                                <div className="text-xs text-gray-500">Mother: {nb.motherName}</div>
+                                                <div className="text-xs text-gray-500">Address: {nb.address}</div>
                                             </li>
                                         ))
                                     ) : (
-                                        <li className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">No newborns found.</li>
+                                        <li className="px-3 py-2 text-sm text-gray-500">No newborns found.</li>
                                     )}
                                 </ul>
                             </div>
@@ -184,12 +184,12 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
 
                     {/* Blood Type */}
                     <div>
-                        <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Blood Type</label>
+                        <label className="mb-1 block text-sm text-gray-600">Blood Type</label>
                         <select
                             name="blood_type"
                             value={formData.blood_type}
                             onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select</option>
                             {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((type) => (
@@ -203,13 +203,13 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                     {/* Health Condition (only on add mode) */}
                     {!isUpdateMode && (
                         <div>
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Health Condition</label>
+                            <label className="mb-1 block text-sm text-gray-600">Health Condition</label>
                             <input
                                 type="text"
                                 name="health_condition"
                                 value={formData.health_condition}
                                 onChange={handleChange}
-                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     )}
@@ -217,13 +217,13 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                     {/* Notes (only on add mode) */}
                     {!isUpdateMode && (
                         <div>
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Notes</label>
+                            <label className="mb-1 block text-sm text-gray-600">Notes</label>
                             <textarea
                                 rows={3}
                                 name="notes"
                                 value={formData.notes}
                                 onChange={handleChange}
-                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     )}
@@ -232,7 +232,7 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                 <div className="mt-6 flex justify-end gap-2">
                     <button
                         onClick={onClose}
-                        className="rounded bg-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
+                        className="rounded bg-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
                     >
                         Cancel
                     </button>
@@ -241,11 +241,11 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                         onClick={handleSave}
                         type="submit"
                         disabled={isSubmitting}
-                        className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-red-600 dark:text-gray-200 dark:hover:bg-pink-500"
+                        className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400"
                     >
                         {isSubmitting ? (
                             <div className="flex items-center justify-center gap-2">
-                                <svg className="h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
                                 </svg>

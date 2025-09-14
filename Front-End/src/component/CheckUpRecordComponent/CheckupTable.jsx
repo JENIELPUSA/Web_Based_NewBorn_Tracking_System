@@ -187,20 +187,20 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                         onClick={handleClose}
                     >
                         <motion.div
-                            className="relative flex h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-900"
+                            className="relative flex h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg bg-white shadow-xl"
                             initial={{ y: "-100vh", opacity: 0 }}
                             animate={{ y: "0", opacity: 1 }}
                             exit={{ y: "100vh", opacity: 0 }}
                             transition={{ type: "spring", damping: 25, stiffness: 200 }}
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between border-b p-4 dark:border-gray-700">
-                                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                            <div className="flex items-center justify-between border-b p-4">
+                                <h2 className="text-xl font-semibold text-gray-800">
                                     Health Records for {newbornData?.newbornName || "Newborn"}
                                 </h2>
                                 <button
                                     onClick={handleClose}
-                                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                    className="text-gray-500 hover:text-gray-700"
                                     aria-label="Close modal"
                                 >
                                     <X className="h-6 w-6" />
@@ -209,12 +209,12 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
 
                             <div className="flex-1 overflow-auto p-4">
                                 <div className="card-header flex flex-col gap-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
-                                    <p className="card-title text-lg font-semibold text-gray-800 dark:text-white">Health Records List</p>
+                                    <p className="card-title text-lg font-semibold text-gray-800">Health Records List</p>
                                     <div className="flex w-full flex-wrap items-center gap-4 md:w-auto">
                                         <div className="flex flex-grow-0 flex-wrap items-center gap-2">
                                             <label
                                                 htmlFor="dateFrom"
-                                                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                                className="text-sm font-medium text-gray-700"
                                             >
                                                 From:
                                             </label>
@@ -226,12 +226,12 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                     setDateFrom(e.target.value);
                                                     setCurrentPage(1);
                                                 }}
-                                                className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-auto"
+                                                className="text-gray-500 input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm sm:w-auto"
                                                 title="Filter by Visit Date (From)"
                                             />
                                             <label
                                                 htmlFor="dateTo"
-                                                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                                className="text-sm font-medium text-gray-500"
                                             >
                                                 To:
                                             </label>
@@ -243,14 +243,14 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                     setDateTo(e.target.value);
                                                     setCurrentPage(1);
                                                 }}
-                                                className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-auto"
+                                                className="text-gray-500 input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm sm:w-auto"
                                                 title="Filter by Visit Date (To)"
                                             />
                                         </div>
                                         <div className="flex flex-grow-0 items-center gap-2">
                                             <label
                                                 htmlFor="itemsPerPage"
-                                                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                                className="text-sm font-medium text-gray-700"
                                             >
                                                 Show:
                                             </label>
@@ -266,10 +266,10 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                         handleItemsPerPageChange(e);
                                                     }
                                                 }}
-                                                className="input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                                                className="text-gray-500 input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm"
                                                 aria-label="Items per page"
                                             />
-                                            <span className="text-sm text-gray-700 dark:text-gray-300">records per page</span>
+                                            <span className="text-sm text-gray-700">records per page</span>
                                         </div>
                                     </div>
                                 </div>
@@ -285,55 +285,55 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
 
                                     {isLoading ? (
                                         <div className="flex h-48 items-center justify-center">
-                                            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900 dark:border-gray-100"></div>
-                                            <p className="ml-4 text-gray-600 dark:text-gray-300">Loading records...</p>
+                                            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900"></div>
+                                            <p className="ml-4 text-gray-600">Loading records...</p>
                                         </div>
                                     ) : currentRecords.length === 0 ? (
-                                        <div className="p-4 text-center text-gray-500 dark:text-gray-400">No health records found.</div>
+                                        <div className="p-4 text-center text-gray-500">No health records found.</div>
                                     ) : (
                                         currentRecords.map((record, index) => (
                                             <div
                                                 key={record._id}
-                                                className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800"
+                                                className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow"
                                             >
                                                 <div className="flex items-start gap-4">
                                                     <div className="flex-1">
                                                         <div className="flex items-start justify-between">
                                                             <div>
-                                                                <h3 className="font-medium text-gray-800 dark:text-gray-200">{record.newbornName}</h3>
-                                                                <p className="text-sm text-blue-600 dark:text-blue-400">
+                                                                <h3 className="font-medium text-gray-800">{record.newbornName}</h3>
+                                                                <p className="text-sm text-blue-600">
                                                                     Visit: {formatDate(record.visitDate)}
                                                                 </p>
                                                             </div>
-                                                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                            <span className="text-xs text-gray-500">
                                                                 #{indexOfFirstRecord + index + 1}
                                                             </span>
                                                         </div>
 
                                                         <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                                                             <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400">Weight</p>
-                                                                <p className="text-gray-800 dark:text-gray-200">{record.weight} kg</p>
+                                                                <p className="text-xs text-gray-500">Weight</p>
+                                                                <p className="text-gray-800">{record.weight} kg</p>
                                                             </div>
                                                             <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400">Height</p>
-                                                                <p className="text-800 dark:text-gray-200">{record.height} cm</p>
+                                                                <p className="text-xs text-gray-500">Height</p>
+                                                                <p className="text-800">{record.height} cm</p>
                                                             </div>
                                                             <div className="col-span-2">
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400">Condition</p>
-                                                                <p className="text-gray-800 dark:text-gray-200">{record.health_condition}</p>
+                                                                <p className="text-xs text-gray-500">Condition</p>
+                                                                <p className="text-gray-800">{record.health_condition}</p>
                                                             </div>
                                                             <div className="col-span-2">
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400">Notes</p>
-                                                                <p className="text-gray-800 dark:text-gray-200">{record.notes}</p>
+                                                                <p className="text-xs text-gray-500">Notes</p>
+                                                                <p className="text-gray-800">{record.notes}</p>
                                                             </div>
                                                             <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400">Added By</p>
-                                                                <p className="text-gray-800 dark:text-gray-200">{record.addedByName || "N/A"}</p>
+                                                                <p className="text-xs text-gray-500">Added By</p>
+                                                                <p className="text-gray-800">{record.addedByName || "N/A"}</p>
                                                             </div>
                                                             <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400">Recorded At</p>
-                                                                <p className="text-gray-800 dark:text-gray-200">{formatDate(record.createdAt)}</p>
+                                                                <p className="text-xs text-gray-500">Recorded At</p>
+                                                                <p className="text-gray-800">{formatDate(record.createdAt)}</p>
                                                             </div>
                                                         </div>
 
@@ -371,7 +371,7 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                     <div className="card-body p-0">
                                         <div className="relative h-[500px] w-full overflow-auto">
                                             <table className="table w-full text-sm">
-                                                <thead className="sticky top-0 z-10 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+                                                <thead className="sticky top-0 z-10 bg-gray-100 text-gray-800">
                                                     <tr>
                                                         <th className="p-3 text-left">#</th>
                                                         <th className="p-3 text-left">Visit Date</th>
@@ -400,11 +400,11 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                         <tr>
                                                             <td
                                                                 colSpan="10"
-                                                                className="p-4 text-center text-gray-500 dark:text-gray-400"
+                                                                className="p-4 text-center text-gray-500"
                                                             >
                                                                 <div className="flex h-48 items-center justify-center">
-                                                                    <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900 dark:border-gray-100"></div>
-                                                                    <p className="ml-4 text-gray-600 dark:text-gray-300">Loading records...</p>
+                                                                    <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900"></div>
+                                                                    <p className="ml-4 text-gray-600">Loading records...</p>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -412,7 +412,7 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                         <tr>
                                                             <td
                                                                 colSpan="10"
-                                                                className="p-4 text-center text-gray-500 dark:text-gray-400"
+                                                                className="p-4 text-center text-gray-500"
                                                             >
                                                                 No health records found.
                                                             </td>
@@ -421,24 +421,24 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                         currentRecords.map((record, index) => (
                                                             <tr
                                                                 key={record._id}
-                                                                className="border-b border-gray-200 dark:border-gray-700"
+                                                                className="border-b border-gray-200"
                                                             >
-                                                                <td className="p-3 align-top text-gray-800 dark:text-gray-200">
+                                                                <td className="p-3 align-top text-gray-800">
                                                                     {indexOfFirstRecord + index + 1}
                                                                 </td>
-                                                                <td className="p-3 align-top text-gray-800 dark:text-gray-200">
+                                                                <td className="p-3 align-top text-gray-800">
                                                                     {formatDate(record.visitDate)}
                                                                 </td>
-                                                                <td className="p-3 align-top text-gray-800 dark:text-gray-200">{record.weight} kg</td>
-                                                                <td className="p-3 align-top text-gray-800 dark:text-gray-200">{record.height} cm</td>
-                                                                <td className="p-3 align-top text-gray-800 dark:text-gray-200">
+                                                                <td className="p-3 align-top text-gray-800">{record.weight} kg</td>
+                                                                <td className="p-3 align-top text-gray-800">{record.height} cm</td>
+                                                                <td className="p-3 align-top text-gray-800">
                                                                     {record.health_condition}
                                                                 </td>
-                                                                <td className="p-3 align-top text-gray-800 dark:text-gray-200">{record.notes}</td>
-                                                                <td className="p-3 align-top capitalize text-gray-800 dark:text-gray-200">
+                                                                <td className="p-3 align-top text-gray-800">{record.notes}</td>
+                                                                <td className="p-3 align-top capitalize text-gray-800">
                                                                     {record.addedByName || "N/A"}
                                                                 </td>
-                                                                <td className="p-3 align-top text-gray-800 dark:text-gray-200">
+                                                                <td className="p-3 align-top text-gray-800">
                                                                     {formatDate(record.createdAt)}
                                                                 </td>
                                                                 <td className="p-3 align-top">
@@ -476,26 +476,26 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                             </div>
 
                             {totalPages > 0 && (
-                                <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 dark:border-gray-700 sm:flex-row">
+                                <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row">
                                     <button
                                         className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
                                             currentPage === 1
-                                                ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
-                                                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                                                ? "cursor-not-allowed text-gray-400"
+                                                : "text-gray-700 hover:bg-gray-100"
                                         }`}
                                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                         disabled={currentPage === 1 || isLoading}
                                     >
                                         Previous
                                     </button>
-                                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                                    <span className="text-sm text-gray-600">
                                         Page {currentPage} of {totalPages} • {filteredRecords.length} records
                                     </span>
                                     <button
                                         className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
                                             currentPage === totalPages
-                                                ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
-                                                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                                                ? "cursor-not-allowed text-gray-400"
+                                                : "text-gray-700 hover:bg-gray-100"
                                         }`}
                                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                                         disabled={currentPage === totalPages || isLoading}

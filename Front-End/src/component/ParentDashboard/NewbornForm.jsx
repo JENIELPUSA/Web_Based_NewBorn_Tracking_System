@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
+const NewbornForm = ({ onSave, onAddNewborn }) => { 
     const [newbornName, setName] = useState("");
     const [dateOfBirth, setBirthDate] = useState("");
     const [gender, setGender] = useState("");
@@ -41,9 +41,8 @@ const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
     };
 
     return (
-        // Apply dark mode classes directly
-        <div className="mb-8 rounded-lg p-6 shadow-inner transition-colors duration-300 bg-gray-50 dark:bg-gray-700">
-            <h3 className="mb-4 text-2xl font-bold text-gray-700 dark:text-gray-100">Add Newborn</h3>
+        <div className="mb-8 rounded-lg p-6 shadow-inner transition-colors duration-300 bg-gray-50">
+            <h3 className="mb-4 text-2xl font-bold text-gray-700">Add Newborn</h3>
             <form
                 onSubmit={handleSubmit}
                 className="grid grid-cols-1 gap-4 md:grid-cols-2"
@@ -51,7 +50,7 @@ const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
                 <div>
                     <label
                         htmlFor="name"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-700"
                     >
                         Name
                     </label>
@@ -61,14 +60,14 @@ const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
                         value={newbornName}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Clint ALDOUS Amistoso Jr"
-                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800"
                         required
                     />
                 </div>
                 <div>
                     <label
                         htmlFor="birthDate"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-700"
                     >
                         Date of Birth
                     </label>
@@ -77,14 +76,14 @@ const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
                         id="birthDate"
                         value={dateOfBirth}
                         onChange={(e) => setBirthDate(e.target.value)}
-                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800"
                         required
                     />
                 </div>
                 <div>
                     <label
                         htmlFor="parentName"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-700"
                     >
                         Mother's Name
                     </label>
@@ -94,14 +93,14 @@ const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
                         value={motherName}
                         onChange={(e) => setParentName(e.target.value)}
                         placeholder="e.g. Maria Santos"
-                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800"
                         required
                     />
                 </div>
                 <div>
                     <label
                         htmlFor="address"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-700"
                     >
                         Full Address
                     </label>
@@ -111,14 +110,14 @@ const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
                         value={FullAddress}
                         onChange={(e) => setAddress(e.target.value)}
                         placeholder="e.g. ZONE 9 123 Mabini St Manila or 123 Mabini St Manila "
-                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800"
                         required
                     />
                 </div>
                 <div className="col-span-1 md:col-span-2">
                     <label
                         htmlFor="gender"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        className="block text-sm font-medium text-gray-700"
                     >
                         Gender
                     </label>
@@ -126,7 +125,7 @@ const NewbornForm = ({ onSave, onAddNewborn }) => { // Remove theme prop
                         id="gender"
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
-                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                        className="mt-1 block w-full rounded-md border p-2 shadow-sm transition-colors duration-300 focus:border-blue-500 focus:ring-blue-500 border-gray-300 bg-white text-gray-800"
                         required
                     >
                         <option value="">Select Gender</option>

@@ -111,14 +111,14 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                 initial={{ opacity: 0, y: -40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -40 }}
-                className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800"
+                className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
             >
-                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">
+                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
                     {editData ? "Edit Vaccination Record" : "Add Vaccination Record"}
                 </h2>
 
                 {customError && (
-                    <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700 dark:bg-red-900 dark:text-red-200">
+                    <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">
                         {customError}
                     </div>
                 )}
@@ -126,15 +126,15 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Vaccine Dropdown */}
                     <div className="relative w-full">
-                        <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Vaccine</label>
+                        <label className="mb-1 block text-sm text-slate-600">Vaccine</label>
                         {editDose ? (
-                            <div className="w-full rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                            <div className="w-full rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700">
                                 {vaccine.find((v) => v._id === formData.vaccine)?.name || "Selected Vaccine"}
                             </div>
                         ) : (
                             <>
                                 <div
-                                    className={`flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:border-slate-400 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 ${editData ? "cursor-not-allowed opacity-70" : ""}`}
+                                    className={`flex w-full cursor-pointer items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:border-slate-400 ${editData ? "cursor-not-allowed opacity-70" : ""}`}
                                     onClick={() => !editData && setDropdownOpenVaccine(!dropdownOpenVaccine)}
                                 >
                                     <span>
@@ -145,9 +145,9 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                                     <i className={`fas ${dropdownOpenVaccine ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
                                 </div>
                                 {dropdownOpenVaccine && (
-                                    <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700">
+                                    <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg">
                                         <li
-                                            className="cursor-pointer px-3 py-2 hover:bg-slate-100 dark:text-gray-200 dark:hover:bg-slate-600"
+                                            className="cursor-pointer px-3 py-2 hover:bg-slate-100"
                                             onClick={() => handleVaccineSelect("")}
                                         >
                                             Select Vaccine
@@ -155,7 +155,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                                         {vaccine.map((v) => (
                                             <li
                                                 key={v._id}
-                                                className="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                                                className="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100"
                                                 onClick={() => handleVaccineSelect(v._id)}
                                             >
                                                 {v.name}
@@ -169,19 +169,19 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
 
                     {/* Dosage */}
                     <div>
-                        <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Dosage</label>
+                        <label className="mb-1 block text-sm text-slate-600">Dosage</label>
                         <input
                             type="text"
                             value={selectedDosage}
                             readOnly
-                            className="w-full cursor-not-allowed rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                            className="w-full cursor-not-allowed rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700"
                             placeholder="Dosage will appear here..."
                         />
                     </div>
 
                     {/* Total Doses */}
                     <div>
-                        <label className="mb-1 block text-sm text-slate-600 dark:text-slate-200">Total Doses</label>
+                        <label className="mb-1 block text-sm text-slate-600">Total Doses</label>
                         <input
                             type="number"
                             name="totalDoses"
@@ -189,7 +189,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                             onChange={handleChange}
                             required
                             min="1"
-                            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter total number of doses"
                             disabled={isSubmitting} // Disable input while submitting
                         />
@@ -199,7 +199,7 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                         <button
                             type="button"
                             onClick={onClose}
-                            className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                            className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400"
                             disabled={isSubmitting} // Disable cancel button while submitting
                         >
                             Cancel
@@ -209,8 +209,8 @@ function AddNewForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, ed
                             disabled={isSubmitting} // Disable submit button while submitting
                             className={`flex items-center justify-center gap-2 rounded-lg px-5 py-2 font-medium text-white transition duration-200 ${
                                 isSubmitting
-                                    ? "cursor-not-allowed bg-pink-400 dark:bg-red-500" // Grey out or change color
-                                    : "bg-red-600 hover:bg-pink-700 dark:bg-red-700 dark:hover:bg-pink-800"
+                                    ? "cursor-not-allowed bg-pink-400" // Grey out or change color
+                                    : "bg-red-600 hover:bg-pink-700"
                             }`}
                         >
                             {isSubmitting && (

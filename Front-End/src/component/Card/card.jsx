@@ -11,28 +11,23 @@ const Card = () => {
     const { isTotalVacinated, isMaleVacinated, isFemaleVacinated } = useContext(VaccineRecordDisplayContext);
     const { Totalbaby, TotalMale, TotalFemale, newBorn } = useContext(NewBornDisplayContext);
     const { isTotal, isFemale, isMale } = useContext(UserDisplayContext);
-    const { totalVaccine, NotExpired, expired,stocks } = useContext(VaccineDisplayContext);
+    const { totalVaccine, NotExpired, expired, stocks } = useContext(VaccineDisplayContext); // Calculate percentages for baby
 
-    // Calculate percentages for baby
     const malePercentage = Totalbaby ? ((TotalMale / Totalbaby) * 100).toFixed(1) + "%" : "0%";
-    const femalePercentage = Totalbaby ? ((TotalFemale / Totalbaby) * 100).toFixed(1) + "%" : "0%";
+    const femalePercentage = Totalbaby ? ((TotalFemale / Totalbaby) * 100).toFixed(1) + "%" : "0%"; // Calculate percentages
 
-    // Calculate percentages
-const TotalExpired = stocks ? ((expired / stocks) * 100).toFixed(1) + "%" : "0%";
-const TotalNotExpired = stocks ? ((NotExpired / stocks) * 100).toFixed(1) + "%" : "0%";
-
+    const TotalExpired = stocks ? ((expired / stocks) * 100).toFixed(1) + "%" : "0%";
+    const TotalNotExpired = stocks ? ((NotExpired / stocks) * 100).toFixed(1) + "%" : "0%";
 
     const now = new Date();
     const currentMonth = now.getMonth(); // 0 = January
-    const currentYear = now.getFullYear();
+    const currentYear = now.getFullYear(); // I-filter lang ang mga ipinanganak ngayong buwan
 
-    // I-filter lang ang mga ipinanganak ngayong buwan
     const newbornsThisMonth = newBorn.filter((nb) => {
         const dob = new Date(nb.dateOfBirth);
         return dob.getMonth() === currentMonth && dob.getFullYear() === currentYear;
-    });
+    }); // Ihiwalay ang Male at Female counts
 
-    // Ihiwalay ang Male at Female counts
     const maleCount = newbornsThisMonth.filter((nb) => nb.gender === "Male").length;
     const femaleCount = newbornsThisMonth.filter((nb) => nb.gender === "Female").length;
 
@@ -65,10 +60,10 @@ const TotalNotExpired = stocks ? ((NotExpired / stocks) * 100).toFixed(1) + "%" 
     ];
 
     const BHWcards = [
-         { title: "Total Vaccine", value: totalVaccine, percentage: `${TotalExpired} Expired | ${TotalNotExpired} Not Expired`, icon: Syringe },
+        { title: "Total Vaccine", value: totalVaccine, percentage: `${TotalExpired} Expired | ${TotalNotExpired} Not Expired`, icon: Syringe },
         { title: "New Born", value: TotalnewbornsThisMonth, percentage: `${TotalCurrentMale} Male | ${TotalCurrentFemale} Female`, icon: Baby },
         { title: "Monthly Vaccinated", value: isTotalVacinated, percentage: `${AllMale} Male | ${AllFemale} Female`, icon: Baby },
-        { title: "Total Stocks Available", value: stocks,icon: ShieldCheck },
+        { title: "Total Stocks Available", value: stocks, icon: ShieldCheck },
     ];
 
     const renderCards = (cardList) => (
@@ -78,19 +73,19 @@ const TotalNotExpired = stocks ? ((NotExpired / stocks) * 100).toFixed(1) + "%" 
                 return (
                     <div
                         key={index}
-                        className="card rounded-lg border bg-white p-4 shadow-md transition-all dark:bg-slate-900"
+                        className="card rounded-lg bg-white p-4 transition-all"
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex items-center justify-center rounded-lg bg-blue-500/20 p-3">
                                 <Icon
                                     size={24}
-                                    className="text-blue-500 "
+                                    className="text-blue-500"
                                 />
                             </div>
-                            <p className="card-title text-lg font-medium text-slate-800 dark:text-slate-200">{card.title}</p>
+                            <p className="card-title text-lg font-medium text-slate-800">{card.title}</p>
                         </div>
                         <div className="card-body mt-4">
-                            <p className="text-3xl font-bold text-slate-900 dark:text-slate-50">{card.value}</p>
+                            <p className="text-3xl font-bold text-slate-900">{card.value}</p>
                             {card.percentage && (
                                 <span className="mt-2 flex items-center gap-x-2 text-sm text-blue-600">
                                     <TrendingUp size={18} />

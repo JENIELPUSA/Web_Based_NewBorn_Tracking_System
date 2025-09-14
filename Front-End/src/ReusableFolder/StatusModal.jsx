@@ -12,7 +12,7 @@ export default function DeleteConfirmationModal({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.8 }}
         transition={{ duration: 0.3 }}
-        className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-xl max-w-md w-full relative text-center"
+        className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full relative text-center"
       >
         {/* Icon */}
         <motion.div
@@ -31,12 +31,12 @@ export default function DeleteConfirmationModal({
         </motion.div>
 
         {/* Heading */}
-        <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
+        <h2 className="text-2xl font-semibold mb-2 text-gray-900">
           Are you sure?
         </h2>
 
         {/* Message */}
-        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
+        <p className="text-gray-600 text-sm mb-6">
           This action cannot be undone. Are you sure you want to delete this item?
         </p>
     

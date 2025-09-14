@@ -64,14 +64,14 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
                 description: vaccine?.description || "",
                 dosage: vaccine?.dosage || "",
                 brand: vaccine?.brand?._id || "",
-                stock: bybatch.stock ?? 0, // Use bybatch.stock, fallback to 0
+                stock: bybatch.stock ?? 0,
                 expirationDate: bybatch?.expirationDate ? bybatch.expirationDate.split("T")[0] : "",
             });
 
             setVaccineId(vaccine._id || "");
             setBatchId(bybatch._id || "");
         }
-    }, [vaccine, bybatch]); //   Don't forget to add bybatch to dependencies
+    }, [vaccine, bybatch]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -126,9 +126,9 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
                 initial={{ opacity: 0, y: -40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -40 }}
-                className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800"
+                className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl"
             >
-                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">{vaccine ? "Edit Vaccine" : "Add New Vaccine"}</h2>
+                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">{vaccine ? "Edit Vaccine" : "Add New Vaccine"}</h2>
 
                 {customError && <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">{customError}</div>}
 
@@ -137,7 +137,7 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
                     className="space-y-4"
                 >
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Vaccine Name</label>
+                        <label className="block text-sm font-medium text-gray-700">Vaccine Name</label>
                         <input
                             type="text"
                             name="name"
@@ -149,7 +149,7 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Description</label>
+                        <label className="block text-sm font-medium text-gray-700">Description</label>
                         <textarea
                             name="description"
                             value={formData.description}
@@ -237,7 +237,7 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Stock</label>
+                            <label className="block text-sm font-medium text-gray-700">Stock</label>
                             <input
                                 type="number"
                                 name="stock"
@@ -250,7 +250,7 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Expiration Date</label>
+                        <label className="block text-sm font-medium text-gray-700">Expiration Date</label>
                         <input
                             type="date"
                             name="expirationDate"
@@ -283,7 +283,7 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
                             type="submit"
                             disabled={isSubmitting}
                             className={
-                                "rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-blue-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                                "rounded-lg bg-blue-600 px-5 py-2 font-medium text-gray-200 hover:bg-blue-500"
                             }
                         >
                             {isSubmitting ? (

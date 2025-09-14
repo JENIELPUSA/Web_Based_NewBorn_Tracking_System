@@ -57,28 +57,26 @@ const ProfileUpdateModalContent = ({ onClose, userData }) => {
     <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label htmlFor="firstName" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"> {/* Dark mode for label */}
+          <label htmlFor="firstName" className="mb-2 block text-sm font-bold text-gray-700">
             First Name:
           </label>
           <input
             type="text"
             id="firstName"
-            className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline
-                       bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:shadow-outline-dark" // Dark mode for input
+            className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
           />
         </div>
         <div>
-          <label htmlFor="lastName" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"> {/* Dark mode for label */}
+          <label htmlFor="lastName" className="mb-2 block text-sm font-bold text-gray-700">
             Last Name:
           </label>
           <input
             type="text"
             id="lastName"
-            className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline
-                       bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:shadow-outline-dark" // Dark mode for input
+            className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
@@ -87,14 +85,13 @@ const ProfileUpdateModalContent = ({ onClose, userData }) => {
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"> {/* Dark mode for label */}
+        <label htmlFor="email" className="mb-2 block text-sm font-bold text-gray-700">
           Email:
         </label>
         <input
           type="email"
           id="email"
-          className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline
-                     bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:shadow-outline-dark" // Dark mode for input
+          className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -103,31 +100,29 @@ const ProfileUpdateModalContent = ({ onClose, userData }) => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label htmlFor="gender" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"> {/* Dark mode for label */}
+          <label htmlFor="gender" className="mb-2 block text-sm font-bold text-gray-700">
             Gender:
           </label>
           <select
             id="gender"
-            className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline
-                       bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:shadow-outline-dark" // Dark mode for select
+            className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline"
             value={gender}
             onChange={(e) => setGender(e.target.value)}
           >
-            <option value="" className="dark:bg-gray-700 dark:text-gray-200">Select Gender</option> {/* Dark mode for option */}
-            <option value="Male" className="dark:bg-gray-700 dark:text-gray-200">Male</option> {/* Dark mode for option */}
-            <option value="Female" className="dark:bg-gray-700 dark:text-gray-200">Female</option> {/* Dark mode for option */}
-            <option value="Other" className="dark:bg-gray-700 dark:text-gray-200">Other</option> {/* Dark mode for option */}
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
           </select>
         </div>
         <div>
-          <label htmlFor="dateOfBirth" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"> {/* Dark mode for label */}
+          <label htmlFor="dateOfBirth" className="mb-2 block text-sm font-bold text-gray-700">
             Date of Birth:
           </label>
           <input
             type="date"
             id="dateOfBirth"
-            className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline
-                       bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:shadow-outline-dark" // Dark mode for input
+            className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline"
             value={dateOfBirth}
             onChange={(e) => setDateOfBirth(e.target.value)}
           />
@@ -135,14 +130,13 @@ const ProfileUpdateModalContent = ({ onClose, userData }) => {
       </div>
 
       <div>
-        <label htmlFor="phoneNumber" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"> {/* Dark mode for label */}
+        <label htmlFor="phoneNumber" className="mb-2 block text-sm font-bold text-gray-700">
           Phone Number:
         </label>
         <input
           type="text"
           id="phoneNumber"
-          className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline
-                     bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:shadow-outline-dark" // Dark mode for input
+          className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
           required
@@ -150,14 +144,13 @@ const ProfileUpdateModalContent = ({ onClose, userData }) => {
       </div>
 
       <div>
-        <label htmlFor="address" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"> {/* Dark mode for label */}
+        <label htmlFor="address" className="mb-2 block text-sm font-bold text-gray-700">
           Address:
         </label>
         <input
           type="text"
           id="address"
-          className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline
-                     bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:shadow-outline-dark" // Dark mode for input
+          className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           required
@@ -165,21 +158,20 @@ const ProfileUpdateModalContent = ({ onClose, userData }) => {
       </div>
 
       <div>
-        <label htmlFor="zone" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"> {/* Dark mode for label */}
+        <label htmlFor="zone" className="mb-2 block text-sm font-bold text-gray-700">
           Zone:
         </label>
         <input
           type="text"
           id="zone"
-          className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline
-                     bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:focus:shadow-outline-dark" // Dark mode for input
+          className="w-full rounded border px-3 py-2 text-gray-700 shadow focus:outline-none focus:shadow-outline"
           value={zone}
           onChange={(e) => setZone(e.target.value)}
         />
       </div>
 
       {message && (
-        <p className={`mt-2 text-sm ${message.includes("successfully") ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}> {/* Dark mode for message text */}
+        <p className={`mt-2 text-sm ${message.includes("successfully") ? "text-green-600" : "text-red-600"}`}>
           {message}
         </p>
       )}
@@ -188,15 +180,13 @@ const ProfileUpdateModalContent = ({ onClose, userData }) => {
         <button
           type="button"
           onClick={onClose}
-          className="rounded-md bg-gray-300 px-4 py-2 font-bold text-gray-800 transition duration-200 hover:bg-gray-400
-                     dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500" // Dark mode for Cancel button
+          className="rounded-md bg-gray-300 px-4 py-2 font-bold text-gray-800 transition duration-200 hover:bg-gray-400"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="rounded-md bg-blue-500 px-4 py-2 font-bold text-white transition duration-200 hover:bg-blue-600
-                     dark:bg-blue-700 dark:hover:bg-blue-600" // Dark mode for Update Profile button
+          className="rounded-md bg-blue-500 px-4 py-2 font-bold text-white transition duration-200 hover:bg-blue-600"
         >
           Update Profile
         </button>

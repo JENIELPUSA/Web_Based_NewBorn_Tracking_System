@@ -57,12 +57,10 @@ function WeeklySchedule() {
         <div className="grid grid-cols-1 gap-4 xs:px-2 sm:px-0 md:grid-cols-2 lg:grid-cols-7 lg:px-0">
             {/* Overview Graph */}
             <div
-                className={`col-span-1 rounded-2xl p-6 backdrop-blur-lg md:col-span-2 lg:col-span-4 ${
-                    theme === "light" ? "border border-slate-200 bg-white/70 shadow-lg" : "border border-slate-700 bg-slate-800/50 shadow-lg"
-                }`}
+                className={`col-span-1 rounded-2xl p-6 backdrop-blur-lg md:col-span-2 lg:col-span-4 border border-slate-200 bg-white/70 shadow-lg`}
             >
                 <div className="mb-4">
-                    <p className={`text-xl font-semibold ${theme === "light" ? "text-slate-800" : "text-white"}`}>Overview</p>
+                    <p className={`text-xl font-semibold text-slate-800`}>Overview</p>
                 </div>
                 <div className="h-[300px]">
                     <ResponsiveContainer
@@ -95,7 +93,7 @@ function WeeklySchedule() {
                             </defs>
                             <Tooltip
                                 contentStyle={{
-                                    background: theme === "dark" ? "#1e293b" : "#ffffff",
+                                    background: "#ffffff",
                                     border: "none",
                                     borderRadius: "0.5rem",
                                     boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
@@ -109,12 +107,12 @@ function WeeklySchedule() {
                             <XAxis
                                 dataKey="name"
                                 strokeWidth={0}
-                                tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8" }}
+                                tick={{ fill: "#64748b" }}
                             />
                             <YAxis
                                 dataKey="total"
                                 strokeWidth={0}
-                                tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8" }}
+                                tick={{ fill: "#64748b" }}
                                 tickFormatter={(value) => `${value} kg`}
                             />
                             <Area
@@ -131,17 +129,17 @@ function WeeklySchedule() {
             </div>
 
             {/* Weekly Schedule Panel */}
-            <div className="card col-span-1 rounded bg-white shadow dark:bg-slate-800 md:col-span-2 lg:col-span-3">
-                <div className="card-header border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-                    <p className="card-title text-lg font-semibold text-slate-800 dark:text-white">Weekly Incoming Schedule</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+            <div className="card col-span-1 rounded bg-white shadow md:col-span-2 lg:col-span-3">
+                <div className="card-header border-b border-slate-200 px-4 py-3">
+                    <p className="card-title text-lg font-semibold text-slate-800">Weekly Incoming Schedule</p>
+                    <p className="text-sm text-slate-500">
                         {monday.toLocaleDateString()} - {sunday.toLocaleDateString()}
                     </p>
                 </div>
 
-                <div className="card-body h-[300px] divide-y divide-slate-100 overflow-y-auto p-0 dark:divide-slate-700">
+                <div className="card-body h-[300px] divide-y divide-slate-100 overflow-y-auto p-0">
                     {weeklyDoses.length === 0 ? (
-                        <div className="p-4 text-center text-slate-500 dark:text-slate-400">No scheduled visits this week.</div>
+                        <div className="p-4 text-center text-slate-500">No scheduled visits this week.</div>
                     ) : (
                         weeklyDoses.map((dose) => {
                             const dateObj = new Date(dose.next_due_date);
@@ -156,15 +154,15 @@ function WeeklySchedule() {
                                     key={`${dose.recordId}-${dose._id || dose.id}`}
                                     className="flex items-start gap-4 px-4 py-4"
                                 >
-                                    <div className="flex w-10 flex-col items-center justify-center text-red-500 dark:text-red-400">
+                                    <div className="flex w-10 flex-col items-center justify-center text-red-500">
                                         <CalendarDays className="h-5 w-5" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="font-medium text-slate-800 dark:text-white">{dose.newbornName || "Unnamed"}</p>
-                                        <p className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400">
+                                        <p className="font-medium text-slate-800">{dose.newbornName || "Unnamed"}</p>
+                                        <p className="flex items-center gap-1 text-sm text-slate-500">
                                             <CalendarDays className="h-4 w-4" /> {dayName}, {time}
                                         </p>
-                                        <p className="mt-1 flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
+                                        <p className="mt-1 flex items-center gap-1 text-xs text-slate-400">
                                             <MapPin className="h-3 w-3" /> Zone: {dose.FullAddress || "N/A"}
                                         </p>
                                     </div>

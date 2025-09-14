@@ -114,15 +114,15 @@ function UserTable() {
     };
 
     return (
-        <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
-            <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">User List</h2>
+        <div className="rounded-lg bg-white shadow xs:p-2 sm:p-6">
+            <div className="flex flex-col gap-4 border-b border-gray-200 p-4 md:flex-row md:items-center md:justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">User List</h2>
                 <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
                     {/* Search input */}
                     <input
                         type="text"
                         placeholder="Search users..."
-                        className="input input-sm flex-grow rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white min-w-[180px] md:min-w-0"
+                        className="input input-sm flex-grow rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 min-w-[180px] md:min-w-0"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -131,7 +131,7 @@ function UserTable() {
                     />
                     {/* Date filter inputs - Now uses flex-wrap to stack on small screens */}
                     <div className="flex flex-wrap items-center gap-2 flex-grow-0">
-                        <label htmlFor="dateFrom" className="text-sm font-medium text-gray-700 dark:text-gray-300">From:</label>
+                        <label htmlFor="dateFrom" className="text-sm font-medium text-gray-700">From:</label>
                         <input
                             type="date"
                             id="dateFrom"
@@ -140,10 +140,10 @@ function UserTable() {
                                 setDateFrom(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white w-32 md:w-auto"
+                            className="input input-xs rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 w-32 md:w-auto"
                             title="Filter by 'Created At' date (From)"
                         />
-                        <label htmlFor="dateTo" className="text-sm font-medium text-gray-700 dark:text-gray-300">To:</label>
+                        <label htmlFor="dateTo" className="text-sm font-medium text-gray-700">To:</label>
                         <input
                             type="date"
                             id="dateTo"
@@ -152,13 +152,13 @@ function UserTable() {
                                 setDateTo(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white w-32 md:w-auto"
+                            className="input input-xs rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 w-32 md:w-auto"
                             title="Filter by 'Created At' date (To)"
                         />
                     </div>
                     {/* Page size selector */}
                     <div className="flex items-center gap-2 flex-grow-0">
-                        <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700 dark:text-gray-300">Show:</label>
+                        <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700">Show:</label>
                         <input
                             type="number"
                             id="itemsPerPage"
@@ -171,10 +171,10 @@ function UserTable() {
                                     handleItemsPerPageChange(e);
                                 }
                             }}
-                            className="input input-xs w-16 text-center rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                            className="input input-xs w-16 text-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800"
                             aria-label="Items per page"
                         />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">users per page</span>
+                        <span className="text-sm text-gray-700">users per page</span>
                     </div>
                 </div>
             </div>
@@ -191,21 +191,21 @@ function UserTable() {
 
             <div className="hidden overflow-x-auto sm:block">
                 <table className="table min-w-full text-sm">
-                    <thead className="bg-gray-100 dark:bg-gray-800">
+                    <thead className="bg-gray-100">
                         <tr>
-                            <th className="p-3 text-left">#</th>
-                            <th className="p-3 text-left">Avatar</th>
-                            <th className="p-3 text-left">Full Name</th>
-                            <th className="p-3 text-left">Email</th>
-                            <th className="p-3 text-left">Role</th>
-                            <th className="p-3 text-left">Address</th>
-                            <th className="p-3 text-left">Zone</th>
-                            <th className="p-3 text-left">Designated Zone</th>
-                            <th className="p-3 text-left">Phone</th>
-                            <th className="p-3 text-left">DOB</th>
-                            <th className="p-3 text-left">Gender</th>
-                            <th className="p-3 text-left">Created At</th>
-                            <th className="p-3 text-left">
+                            <th className="p-3 text-left text-gray-500">#</th>
+                            <th className="p-3 text-left text-gray-500">Avatar</th>
+                            <th className="p-3 text-left text-gray-500">Full Name</th>
+                            <th className="p-3 text-left text-gray-500">Email</th>
+                            <th className="p-3 text-left text-gray-500">Role</th>
+                            <th className="p-3 text-left text-gray-500">Address</th>
+                            <th className="p-3 text-left text-gray-500">Zone</th>
+                            <th className="p-3 text-left text-gray-500">Designated Zone</th>
+                            <th className="p-3 text-left text-gray-500">Phone</th>
+                            <th className="p-3 text-left text-gray-500">DOB</th>
+                            <th className="p-3 text-left text-gray-500">Gender</th>
+                            <th className="p-3 text-left text-gray-500">Created At</th>
+                            <th className="p-3 text-left text-gray-500">
                                 <button
                                     onClick={handleAddClick}
                                     className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
@@ -221,7 +221,7 @@ function UserTable() {
                             <tr>
                                 <td
                                     colSpan="13"
-                                    className="p-4 text-center text-gray-500 dark:text-gray-400"
+                                    className="p-4 text-center text-gray-500"
                                 >
                                     No users found.
                                 </td>
@@ -233,9 +233,9 @@ function UserTable() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.3 }}
-                                    className="border-b hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                    className="border-b border-gray-200 hover:bg-gray-50"
                                 >
-                                    <td className="p-3 align-top">{indexOfFirstUser + index + 1}</td>
+                                    <td className="p-3 align-top text-gray-800">{indexOfFirstUser + index + 1}</td>
                                     <td className="p-3 align-top">
                                         {user.avatar ? (
                                             <img
@@ -249,16 +249,16 @@ function UserTable() {
                                             </div>
                                         )}
                                     </td>
-                                        <td className="p-3 align-top">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
-                                    <td className="p-3 align-top">{user.email}</td>
-                                    <td className="p-3 align-top capitalize">{user.role}</td>
-                                    <td className="max-w-xs truncate p-3 align-top">{user.address || "N/A"}</td>
-                                    <td className="p-3 align-top">{user.zone || "N/A"}</td>
-                                    <td className="p-3 align-top">{user.Designatedzone || "N/A"}</td>
-                                    <td className="p-3 align-top">{user.phoneNumber || "N/A"}</td>
-                                    <td className="p-3 align-top">{formatDate(user.dateOfBirth)}</td>
-                                    <td className="p-3 align-top capitalize">{user.gender || "N/A"}</td>
-                                    <td className="p-3 align-top">{formatDate(user.createdAt)}</td>
+                                    <td className="p-3 align-top text-gray-800">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
+                                    <td className="p-3 align-top text-gray-800">{user.email}</td>
+                                    <td className="p-3 align-top capitalize text-gray-800">{user.role}</td>
+                                    <td className="max-w-xs truncate p-3 align-top text-gray-800">{user.address || "N/A"}</td>
+                                    <td className="p-3 align-top text-gray-800">{user.zone || "N/A"}</td>
+                                    <td className="p-3 align-top text-gray-800">{user.Designatedzone || "N/A"}</td>
+                                    <td className="p-3 align-top text-gray-800">{user.phoneNumber || "N/A"}</td>
+                                    <td className="p-3 align-top text-gray-800">{formatDate(user.dateOfBirth)}</td>
+                                    <td className="p-3 align-top capitalize text-gray-800">{user.gender || "N/A"}</td>
+                                    <td className="p-3 align-top text-gray-800">{formatDate(user.createdAt)}</td>
                                     <td className="p-3 align-top">
                                         <div className="flex gap-2">
                                             <motion.button
@@ -288,14 +288,14 @@ function UserTable() {
 
             <div className="mt-4 space-y-4 sm:hidden">
                 {currentUsers.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                    <div className="p-4 text-center text-gray-500">
                         No users found.
                     </div>
                 ) : (
                     currentUsers.map((user) => (
                         <div
                             key={user._id}
-                            className="rounded-lg border p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+                            className="rounded-lg border border-gray-200 p-4 shadow-sm"
                         >
                             <div className="flex items-center gap-3">
                                 {user.avatar ? (
@@ -310,28 +310,28 @@ function UserTable() {
                                     </div>
                                 )}
                                 <div>
-                                    <h4 className="text-base font-semibold text-gray-800 dark:text-white">{`${user.FirstName} ${user.LastName}`}</h4>
-                                    <p className="text-sm text-gray-500 dark:text-gray-300">{user.email}</p>
+                                    <h4 className="text-base font-semibold text-gray-800">{`${user.FirstName} ${user.LastName}`}</h4>
+                                    <p className="text-sm text-gray-500">{user.email}</p>
                                 </div>
                             </div>
-                            <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                            <div className="mt-2 text-sm text-gray-700">
                                 <p>
-                                    <span className="font-semibold">Role:</span> {user.role}
+                                    <span className="font-semibold text-gray-800">Role:</span> {user.role}
                                 </p>
                                 <p>
-                                    <span className="font-semibold">Zone:</span> {user.zone || "N/A"}
+                                    <span className="font-semibold text-gray-800">Zone:</span> {user.zone || "N/A"}
                                 </p>
                                 <p>
-                                    <span className="font-semibold">Phone:</span> {user.phoneNumber || "N/A"}
+                                    <span className="font-semibold text-gray-800">Phone:</span> {user.phoneNumber || "N/A"}
                                 </p>
                                 <p>
-                                    <span className="font-semibold">DOB:</span> {formatDate(user.dateOfBirth)}
+                                    <span className="font-semibold text-gray-800">DOB:</span> {formatDate(user.dateOfBirth)}
                                 </p>
                                 <p>
-                                    <span className="font-semibold">Gender:</span> {user.gender || "N/A"}
+                                    <span className="font-semibold text-gray-800">Gender:</span> {user.gender || "N/A"}
                                 </p>
                                 <p>
-                                    <span className="font-semibold">Created At:</span> {formatDate(user.createdAt)}
+                                    <span className="font-semibold text-gray-800">Created At:</span> {formatDate(user.createdAt)}
                                 </p>
                             </div>
                             <div className="mt-3 flex justify-end gap-2">
@@ -353,21 +353,21 @@ function UserTable() {
                 )}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between border-t px-4 py-3 dark:border-gray-700 gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 px-4 py-3 gap-3">
                 {totalPages > 0 && (
                     <div className="flex items-center gap-4">
                         <button
-                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
+                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === 1 ? "text-gray-400" : "text-gray-700 hover:bg-gray-100"}`}
                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
                         >
                             Previous
                         </button>
-                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                        <span className="text-sm text-gray-700">
                             Page {currentPage} of {totalPages} • {filteredUsers.length} users
                         </span>
                         <button
-                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
+                            className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "text-gray-700 hover:bg-gray-100"}`}
                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}
                         >

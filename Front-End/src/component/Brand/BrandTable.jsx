@@ -97,10 +97,10 @@ function BrandTable() {
     };
 
     const handleCloseModal = () => {
-        setVerification(false);
-        setFormBrand(false);
-        setPassdata("");
-        setDeleteID(null);
+            setVerification(false);
+            setFormBrand(false);
+            setPassdata("");
+            setDeleteID(null);
     };
 
     const handleItemsPerPageChange = (e) => {
@@ -110,16 +110,16 @@ function BrandTable() {
     };
 
     return (
-        <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
-            <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Brand List</h2>
+        <div className="rounded-lg bg-white shadow xs:p-2 sm:p-6">
+            <div className="flex flex-col gap-4 border-b p-4 md:flex-row md:items-center md:justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">Brand List</h2>
                 {/* Consolidated filter controls into one flex container for responsive layout */}
                 <div className="flex w-full flex-wrap items-center gap-4 md:w-auto">
                     {/* Search input */}
                     <input
                         type="text"
                         placeholder="Search brands by name..."
-                        className="input input-sm min-w-[180px] flex-grow rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:min-w-0"
+                        className="input input-sm min-w-[180px] flex-grow rounded-md border border-gray-300 px-3 py-1 text-sm md:min-w-0"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -130,7 +130,7 @@ function BrandTable() {
                     <div className="flex flex-grow-0 flex-wrap items-center gap-2">
                         <label
                             htmlFor="dateFrom"
-                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                            className="text-sm font-medium text-gray-700"
                         >
                             From:
                         </label>
@@ -142,12 +142,12 @@ function BrandTable() {
                                 setDateFrom(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-auto"
+                            className="input input-xs w-32 text-gray-500 rounded-md border border-gray-300 px-2 py-1 text-sm md:w-auto"
                             title="Filter by 'Created At' date (From)"
                         />
                         <label
                             htmlFor="dateTo"
-                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                            className="text-sm font-medium text-gray-700"
                         >
                             To:
                         </label>
@@ -159,7 +159,7 @@ function BrandTable() {
                                 setDateTo(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-auto"
+                            className="input input-xs w-32 text-gray-500 rounded-md border border-gray-300 px-2 py-1 text-sm md:w-auto"
                             title="Filter by 'Created At' date (To)"
                         />
                     </div>
@@ -167,7 +167,7 @@ function BrandTable() {
                     <div className="flex flex-grow-0 items-center gap-2">
                         <label
                             htmlFor="itemsPerPage"
-                            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                            className="text-sm font-medium text-gray-700"
                         >
                             Show:
                         </label>
@@ -183,22 +183,22 @@ function BrandTable() {
                                     handleItemsPerPageChange(e);
                                 }
                             }}
-                            className="input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                            className="input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-gray-500 text-center text-sm"
                             aria-label="Items per page"
                         />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">brands per page</span>
+                        <span className="text-sm text-gray-700">brands per page</span>
                     </div>
                 </div>
             </div>
 
             <div className="hidden overflow-x-auto sm:block">
                 <table className="table min-w-full text-sm">
-                    <thead className="bg-gray-100 dark:bg-gray-800">
+                    <thead className="bg-gray-100">
                         <tr>
-                            <th className="p-3 text-left">#</th>
-                            <th className="p-3 text-left">Name</th>
-                            <th className="p-3 text-left">Created At</th>
-                            <th className="p-3 text-left">
+                            <th className="p-3 text-left text-gray-500">#</th>
+                            <th className="p-3 text-left text-gray-500">Name</th>
+                            <th className="p-3 text-left text-gray-500">Created At</th>
+                            <th className="p-3 text-left text-gray-500">
                                 <button
                                     onClick={handleAddBrand}
                                     className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
@@ -214,7 +214,7 @@ function BrandTable() {
                             <tr>
                                 <td
                                     colSpan="4"
-                                    className="p-4 text-center text-gray-500 dark:text-gray-400"
+                                    className="p-4 text-center text-gray-500"
                                 >
                                     No brands found.
                                 </td>
@@ -226,11 +226,11 @@ function BrandTable() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.3 }}
-                                    className="border-b hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                    className="border-b hover:bg-gray-50"
                                 >
-                                    <td className="p-3 align-top">{indexOfFirstBrand + index + 1}</td>
-                                    <td className="p-3 align-top">{brand.name}</td>
-                                    <td className="p-3 align-top">{formatDate(brand.createdAt)}</td>
+                                    <td className="p-3 align-top text-gray-500">{indexOfFirstBrand + index + 1}</td>
+                                    <td className="p-3 align-top text-gray-500">{brand.name}</td>
+                                    <td className="p-3 align-top text-gray-500">{formatDate(brand.createdAt)}</td>
                                     <td className="p-3 align-top">
                                         <div className="flex flex-wrap gap-2">
                                             <motion.button
@@ -271,12 +271,12 @@ function BrandTable() {
                 </button>
 
                 {currentBrands.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">No brands found.</div>
+                    <div className="p-4 text-center text-gray-500">No brands found.</div>
                 ) : (
                     currentBrands.map((brand) => (
                         <div
                             key={brand._id}
-                            className="rounded-lg border p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+                            className="rounded-lg border p-4 shadow-sm"
                         >
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-center gap-3">
@@ -284,8 +284,8 @@ function BrandTable() {
                                         {getInitial(brand.name)}
                                     </div>
                                     <div>
-                                        <h4 className="text-base font-semibold text-gray-800 dark:text-white">{brand.name}</h4>
-                                        <p className="text-sm text-gray-500 dark:text-gray-300">Created: {formatDate(brand.createdAt)}</p>
+                                        <h4 className="text-base font-semibold text-gray-800">{brand.name}</h4>
+                                        <p className="text-sm text-gray-500">Created: {formatDate(brand.createdAt)}</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
@@ -315,28 +315,28 @@ function BrandTable() {
             </div>
 
             {/* Pagination */}
-            <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 dark:border-gray-700 sm:flex-row">
+            <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row">
                 {totalPages > 0 && (
                     <div className="flex items-center gap-4">
                         <button
                             className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
                                 currentPage === totalPages
-                                    ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
-                                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                                    ? "cursor-not-allowed text-gray-400"
+                                    : "text-gray-700 hover:bg-gray-100"
                             }`}
                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
                         >
                             Previous
                         </button>
-                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                        <span className="text-sm text-gray-700">
                             Page {currentPage} of {totalPages} • {filteredBrands.length} brands
                         </span>
                         <button
                             className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
                                 currentPage === totalPages
-                                    ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
-                                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                                    ? "cursor-not-allowed text-gray-400"
+                                    : "text-gray-700 hover:bg-gray-100"
                             }`}
                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}

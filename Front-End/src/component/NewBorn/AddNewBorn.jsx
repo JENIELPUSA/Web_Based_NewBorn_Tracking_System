@@ -9,7 +9,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
-    const { userId, DesignatedZone ,role} = useContext(AuthContext);
+    const { userId, DesignatedZone, role } = useContext(AuthContext);
     const { AddNewBorn, UpdateBorn, customError } = useContext(NewBornDisplayContext);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -108,12 +108,12 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 initial={{ opacity: 0, y: -40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -40 }}
-                className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800"
+                className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl"
             >
-                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">{born ? "Edit Newborn Info" : "Add Newborn"}</h2>
+                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">{born ? "Edit Newborn Info" : "Add Newborn"}</h2>
 
                 {customError && (
-                    <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700 dark:bg-red-900 dark:text-red-200">
+                    <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">
                         {customError}
                     </div>
                 )}
@@ -124,58 +124,58 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 >
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">First Name</label>
+                            <label className="mb-1 block text-sm text-gray-600">First Name</label>
                             <input
                                 type="text"
                                 name="firstName"
                                 value={formData.firstName}
                                 onChange={handleChange}
-                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Middle Name</label>
+                            <label className="mb-1 block text-sm text-gray-600">Middle Name</label>
                             <input
                                 type="text"
                                 name="middleName"
                                 value={formData.middleName}
                                 onChange={handleChange}
-                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Last Name</label>
+                            <label className="mb-1 block text-sm text-gray-600">Last Name</label>
                             <input
                                 type="text"
                                 name="lastName"
                                 value={formData.lastName}
                                 onChange={handleChange}
-                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Date of Birth</label>
+                            <label className="mb-1 block text-sm text-gray-600">Date of Birth</label>
                             <input
                                 type="date"
                                 name="dateOfBirth"
                                 value={formData.dateOfBirth}
                                 onChange={handleChange}
-                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Extension Name</label>
+                            <label className="mb-1 block text-sm text-gray-600">Extension Name</label>
                             <input
                                 type="text"
                                 name="extensionName"
                                 value={formData.extensionName}
                                 onChange={handleChange}
-                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     </div>
@@ -183,30 +183,30 @@ function AddNewBorn({ isOpen, onClose, born }) {
                     <div className="grid grid-cols-2 gap-4">
                         {/* Gender Dropdown */}
                         <div className="relative">
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Gender</label>
+                            <label className="mb-1 block text-sm text-gray-600">Gender</label>
                             <div
-                                className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700"
                                 onClick={() => setDropdownOpenGender(!dropdownOpenGender)}
                             >
                                 <span>{formData.gender || "Select Gender"}</span>
                                 <i className={`fas ${dropdownOpenGender ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
                             </div>
                             {dropdownOpenGender && (
-                                <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700">
+                                <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                                         onClick={() => handleSelect("gender", "")}
                                     >
                                         Select Gender
                                     </li>
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                                         onClick={() => handleSelect("gender", "Male")}
                                     >
                                         Male
                                     </li>
                                     <li
-                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                        className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                                         onClick={() => handleSelect("gender", "Female")}
                                     >
                                         Female
@@ -215,22 +215,22 @@ function AddNewBorn({ isOpen, onClose, born }) {
                             )}
                         </div>
                         <div>
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Birth Weight (kg)</label>
+                            <label className="mb-1 block text-sm text-gray-600">Birth Weight (kg)</label>
                             <input
                                 type="number"
                                 step="0.01"
                                 name="birthWeight"
                                 value={formData.birthWeight}
                                 onChange={handleChange}
-                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     </div>
 
                     <div className="relative">
-                            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Mother's Name</label>   {" "}
+                        <label className="mb-1 block text-sm text-gray-600">Mother's Name</label>{" "}
                         <div
-                            className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                            className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700"
                             onClick={() => setDropdownOpen(!dropdownOpen)}
                         >
                             <span>
@@ -243,9 +243,9 @@ function AddNewBorn({ isOpen, onClose, born }) {
                             <i className={`fas ${dropdownOpen ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
                         </div>
                         {dropdownOpen && (
-                            <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700">
+                            <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
                                 <li
-                                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                    className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                                     onClick={() => handleSelect("motherName", "")}
                                 >
                                     Select Mother
@@ -256,12 +256,12 @@ function AddNewBorn({ isOpen, onClose, born }) {
                                         if (role === DesignatedZone) {
                                             return parent.address?.includes(zone);
                                         }
-                                        return true; 
+                                        return true;
                                     })
                                     .map((parent) => (
                                         <li
                                             key={parent._id}
-                                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                                            className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                                             onClick={() => handleSelect("motherName", parent._id)}
                                         >
                                             {parent.FirstName} {parent.LastName}
@@ -272,14 +272,14 @@ function AddNewBorn({ isOpen, onClose, born }) {
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm text-gray-600 dark:text-gray-300">Birth Height (cm)</label>
+                        <label className="mb-1 block text-sm text-gray-600">Birth Height (cm)</label>
                         <input
                             type="number"
                             step="0.01"
                             name="birthHeight"
                             value={formData.birthHeight}
                             onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 
@@ -287,7 +287,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                            className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400"
                         >
                             Cancel
                         </button>
@@ -295,7 +295,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                             type="submit"
                             disabled={isSubmitting}
                             className={
-                                "rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400 dark:bg-red-600 dark:text-gray-200 dark:hover:bg-pink-500"
+                                "rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700 disabled:bg-gray-400"
                             }
                         >
                             {isSubmitting ? (

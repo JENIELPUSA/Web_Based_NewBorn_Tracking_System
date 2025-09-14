@@ -78,7 +78,7 @@ const ProfileModal = ({ isOpen, onClose, data }) => {
             onClick={onClose} // Close modal when clicking outside
           >
             <motion.div
-              className="relative mx-auto w-full max-w-xs overflow-hidden rounded-xl bg-white p-6 shadow-lg sm:max-w-md dark:bg-gray-800 dark:shadow-2xl"
+              className="relative mx-auto w-full max-w-xs overflow-hidden rounded-xl bg-white p-6 shadow-lg sm:max-w-md"
               variants={modalVariants}
               initial="hidden"
               animate="visible"
@@ -89,14 +89,14 @@ const ProfileModal = ({ isOpen, onClose, data }) => {
               {/* Close button for the modal */}
               <button
                 onClick={onClose}
-                className="absolute right-4 top-4 text-2xl font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                className="absolute right-4 top-4 text-2xl font-bold text-gray-500 hover:text-gray-800"
               >
                 &times;
               </button>
 
               {/* Modal content: Title and action buttons */}
               <div className="flex flex-col items-center">
-                <h2 className="mb-6 text-xl font-semibold text-gray-800 sm:text-2xl dark:text-white text-center">
+                <h2 className="mb-6 text-xl font-semibold text-gray-800 sm:text-2xl text-center">
                   Actions for {fullName || "Newborn"}
                 </h2>
 
@@ -104,25 +104,25 @@ const ProfileModal = ({ isOpen, onClose, data }) => {
                 <div className="flex w-full flex-col space-y-3">
                   <button
                     onClick={handleCheckUpVisit}
-                    className="w-full transform rounded-full bg-green-500 px-4 py-2 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-800"
+                    className="w-full transform rounded-full bg-green-500 px-4 py-2 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-green-600"
                   >
                     Visit Entry
                   </button>
                   <button
                     onClick={handleDisplayVaccine}
-                    className="w-full transform rounded-full bg-purple-500 px-4 py-2 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-purple-600 dark:bg-purple-700 dark:hover:bg-purple-800"
+                    className="w-full transform rounded-full bg-purple-500 px-4 py-2 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-purple-600"
                   >
                     Vaccine Checklist
                   </button>
                   <button
                     onClick={handleAssignVaccine}
-                    className="w-full transform rounded-full bg-yellow-500 px-4 py-2 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-yellow-600 dark:bg-yellow-700 dark:hover:bg-yellow-800"
+                    className="w-full transform rounded-full bg-yellow-500 px-4 py-2 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-yellow-600"
                   >
                     Assign Vaccine
                   </button>
                   <button
                     onClick={() => handleEditInfo(data)}
-                    className="w-full transform rounded-full bg-blue-500 px-4 py-2 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800"
+                    className="w-full transform rounded-full bg-blue-500 px-4 py-2 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-blue-600"
                   >
                     Edit Info
                   </button>

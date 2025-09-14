@@ -7,7 +7,7 @@ import UserFormModal from "../User/AddUser";
 import StatusVerification from "../../ReusableFolder/StatusModal";
 
 function ParentTable() {
-    const {isParent,DeleteParent}=useContext(ParentDisplayContext)
+    const { isParent, DeleteParent } = useContext(ParentDisplayContext);
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -15,6 +15,8 @@ function ParentTable() {
     const [isAddFormOpen, setAddFormOpen] = useState(false);
     const [isVerification, setVerification] = useState(false);
     const [isDeleteID, setIsDeleteId] = useState("");
+    const { setUsers } = useContext(UserDisplayContext);
+
     const filteredUsers = useMemo(() => {
         const data = Array.isArray(isParent) ? isParent : [];
         return data.filter((user) =>
@@ -62,7 +64,7 @@ function ParentTable() {
     };
 
     const getInitials = (name) => {
-        if (!name) return "US"; // Default to "US" for User if no name
+        if (!name) return "US"; 
         const names = name.split(" ");
         let initials = names[0].substring(0, 1).toUpperCase();
         if (names.length > 1) {
@@ -72,15 +74,14 @@ function ParentTable() {
     };
 
     return (
-        <div className="rounded-lg bg-white shadow dark:bg-gray-900 xs:p-2 sm:p-6">
-            <div className="flex flex-col gap-4 border-b p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Parent List</h2>
+        <div className="rounded-lg bg-white shadow xs:p-2 sm:p-6">
+            <div className="flex flex-col gap-4 border-b p-4 border-gray-200 md:flex-row md:items-center md:justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">Parent List</h2>
                 <div className="flex items-center gap-2">
-                    {/* This search input is always visible */}
                     <input
                         type="text"
                         placeholder="Search users..."
-                        className="input input-sm w-full rounded-md border border-gray-300 px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white md:w-56"
+                        className="input input-sm w-full rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 md:w-56"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -90,7 +91,6 @@ function ParentTable() {
                 </div>
             </div>
 
-            {/* This Add button is only visible on small screens (hidden on sm and above) */}
             <div className="mt-4 flex justify-center sm:hidden">
                 <button
                     onClick={handleAddClick}
@@ -101,19 +101,18 @@ function ParentTable() {
                 </button>
             </div>
 
-            {/* Table View */}
             <div className="hidden overflow-x-auto sm:block">
                 <table className="table min-w-full text-sm">
-                    <thead className="bg-gray-100 dark:bg-gray-800">
+                    <thead className="bg-gray-100">
                         <tr>
-                            <th className="p-3 text-left">#</th>
-                            <th className="p-3 text-left">Avatar</th>
-                            <th className="p-3 text-left">Full Name</th>
-                            <th className="p-3 text-left">Email</th>
-                            <th className="p-3 text-left">Address</th>
-                            <th className="p-3 text-left">Phone</th>
-                            <th className="p-3 text-left">DOB</th>
-                            <th className="p-3 text-left">Gender</th>
+                            <th className="p-3 text-left text-gray-500">#</th>
+                            <th className="p-3 text-left text-gray-500">Avatar</th>
+                            <th className="p-3 text-left text-gray-500">Full Name</th>
+                            <th className="p-3 text-left text-gray-500">Email</th>
+                            <th className="p-3 text-left text-gray-500">Address</th>
+                            <th className="p-3 text-left text-gray-500">Phone</th>
+                            <th className="p-3 text-left text-gray-500">DOB</th>
+                            <th className="p-3 text-left text-gray-500">Gender</th>
                             <th className="p-3 text-left">
                                 <button
                                     onClick={handleAddClick}
@@ -130,7 +129,7 @@ function ParentTable() {
                             <tr>
                                 <td
                                     colSpan="11"
-                                    className="p-4 text-center text-gray-500 dark:text-gray-400"
+                                    className="p-4 text-center text-gray-500"
                                 >
                                     No users found.
                                 </td>
@@ -142,9 +141,9 @@ function ParentTable() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.3 }}
-                                    className="border-b hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                    className="border-b border-gray-200 hover:bg-gray-50"
                                 >
-                                    <td className="p-3 align-top">{indexOfFirstUser + index + 1}</td>
+                                    <td className="p-3 align-top text-gray-800">{indexOfFirstUser + index + 1}</td>
                                     <td className="p-3 align-top">
                                         {user.avatar ? (
                                             <img
@@ -158,15 +157,14 @@ function ParentTable() {
                                             </div>
                                         )}
                                     </td>
-                                    <td className="p-3 align-top">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
-                                    <td className="p-3 align-top">{user.email}</td>
-                                    <td className="max-w-xs truncate p-3 align-top">
+                                    <td className="p-3 align-top text-gray-800">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
+                                    <td className="p-3 align-top text-gray-800">{user.email}</td>
+                                    <td className="max-w-xs truncate p-3 align-top text-gray-800">
                                         {user.zone ? `${user.zone}, ${user.address}` : user.address || "N/A"}
                                     </td>
-
-                                    <td className="p-3 align-top">{user.phoneNumber || "N/A"}</td>
-                                    <td className="p-3 align-top">{formatDate(user.dateOfBirth)}</td>
-                                    <td className="p-3 align-top capitalize">{user.gender || "N/A"}</td>
+                                    <td className="p-3 align-top text-gray-800">{user.phoneNumber || "N/A"}</td>
+                                    <td className="p-3 align-top text-gray-800">{formatDate(user.dateOfBirth)}</td>
+                                    <td className="p-3 align-top capitalize text-gray-800">{user.gender || "N/A"}</td>
                                     <td className="p-3 align-top">
                                         <div className="flex gap-2">
                                             <motion.button
@@ -197,7 +195,7 @@ function ParentTable() {
                 {currentUsers.map((user) => (
                     <div
                         key={user._id}
-                        className="rounded-lg border p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+                        className="rounded-lg border border-gray-200 p-4 shadow-sm"
                     >
                         <div className="flex items-center gap-3">
                             {user.avatar ? (
@@ -212,25 +210,25 @@ function ParentTable() {
                                 </div>
                             )}
                             <div>
-                                <h4 className="text-base font-semibold text-gray-800 dark:text-white">{`${user.FirstName} ${user.LastName}`}</h4>
-                                <p className="text-sm text-gray-500 dark:text-gray-300">{user.email}</p>
+                                <h4 className="text-base font-semibold text-gray-800">{`${user.FirstName} ${user.LastName}`}</h4>
+                                <p className="text-sm text-gray-500">{user.email}</p>
                             </div>
                         </div>
-                        <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                        <div className="mt-2 text-sm text-gray-700">
                             <p>
-                                <span className="font-semibold">Role:</span> {user.role}
+                                <span className="font-semibold text-gray-800">Role:</span> {user.role}
                             </p>
                             <p>
-                                <span className="font-semibold">Zone:</span> {user.zone || "N/A"}
+                                <span className="font-semibold text-gray-800">Zone:</span> {user.zone || "N/A"}
                             </p>
                             <p>
-                                <span className="font-semibold">Phone:</span> {user.phoneNumber || "N/A"}
+                                <span className="font-semibold text-gray-800">Phone:</span> {user.phoneNumber || "N/A"}
                             </p>
                             <p>
-                                <span className="font-semibold">DOB:</span> {formatDate(user.dateOfBirth)}
+                                <span className="font-semibold text-gray-800">DOB:</span> {formatDate(user.dateOfBirth)}
                             </p>
                             <p>
-                                <span className="font-semibold">Gender:</span> {user.gender || "N/A"}
+                                <span className="font-semibold text-gray-800">Gender:</span> {user.gender || "N/A"}
                             </p>
                         </div>
                         <div className="mt-3 flex justify-end gap-2">
@@ -251,21 +249,20 @@ function ParentTable() {
                 ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-between border-t px-4 py-3 dark:border-gray-700">
+                <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
                     <button
-                        className={`rounded-md px-3 py-1.5 text-sm ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
+                        className={`rounded-md px-3 py-1.5 text-sm ${currentPage === 1 ? "text-gray-400" : "text-gray-700 hover:bg-gray-100"}`}
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
                     >
                         Previous
                     </button>
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-sm text-gray-700">
                         Page {currentPage} of {totalPages} • {filteredUsers.length} users
                     </span>
                     <button
-                        className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"}`}
+                        className={`rounded-md px-3 py-1.5 text-sm ${currentPage === totalPages ? "text-gray-400" : "text-gray-700 hover:bg-gray-100"}`}
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
                     >

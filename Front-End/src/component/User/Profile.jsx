@@ -55,11 +55,11 @@ function Profile() {
         if (!show) return null;
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-                <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-                    <h3 className="mb-4 border-b pb-2 text-2xl font-bold text-gray-800 dark:text-white">{title}</h3>
+                <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+                    <h3 className="mb-4 border-b pb-2 text-2xl font-bold text-gray-800">{title}</h3>
                     <button
                         onClick={onClose}
-                        className="absolute right-4 top-4 text-2xl font-bold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        className="absolute right-4 top-4 text-2xl font-bold text-gray-500 hover:text-gray-700"
                     >
                         &times;
                     </button>
@@ -71,12 +71,12 @@ function Profile() {
 
     return (
         <div className="font-inter flex min-h-screen items-center justify-center">
-            <div className="w-full max-w-5xl rounded-xl bg-white p-8 shadow-xl dark:border dark:border-gray-700 dark:bg-gray-800">
+            <div className="w-full max-w-5xl rounded-xl bg-white p-8 shadow-xl">
                 <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Profile Picture Section */}
-                    <div className="flex flex-col items-center rounded-lg bg-gray-50 p-4 shadow-inner dark:border dark:border-gray-600 dark:bg-gray-700">
-                        <h2 className="mb-6 text-xl font-bold text-gray-800 dark:text-white">Profile Picture</h2>
-                        <div className="mb-6 flex h-48 w-48 items-center justify-center overflow-hidden rounded-full border-4 border-blue-400 bg-blue-100 shadow-md dark:border-blue-600 dark:bg-blue-800">
+                    <div className="flex flex-col items-center rounded-lg bg-gray-50 p-4 shadow-inner">
+                        <h2 className="mb-6 text-xl font-bold text-gray-800">Profile Picture</h2>
+                        <div className="mb-6 flex h-48 w-48 items-center justify-center overflow-hidden rounded-full border-4 border-blue-400 bg-blue-100 shadow-md">
                             {avatar ? (
                                 <img
                                     src={`https://web-based-newborn-tracking-system-server.onrender.com${avatar?.replace(/\\/g, "/")}`}
@@ -84,8 +84,8 @@ function Profile() {
                                     className="h-48 w-48 rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="flex h-48 w-48 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
-                                    <User className="h-12 w-12 text-blue-600 dark:text-blue-200" />
+                                <div className="flex h-48 w-48 items-center justify-center rounded-full bg-blue-100">
+                                    <User className="h-12 w-12 text-blue-600" />
                                 </div>
                             )}
                         </div>
@@ -93,11 +93,11 @@ function Profile() {
 
                     {/* Profile Info Section */}
                     <div className="flex flex-col justify-center p-4 lg:col-span-2">
-                        <h1 className="mb-3 text-4xl font-extrabold text-gray-900 dark:text-white">
+                        <h1 className="mb-3 text-4xl font-extrabold text-gray-900">
                             {FirstName} {Middle && `${Middle}.`} {LastName} {extensionName && <span>{extensionName}</span>}
                         </h1>
-                        <p className="mb-6 text-xl font-semibold text-blue-600 dark:text-blue-400">{role}</p>
-                        <div className="grid grid-cols-1 gap-3 text-lg text-gray-700 dark:text-gray-300 md:grid-cols-2">
+                        <p className="mb-6 text-xl font-semibold text-blue-600">{role}</p>
+                        <div className="grid grid-cols-1 gap-3 text-lg text-gray-700 md:grid-cols-2">
                             <p>
                                 <strong>Email:</strong> {email}
                             </p>
@@ -134,7 +134,7 @@ function Profile() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap justify-center gap-6 border-t pt-8 dark:border-gray-700">
+                <div className="flex flex-wrap justify-center gap-6 border-t pt-8">
                     <button
                         onClick={() => setShowPhotoModal(true)}
                         className="rounded-full bg-yellow-500 px-6 py-2 font-bold text-white hover:bg-yellow-600"

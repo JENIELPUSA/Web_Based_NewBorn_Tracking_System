@@ -8,8 +8,8 @@ import { ArrowLeft } from "lucide-react";
 
 const Card = ({ title, children }) => {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-gray-700 dark:bg-gray-800">
-      <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-white">{title}</h2>
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg transition-colors duration-300">
+      <h2 className="mb-4 text-xl font-semibold text-gray-800">{title}</h2>
       {children}
     </div>
   );
@@ -28,23 +28,23 @@ const EmergencyInfo = () => {
   ];
   return (
     <Card title="Emergency Info">
-      <h3 className="mb-3 text-lg font-medium text-gray-700 dark:text-gray-200">Contact List</h3>
+      <h3 className="mb-3 text-lg font-medium text-gray-700">Contact List</h3>
       <ul className="space-y-3">
         {contacts.map((contact, index) => (
           <li
             key={index}
-            className="flex items-center rounded-lg bg-red-50 p-4 shadow-sm dark:bg-red-900"
+            className="flex items-center rounded-lg bg-red-50 p-4 shadow-sm"
           >
             <svg
-              className="mr-3 h-6 w-6 flex-shrink-0 text-red-500 dark:text-red-400"
+              className="mr-3 h-6 w-6 flex-shrink-0 text-red-500"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
               <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.774a11.037 11.037 0 006.103 6.103l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
             </svg>
             <div>
-              <p className="font-semibold text-gray-800 dark:text-white">{contact.name}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">{contact.info}</p>
+              <p className="font-semibold text-gray-800">{contact.name}</p>
+              <p className="text-sm text-gray-600">{contact.info}</p>
             </div>
           </li>
         ))}
@@ -98,26 +98,26 @@ const NotificationsCenter = () => {
               key={notif.id}
               className={`rounded-lg p-4 shadow-sm ${
                 notif.priority === "critical"
-                  ? "border border-red-300 bg-red-100 dark:border-red-600 dark:bg-red-800"
-                  : "border border-yellow-200 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-800"
+                  ? "border border-red-300 bg-red-100"
+                  : "border border-yellow-200 bg-yellow-50"
               }`}
             >
-              <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">{notif.date}</p>
+              <p className="mb-1 text-xs text-gray-500">{notif.date}</p>
               <p
                 className={`font-semibold ${
                   notif.priority === "critical"
-                    ? "text-red-700 dark:text-red-300"
-                    : "text-yellow-800 dark:text-yellow-300"
+                    ? "text-red-700"
+                    : "text-yellow-800"
                 }`}
               >
                 {notif.type}
               </p>
-              <p className="text-sm text-gray-700 dark:text-gray-200">{notif.message}</p>
+              <p className="text-sm text-gray-700">{notif.message}</p>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-gray-500 dark:text-gray-400">No new notifications.</p>
+        <p className="text-gray-500">No new notifications.</p>
       )}
     </Card>
   );
@@ -131,12 +131,12 @@ const ParentLayoutDashboard = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="font-inter min-h-screen bg-gray-100 p-4 text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100 sm:p-6 lg:p-8"
+      className="font-inter min-h-screen bg-gray-100 p-4 text-gray-900 transition-colors duration-300 sm:p-6 lg:p-8"
     >
       {/* Floating Back Button */}
       <motion.button
         onClick={() => navigate("/login")}
-        className="fixed bottom-4 left-4 z-50 flex items-center gap-2 rounded-full border border-gray-300 bg-white p-3 text-gray-700 shadow-lg hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+        className="fixed bottom-4 left-4 z-50 flex items-center gap-2 rounded-full border border-gray-300 bg-white p-3 text-gray-700 shadow-lg hover:bg-gray-200"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -145,8 +145,8 @@ const ParentLayoutDashboard = () => {
       </motion.button>
 
       {/* Main Content (Dashboard) */}
-      <header className="mb-8 flex flex-col items-center justify-center gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800">
-        <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 sm:text-3xl">
+      <header className="mb-8 flex flex-col items-center justify-center gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-lg">
+        <h1 className="text-2xl font-bold text-red-600 sm:text-3xl">
           Newborn Tracking Dashboard
         </h1>
       </header>

@@ -12,11 +12,8 @@ function ParentDashboard() {
   const [messageType, setMessageType] = useState('success');
   const [isDropZoneHovered, setIsDropZoneHovered] = useState(false);
 
-  // Theme state and logic remains the same as it controls the 'dark' class on <html>
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme ? savedTheme : 'light';
-  });
+  // Theme state and logic has been simplified to a fixed 'light' theme.
+  const [theme] = useState('light');
 
   useEffect(() => {
     document.documentElement.classList.remove('light', 'dark');
@@ -24,9 +21,10 @@ function ParentDashboard() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
-  };
+  // The toggleTheme function is no longer needed since dark mode is removed.
+  // const toggleTheme = () => {
+  //   setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  // };
 
   const showMessage = (msg, type) => {
     setMessage(msg);
@@ -131,10 +129,10 @@ function ParentDashboard() {
     <div className="font-inter flex flex-col items-center transition-colors duration-300">
       <MessageBox message={message} type={messageType} onClose={closeMessage} />
       <main
-        className="w-full shadow-md rounded-xl p-6 transition-colors duration-300 bg-white dark:bg-gray-800"
+        className="w-full shadow-md rounded-xl p-6 transition-colors duration-300 bg-white"
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-200">
+          <h2 className="text-3xl font-bold text-gray-700">
             Our Newborns
           </h2>
           <button
@@ -148,10 +146,10 @@ function ParentDashboard() {
           </button>
         </div>
 
-        {showForm && <NewbornForm onSave={() => setShowForm(false)} onAddNewborn={addNewborn} />} {/* Remove theme prop */}
+        {showForm && <NewbornForm onSave={() => setShowForm(false)} onAddNewborn={addNewborn} />}
 
         {!showForm && newborns.length === 0 && (
-          <div className="text-center text-xl py-10 text-gray-500 dark:text-gray-400">
+          <div className="text-center text-xl py-10 text-gray-500">
             No newborns registered yet. Add one!
           </div>
         )}
@@ -165,14 +163,14 @@ function ParentDashboard() {
                 onDrop={handleDropNewborn}
                 className={`max-w-2xl mx-auto p-6 mb-8 border-4 border-dashed rounded-xl text-center transition-all ${
                   isDropZoneHovered
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/50' // Added dark mode for hovered state
-                    : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-300 bg-gray-50'
                 }`}
               >
-                <p className="text-xl font-bold mb-2 text-gray-700 dark:text-gray-200">
+                <p className="text-xl font-bold mb-2 text-gray-700">
                   Drag Newborn Card Here
                 </p>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600">
                   To view full details and vaccination schedule
                 </p>
               </div>
@@ -183,7 +181,7 @@ function ParentDashboard() {
                 <NewbornCard
                   key={newborn.id}
                   newborn={newborn}
-                  onSelect={setSelectedNewborn} // 👈 Fallback tap support
+                  onSelect={setSelectedNewborn}
                 />
               ))}
             </div>

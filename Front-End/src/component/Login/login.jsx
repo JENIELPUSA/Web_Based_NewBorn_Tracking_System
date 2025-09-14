@@ -10,131 +10,131 @@ import { X } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Login({ isOpen, onClose }) {
-    const [isForgotModal, setForgotModal] = useState(false);
-    const [values, setValues] = useState({ email: "", password: "" });
-    const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
+    const [isForgotModal, setForgotModal] = useState(false);
+    const [values, setValues] = useState({ email: "", password: "" });
+    const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
 
-    const navigate = useNavigate();
-    const { login } = useAuth();
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
-    const handleInput = (event) => {
-        const { name, value } = event.target;
-        setValues({ ...values, [name]: value });
-    };
+    const handleInput = (event) => {
+        const { name, value } = event.target;
+        setValues({ ...values, [name]: value });
+    };
 
-    const handleCloseModal = () => {
-        setForgotModal(false);
-    };
+    const handleCloseModal = () => {
+        setForgotModal(false);
+    };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const newErrors = {};
-        if (!values.email) newErrors.email = "Email is required";
-        if (!values.password) newErrors.password = "Password is required";
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            return;
-        }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const newErrors = {};
+        if (!values.email) newErrors.email = "Email is required";
+        if (!values.password) newErrors.password = "Password is required";
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
 
-        setIsLoading(true);
-        const response = await login(values.email, values.password);
-        setIsLoading(false);
+        setIsLoading(true);
+        const response = await login(values.email, values.password);
+        setIsLoading(false);
 
-        if (response.success) {
-            toast.success("Successfully logged in!");
-            navigate("/dashboard");
-            onClose(); // close modal after login
-        } else {
-            toast.error(response.message || "Login failed");
-        }
-    };
+        if (response.success) {
+            toast.success("Successfully logged in!");
+            navigate("/dashboard");
+            onClose(); // close modal after login
+        } else {
+            toast.error(response.message || "Login failed");
+        }
+    };
 
-    if (!isOpen) return null; // hide modal when isOpen is false
+    if (!isOpen) return null; // hide modal when isOpen is false
 
-    return (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-md">
-            <motion.div
-                initial={{ y: -100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -100, opacity: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="relative mx-auto w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-slate-800"
-            >
-                {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute right-4 top-4 rounded-full p-2 text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-                >
-                    <X className="h-5 w-5" />
-                </button>
+    return (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-md">
+            <motion.div
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -100, opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="relative mx-auto w-full max-w-md rounded-lg bg-white p-8 shadow-lg"
+            >
+                {/* Close Button */}
+                <button
+                    onClick={onClose}
+                    className="absolute right-4 top-4 rounded-full p-2 text-gray-600 hover:bg-gray-200"
+                >
+                    <X className="h-5 w-5" />
+                </button>
 
-                {/* Logo */}
-                <div className="mb-6 flex justify-center">
-                    <img
-                        src={logo}
-                        alt="App Logo"
-                        className="h-32 w-32 object-contain"
-                    />
-                </div>
+                {/* Logo */}
+                <div className="mb-6 flex justify-center">
+                    <img
+                        src={logo}
+                        alt="App Logo"
+                        className="h-32 w-32 object-contain"
+                    />
+                </div>
 
-                {/* Title */}
-                <h2 className="mb-6 text-center text-2xl font-bold text-blue-600">NEWBORN TRACKING SYSTEM</h2>
+                {/* Title */}
+                <h2 className="mb-6 text-center text-2xl font-bold text-blue-600">NEWBORN TRACKING SYSTEM</h2>
 
-                {/* Login Form */}
-                <form className="space-y-5" onSubmit={handleSubmit}>
-                    <div>
-                        <label className="mb-1 block text-slate-700 dark:text-slate-300">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={values.email}
-                            onChange={handleInput}
-                            disabled={isLoading}
-                            className="w-full rounded border border-gray-300 px-4 py-2 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                            placeholder="you@example.com"
-                        />
-                        {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
-                    </div>
+                {/* Login Form */}
+                <form className="space-y-5" onSubmit={handleSubmit}>
+                    <div>
+                        <label className="mb-1 block text-slate-700">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={values.email}
+                            onChange={handleInput}
+                            disabled={isLoading}
+                            className="w-full rounded border border-gray-300 px-4 py-2 disabled:opacity-50"
+                            placeholder="you@example.com"
+                        />
+                        {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
+                    </div>
 
-                    <div>
-                        <label className="mb-1 block text-slate-700 dark:text-slate-300">Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            value={values.password}
-                            onChange={handleInput}
-                            disabled={isLoading}
-                            className="w-full rounded border border-gray-300 px-4 py-2 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                            placeholder="••••••••"
-                        />
-                        {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
-                    </div>
+                    <div>
+                        <label className="mb-1 block text-slate-700">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={values.password}
+                            onChange={handleInput}
+                            disabled={isLoading}
+                            className="w-full rounded border border-gray-300 px-4 py-2 disabled:opacity-50"
+                            placeholder="••••••••"
+                        />
+                        {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
+                    </div>
 
-                    <button
-                        type="submit"
-                        className={`flex w-full items-center justify-center gap-2 ${
-                            isLoading ? "cursor-not-allowed bg-blue-400" : "bg-blue-500 hover:bg-blue-600"
-                        } rounded px-4 py-2 font-semibold text-white`}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? <LoadingIntro /> : "Log In"}
-                    </button>
+                    <button
+                        type="submit"
+                        className={`flex w-full items-center justify-center gap-2 ${
+                            isLoading ? "cursor-not-allowed bg-blue-400" : "bg-blue-500 hover:bg-blue-600"
+                        } rounded px-4 py-2 font-semibold text-white`}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? <LoadingIntro /> : "Log In"}
+                    </button>
 
-                    <div className="mt-4 text-center">
-                        <button
-                            type="button"
-                            onClick={() => setForgotModal(true)}
-                            className="text-sm text-blue-600 hover:underline"
-                        >
-                            Forgot Password?
-                        </button>
-                    </div>
-                </form>
+                    <div className="mt-4 text-center">
+                        <button
+                            type="button"
+                            onClick={() => setForgotModal(true)}
+                            className="text-sm text-blue-600 hover:underline"
+                        >
+                            Forgot Password?
+                        </button>
+                    </div>
+                </form>
 
-                {/* Forgot Password Modal */}
-                <ForgotPassword show={isForgotModal} onClose={handleCloseModal} />
-            </motion.div>
-        </div>
-    );
+                {/* Forgot Password Modal */}
+                <ForgotPassword show={isForgotModal} onClose={handleCloseModal} />
+            </motion.div>
+        </div>
+    );
 }

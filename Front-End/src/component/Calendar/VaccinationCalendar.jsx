@@ -122,12 +122,12 @@ const VaccinationCalendar = () => {
                 </button>
                 <button
                     onClick={handleToday}
-                    className="rounded bg-gray-200 px-3 py-1 text-black hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                    className="rounded bg-gray-200 px-3 py-1 text-black hover:bg-gray-300 "
                 >
                     Today
                 </button>
             </div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+            <h2 className="text-xl font-bold text-gray-800 ">
                 {format(currentMonth, "MMMM yyyy")}
             </h2>
             <button
@@ -144,7 +144,7 @@ const VaccinationCalendar = () => {
         const startDate = startOfWeek(currentMonth, { weekStartsOn: 1 });
         for (let i = 0; i < 7; i++) {
             days.push(
-                <div key={i} className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <div key={i} className="text-center text-sm font-semibold text-gray-700 ">
                     {format(addDays(startDate, i), "EEE")}
                 </div>
             );
@@ -170,14 +170,14 @@ const VaccinationCalendar = () => {
                     onClick={(e) => handleDateClick(date, e)}
                     className={`relative min-h-[80px] rounded p-1 border cursor-pointer transition ${
                         !isCurrentMonth ? "opacity-40" : ""
-                    } ${isCurrentDay ? "bg-blue-100 border-blue-400 dark:bg-blue-900/30" : ""} ${
-                        doses.length > 0 ? "bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-800/30" : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                    } ${isCurrentDay ? "bg-blue-100 border-blue-400 " : ""} ${
+                        doses.length > 0 ? "bg-green-50 hover:bg-green-100  " : "hover:bg-gray-10"
                     } ${isClicked ? "ring-2 ring-blue-400" : ""}`}
                 >
                     <div className="text-right text-xs">
                         <span
                             className={`inline-flex h-5 w-5 items-center justify-center rounded-full${
-                                isCurrentDay ? "bg-blue-500 text-white" : "text-gray-700 dark:text-white"
+                                isCurrentDay ? "bg-blue-500 text-white" : "text-gray-700"
                             }`}
                         >
                             {format(date, "d")}
@@ -201,7 +201,7 @@ const VaccinationCalendar = () => {
                                 </div>
                             ))}
                             {doses.length > 2 && (
-                                <div className="text-[10px] text-gray-500 dark:text-red-300">
+                                <div className="text-[10px] text-gray-500">
                                     +{doses.length - 2} more...
                                 </div>
                             )}
@@ -233,53 +233,53 @@ const VaccinationCalendar = () => {
                 animate={{ y: 0 }}
                 exit={{ y: "100%" }}
                 transition={{ duration: 0.3 }}
-                className="w-full max-w-md bg-white dark:bg-gray-800 rounded-t-lg shadow-lg p-4 pb-8 relative"
+                className="w-full max-w-md bg-white rounded-t-lg shadow-lg p-4 pb-8 relative"
             >
                 <div className="mb-4 flex justify-between items-center">
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-lg text-gray-900">
                         Doses on {format(date, "MMM d, yyyy")}
                     </h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-red-500 dark:hover:text-red-400 text-xl"
+                        className="text-gray-500 hover:text-red-500 text-xl"
                     >
                         ✕
                     </button>
                 </div>
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                     {content.map((item, i) => (
-                        <div key={i} className="border-b border-gray-200 dark:border-gray-700 pb-3 last:border-0">
-                            <div className="font-medium text-blue-600 dark:text-blue-300 text-base">{item.newbornName}</div>
-                            <div className="text-sm text-gray-800 dark:text-gray-200">
+                        <div key={i} className="border-b border-gray-20 pb-3 last:border-0">
+                            <div className="font-medium text-blue-600 ">{item.newbornName}</div>
+                            <div className="text-sm text-gray-800 ">
                                 <span className="font-medium">Vaccine:</span> {item.vaccineName}
                             </div>
                             {/* Conditional rendering for Dose, Status, and AssignedBy */}
                             {!item.isDue && ( // Only show if NOT a next_due_date entry
                                 <>
-                                    <div className="text-sm text-gray-800 dark:text-gray-200">
+                                    <div className="text-sm text-gray-800 ">
                                         <span className="font-medium">Dose:</span> {item.doseNumber}
                                     </div>
-                                    <div className="text-sm text-gray-800 dark:text-gray-200">
+                                    <div className="text-sm text-gray-800 ">
                                         <span className="font-medium">Status:</span>
                                         <span
                                             className={`ml-1 rounded px-1 py-0.5 text-sm ${
                                                 item.status === "On-Time"
-                                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                                    ? "bg-green-100 text-green-800"
                                                     : item.status === "Missed"
-                                                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                                    : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                                    ? "bg-red-100 text-red-800"
+                                                    : "bg-yellow-100 text-yellow-800"
                                             }`}
                                         >
                                             {item.status}
                                         </span>
                                     </div>
-                                    <div className="text-sm text-gray-700 dark:text-gray-300">
+                                    <div className="text-sm text-gray-700 ">
                                         <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
                                     </div>
                                 </>
                             )}
                             {item.isDue && ( // Show "Due Date" if it's a next_due_date entry
-                                <div className="text-sm text-red-500 dark:text-red-400 font-medium">
+                                <div className="text-sm text-red-500  font-medium">
                                     Next Due Date!
                                 </div>
                             )}
@@ -292,7 +292,7 @@ const VaccinationCalendar = () => {
 
     return (
         <motion.div
-            className="min-h-screen w-full max-w-[1400px] px-4 xs:px-2 sm:px-6 lg:px-8 mx-auto bg-gray-100 dark:bg-gray-900"
+            className="min-h-screen w-full max-w-[1400px] px-4 xs:px-2 sm:px-6 lg:px-8 mx-auto bg-gray-100 "
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -314,7 +314,7 @@ const VaccinationCalendar = () => {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="fixed z-50 rounded-md border border-gray-300 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                            className="fixed z-50 rounded-md border border-gray-300 bg-white p-4 shadow-lg "
                             style={{
                                 top: tooltipPosition.top + 10,
                                 left: tooltipPosition.left,
@@ -322,50 +322,50 @@ const VaccinationCalendar = () => {
                             }}
                         >
                             <div className="mb-2 flex justify-between items-center">
-                                <span className="font-semibold text-gray-900 dark:text-white xs:text-xs lg:text-sm sm:text-sm">
+                                <span className="font-semibold text-gray-900  xs:text-xs lg:text-sm sm:text-sm">
                                     Doses on {format(clickedDate, "MMM d, yyyy")}
                                 </span>
                                 <button
                                     onClick={() => setClickedDate(null)}
-                                    className="text-gray-500 hover:text-red-500 dark:hover:text-red-400"
+                                    className="text-gray-500 hover:text-red-500 "
                                 >
                                     ✕
                                 </button>
                             </div>
                             <div className="space-y-2 max-h-60 overflow-y-auto">
                                 {tooltipContent.map((item, i) => (
-                                    <div key={i} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
-                                        <div className="font-medium text-blue-600 dark:text-blue-300 xs:text-xs lg:text-sm sm:text-sm">{item.newbornName}</div>
-                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
+                                    <div key={i} className="border-b border-gray-200  pb-2 last:border-0">
+                                        <div className="font-medium text-blue-600  xs:text-xs lg:text-sm sm:text-sm">{item.newbornName}</div>
+                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 ">
                                             <span className="font-medium">Vaccine:</span> {item.vaccineName}
                                         </div>
                                         {/* Conditional rendering for Dose, Status, and AssignedBy */}
                                         {!item.isDue && ( // Only show if NOT a next_due_date entry
                                             <>
-                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
+                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 ">
                                                     <span className="font-medium">Dose:</span> {item.doseNumber}
                                                 </div>
-                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 dark:text-gray-200">
+                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 ">
                                                     <span className="font-medium">Status:</span>
                                                     <span
                                                         className={`ml-1 rounded px-1 py-0.5 xs:text-xs lg:text-sm sm:text-sm ${
                                                             item.status === "On-Time"
-                                                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                                                ? "bg-green-100 text-green-800 "
                                                                 : item.status === "Missed"
-                                                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                                                ? "bg-red-100 text-red-800 "
+                                                                : "bg-yellow-100 text-yellow-800 "
                                                         }`}
                                                     >
                                                         {item.status}
                                                     </span>
                                                 </div>
-                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-700 dark:text-gray-300">
+                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-700 ">
                                                     <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
                                                 </div>
                                             </>
                                         )}
                                         {item.isDue && ( // Show "Next Due Date!" if it's a next_due_date entry
-                                            <div className="xs:text-xs lg:text-sm sm:text-sm text-red-500 dark:text-red-400 font-medium">
+                                            <div className="xs:text-xs lg:text-sm sm:text-sm text-red-500  font-medium">
                                                 Next Due Date!
                                             </div>
                                         )}

@@ -50,7 +50,7 @@ const Header = () => {
             <div className="hidden items-center gap-4 lg:flex">
               <button
                 onClick={() => setShowLogin(true)}
-                className="rounded-xl border border-gray-200 px-6 py-2 font-medium text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-gray-100 hover:text-black"
+                className="rounded-xl border border-blue-300 px-6 py-2 font-medium text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-blue-300 hover:text-black"
               >
                 Log In
               </button>
@@ -89,24 +89,6 @@ const Header = () => {
                   })}
                 </div>
 
-                {/* Mobile CTA */}
-                <div className="flex flex-col gap-4 border-t border-gray-200 pt-6">
-                  <button className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-3 font-medium text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-gray-100 hover:text-black">
-                    <User className="h-4 w-4" />
-                    Sign In
-                  </button>
-                  <button className="group relative overflow-hidden rounded-xl bg-blue-600 px-6 py-3 font-medium text-white shadow-lg transition-all duration-300 hover:scale-105">
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      Get Started Free
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </span>
-                    <div className="absolute inset-0 bg-blue-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-                  </button>
-
-                  <div className="pt-4 text-center">
-                    <p className="text-sm text-gray-500">30-day free trial • No credit card required</p>
-                  </div>
-                </div>
               </nav>
             </div>
           </div>
