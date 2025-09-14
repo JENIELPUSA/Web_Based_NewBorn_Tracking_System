@@ -24,6 +24,7 @@ import ParentDashboard from "./component/ParentDashboard/ParentDashboard";
 import ParentLayoutDashboard from "./component/ParentDashboard/ParentLayoutDashboar";
 import PrivateRoute from "./component/PrivateRoute/PrivateRoute";
 import PublicRoute from "./component/PublicRoute/PublicRoute";
+import LandingPage from "./component/LandingPage/landingpage";
 function App() {
     const router = createBrowserRouter([
         // Public Routes (Login, Reset Password)
@@ -32,7 +33,7 @@ function App() {
             children: [
                 {
                     path: "/login",
-                    element: <Login />,
+                    element: <LandingPage />,
                 },
                 {
                     path: "/reset-password/:token",
@@ -41,7 +42,8 @@ function App() {
                 {
                     path: "/",
                     element: <Login />,
-                },
+                }
+                 
             ],
         },
 

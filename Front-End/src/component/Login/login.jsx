@@ -1,19 +1,17 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logo from "@/assets/logo.png";
 import LoadingIntro from "../../ReusableFolder/loadingIntro";
 import ForgotPassword from "../ForgotPassword/ForgotPassword";
-import { ArrowLeft } from "lucide-react";
+import { X } from "lucide-react";
+import { motion } from "framer-motion";
 
-export default function Login() {
+export default function Login({ isOpen, onClose }) {
     const [isForgotModal, setForgotModal] = useState(false);
-    const [values, setValues] = useState({
-        email: "",
-        password: "",
-    });
+    const [values, setValues] = useState({ email: "", password: "" });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
 
@@ -28,121 +26,115 @@ export default function Login() {
     const handleCloseModal = () => {
         setForgotModal(false);
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const newErrors = {};
         if (!values.email) newErrors.email = "Email is required";
         if (!values.password) newErrors.password = "Password is required";
-
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
 
         setIsLoading(true);
-
         const response = await login(values.email, values.password);
+        setIsLoading(false);
 
         if (response.success) {
             toast.success("Successfully logged in!");
             navigate("/dashboard");
+            onClose(); // close modal after login
         } else {
-            setIsLoading(false);
             toast.error(response.message || "Login failed");
         }
     };
 
+    if (!isOpen) return null; // hide modal when isOpen is false
+
     return (
-        <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 dark:bg-slate-900">
-            <Link
-                to="/parent-dashboard"
-                className="group absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white px-3 py-2 text-slate-700 shadow-md transition-all duration-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                aria-label="Go to Parent Dashboard"
+        <div className="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-md">
+            <motion.div
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -100, opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="relative mx-auto w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-slate-800"
             >
-                <ArrowLeft className="h-6 w-6 transition-transform duration-200 group-hover:-translate-x-1" />
-                <span className="text-sm font-medium opacity-0 transition-opacity duration-200 group-hover:opacity-100">Go to Parent Dashboard</span>
-            </Link>
+                {/* Close Button */}
+                <button
+                    onClick={onClose}
+                    className="absolute right-4 top-4 rounded-full p-2 text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
+                >
+                    <X className="h-5 w-5" />
+                </button>
 
-            <div className="flex w-full max-w-lg items-center justify-center">
-                <div
-                    className="hidden flex-grow rounded-l-lg bg-cover bg-center md:block"
-                    style={{ backgroundImage: "url(/your-image-path.jpg)" }}
-                />
+                {/* Logo */}
+                <div className="mb-6 flex justify-center">
+                    <img
+                        src={logo}
+                        alt="App Logo"
+                        className="h-32 w-32 object-contain"
+                    />
+                </div>
 
-                <div className="w-full max-w-md rounded-r-lg bg-white p-8 shadow-md dark:bg-slate-800">
-                    <div className="mb-6 flex justify-center">
-                        <img
-                            src={logo}
-                            alt="App Logo"
-                            className="h-32 w-32 object-contain"
+                {/* Title */}
+                <h2 className="mb-6 text-center text-2xl font-bold text-blue-600">NEWBORN TRACKING SYSTEM</h2>
+
+                {/* Login Form */}
+                <form className="space-y-5" onSubmit={handleSubmit}>
+                    <div>
+                        <label className="mb-1 block text-slate-700 dark:text-slate-300">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={values.email}
+                            onChange={handleInput}
+                            disabled={isLoading}
+                            className="w-full rounded border border-gray-300 px-4 py-2 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                            placeholder="you@example.com"
                         />
+                        {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
                     </div>
 
-                    <h2 className="mb-6 text-center text-3xl font-extrabold tracking-wide text-blue-600 shadow-md">
-                        NEWBORN TRACKING SYSTEM
-                    </h2>
-
-                    <form
-                        className="space-y-5"
-                        onSubmit={handleSubmit}
-                    >
-                        <div>
-                            <label className="mb-1 block text-slate-700 dark:text-slate-300">Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={values.email}
-                                onChange={handleInput}
-                                disabled={isLoading}
-                                className="w-full rounded border border-gray-300 px-4 py-2 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                                placeholder="you@example.com"
-                            />
-                            {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
-                        </div>
-
-                        <div>
-                            <label className="mb-1 block text-slate-700 dark:text-slate-300">Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={values.password}
-                                onChange={handleInput}
-                                disabled={isLoading}
-                                className="w-full rounded border border-gray-300 px-4 py-2 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                                placeholder="••••••••"
-                            />
-                            {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
-                        </div>
-
-                        <button
-                            type="submit"
-                            className={`flex w-full items-center justify-center gap-2 ${
-                                isLoading ? "cursor-not-allowed bg-blue-400" : "bg-blue-500 hover:bg-blue-600"
-                            } rounded px-4 py-2 font-semibold text-white`}
+                    <div>
+                        <label className="mb-1 block text-slate-700 dark:text-slate-300">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={values.password}
+                            onChange={handleInput}
                             disabled={isLoading}
+                            className="w-full rounded border border-gray-300 px-4 py-2 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                            placeholder="••••••••"
+                        />
+                        {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
+                    </div>
+
+                    <button
+                        type="submit"
+                        className={`flex w-full items-center justify-center gap-2 ${
+                            isLoading ? "cursor-not-allowed bg-blue-400" : "bg-blue-500 hover:bg-blue-600"
+                        } rounded px-4 py-2 font-semibold text-white`}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? <LoadingIntro /> : "Log In"}
+                    </button>
+
+                    <div className="mt-4 text-center">
+                        <button
+                            type="button"
+                            onClick={() => setForgotModal(true)}
+                            className="text-sm text-blue-600 hover:underline"
                         >
-                            {isLoading ? <LoadingIntro /> : "Log In"}
+                            Forgot Password?
                         </button>
+                    </div>
+                </form>
 
-                        <div className="mt-4 text-center">
-                            <button
-                                type="button"
-                                onClick={() => setForgotModal(true)}
-                                className="text-sm text-blue-600 hover:underline"
-                            >
-                                Forgot Password?
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            {/* Forgot Password Modal */}
-            <ForgotPassword
-                show={isForgotModal}
-                onClose={handleCloseModal}
-            />
+                {/* Forgot Password Modal */}
+                <ForgotPassword show={isForgotModal} onClose={handleCloseModal} />
+            </motion.div>
         </div>
     );
 }
