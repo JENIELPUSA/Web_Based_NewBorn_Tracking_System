@@ -327,8 +327,9 @@ function NewBorn() {
                             <thead className="bg-gray-100 text-gray-800">
                                 <tr>
                                     <th className="p-3 text-left">#</th>
-                                    <th className="p-3 text-left">Code Number</th>
                                     <th className="p-3 text-left">Avatar</th>
+                                    <th className="p-3 text-left">Code Number</th>
+
                                     <th className="p-3 text-left">FullName</th>
                                     <th className="p-3 text-left">Gender</th>
                                     <th className="p-3 text-left">Birth Date</th>
