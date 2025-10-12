@@ -43,7 +43,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
             return <File className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
         } else if (title === "Vaccine Inventory") {
             return <Syringe className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
-        } else if (title === "New Born Reports") {
+        } else if (title === "Child Reports") {
             return <User className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
         }
         return <Download className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
