@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Download } from "lucide-react";
+import { File,Download, Syringe, User } from "lucide-react";
 import { Footer } from "@/layouts/footer";
 import { ReportDisplayContext } from "../../contexts/Report/ReportContext";
 import { toast } from "react-toastify";
@@ -24,7 +24,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
                 await downloadProfillingReport(fromDate, toDate);
             } else if (title === "New Born Reports") {
                 await downloadNewBornReport(fromDate, toDate);
-            } else {
+            } else if (title === "Vaccine Inventory") {
                 await downloadIventoryReport(fromDate, toDate);
             }
             setFromDate("");
@@ -37,20 +37,30 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
         }
     };
 
+    // Determine main icon to show in the center
+    const renderMainIcon = () => {
+        if (title === "Profilling Reports") {
+            return <File className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
+        } else if (title === "Vaccine Inventory") {
+            return <Syringe className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
+        } else if (title === "New Born Reports") {
+            return <User className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
+        }
+        return <Download className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
+    };
+
     return (
         <div className="w-full max-w-xs transform rounded-2xl border border-gray-100 bg-white p-4 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl sm:p-6">
             <div className="relative flex h-32 w-full items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 sm:h-36">
                 <span className="absolute left-2 top-2 rounded bg-blue-600 px-2 py-0.5 text-xs font-bold tracking-wider text-white">PDF</span>
-                <svg
-                    className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
-                </svg>
-                <div className="absolute bottom-2 right-2">
+                
+                {/* MAIN ICON - CENTERED */}
+                {renderMainIcon()}
+
+                {/* Optional: Keep download indicator in corner if needed, or remove */}
+                {/* <div className="absolute bottom-2 right-2">
                     <Download className="h-4 w-4 text-red-700 sm:h-5 sm:w-5" />
-                </div>
+                </div> */}
             </div>
 
             <p className="mt-3 text-center text-xs font-bold text-gray-800 sm:mt-4 sm:text-sm md:text-base">{title}</p>
@@ -60,7 +70,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
                 <div className="w-full">
                     <label
                         htmlFor={`fromDate-${title.replace(/\s+/g, "-")}`}
-                        className="mb-1 block text-xs font-medium text-gray-700 "
+                        className="mb-1 block text-xs font-medium text-gray-700"
                     >
                         From:
                     </label>
@@ -69,14 +79,14 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
                         id={`fromDate-${title.replace(/\s+/g, "-")}`}
                         value={fromDate}
                         onChange={(e) => setFromDate(e.target.value)}
-                        className="w-full rounded-md border border-gray-300 p-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 "
-                        disabled={loading} // Disable input while loading
+                        className="w-full rounded-md border border-gray-300 p-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={loading}
                     />
                 </div>
                 <div className="w-full">
                     <label
                         htmlFor={`toDate-${title.replace(/\s+/g, "-")}`}
-                        className="mb-1 block text-xs font-medium text-gray-700 "
+                        className="mb-1 block text-xs font-medium text-gray-700"
                     >
                         To:
                     </label>
@@ -85,21 +95,37 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
                         id={`toDate-${title.replace(/\s+/g, "-")}`}
                         value={toDate}
                         onChange={(e) => setToDate(e.target.value)}
-                        className="w-full rounded-md border border-gray-300 p-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 "
-                        disabled={loading} // Disable input while loading
+                        className="w-full rounded-md border border-gray-300 p-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={loading}
                     />
                 </div>
             </div>
 
             <button
                 onClick={handleDownload}
-                className="mt-3 w-full rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-5 sm:text-sm flex items-center justify-center"
-                disabled={loading} // Disable button while loading
+                className="mt-3 flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-5 sm:text-sm"
+                disabled={loading}
             >
                 {loading ? (
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                        className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                        ></circle>
+                        <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                     </svg>
                 ) : (
                     <>
@@ -117,20 +143,14 @@ function ReportsLayout() {
 
     return (
         <div className="flex min-h-screen flex-col">
-            <main className="flex flex-grow flex-col items-center bg-gray-50 p-4 transition-colors duration-300 sm:p-6 md:p-8 rounded-lg">
-                <div className="mb-8 w-full rounded-md bg-blue-600 px-4 py-3 text-center text-white shadow-lg ">
+            <main className="flex flex-grow flex-col items-center rounded-lg bg-gray-50 p-4 transition-colors duration-300 sm:p-6 md:p-8">
+                <div className="mb-8 w-full rounded-md bg-blue-600 px-4 py-3 text-center text-white shadow-lg">
                     <p className="text-base font-semibold sm:text-lg">Important Announcement: New Reports Available!</p>
                 </div>
 
-                {customError && (
-                    <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700 ">
-                        {customError}
-                    </div>
-                )}
+                {customError && <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">{customError}</div>}
 
-                <h2 className="mb-10 text-center text-2xl font-extrabold text-gray-800 drop-shadow-sm sm:text-3xl md:text-4xl">
-                    Our Latest Reports
-                </h2>
+                <h2 className="mb-10 text-center text-2xl font-extrabold text-gray-800 drop-shadow-sm sm:text-3xl md:text-4xl">Our Latest Reports</h2>
 
                 <div className="grid w-full grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <PdfReportCard

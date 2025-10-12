@@ -156,16 +156,16 @@ function NewBorn() {
     };
 
     return (
-        <div className="rounded-lg bg-white shadow  xs:p-2 sm:p-6">
+        <div className="rounded-lg bg-white shadow xs:p-2 sm:p-6">
             <div className="card-header flex flex-col gap-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="card-title text-lg font-semibold text-gray-800 ">New Born List</p>
+                <p className="card-title text-lg font-semibold text-gray-800">New Born List</p>
                 {/* Consolidated filter controls into one flex container for responsive layout */}
                 <div className="flex w-full flex-wrap items-center gap-4 md:w-auto">
                     {/* Search input */}
                     <input
                         type="text"
                         placeholder="Search New Borns..."
-                        className="input input-sm min-w-[180px] flex-grow rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 "
+                        className="input input-sm min-w-[180px] flex-grow rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -176,7 +176,7 @@ function NewBorn() {
                     <div className="flex flex-grow-0 flex-wrap items-center gap-2">
                         <label
                             htmlFor="dateFrom"
-                            className="text-sm font-medium text-gray-700 "
+                            className="text-sm font-medium text-gray-700"
                         >
                             From:
                         </label>
@@ -188,12 +188,12 @@ function NewBorn() {
                                 setDateFrom(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="text-gray-500 input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm  sm:w-auto"
+                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-500 sm:w-auto"
                             title="Filter by 'Created At' date (From)"
                         />
                         <label
                             htmlFor="dateTo"
-                            className="text-sm font-medium text-gray-700 "
+                            className="text-sm font-medium text-gray-700"
                         >
                             To:
                         </label>
@@ -205,7 +205,7 @@ function NewBorn() {
                                 setDateTo(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="text-gray-500 input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm sm:w-auto"
+                            className="input input-xs w-32 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-500 sm:w-auto"
                             title="Filter by 'Created At' date (To)"
                         />
                     </div>
@@ -213,7 +213,7 @@ function NewBorn() {
                     <div className="flex flex-grow-0 items-center gap-2">
                         <label
                             htmlFor="itemsPerPage"
-                            className="text-sm font-medium text-gray-700 "
+                            className="text-sm font-medium text-gray-700"
                         >
                             Show:
                         </label>
@@ -229,10 +229,10 @@ function NewBorn() {
                                     handleItemsPerPageChange(e);
                                 }
                             }}
-                            className="text-gray-500 input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm "
+                            className="input input-xs w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm text-gray-500"
                             aria-label="Items per page"
                         />
-                        <span className="text-sm text-gray-700 ">new borns per page</span>
+                        <span className="text-sm text-gray-700">new borns per page</span>
                     </div>
                 </div>
             </div>
@@ -247,12 +247,12 @@ function NewBorn() {
                 </button>
 
                 {currentUsers.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 ">No records found.</div>
+                    <div className="p-4 text-center text-gray-500">No records found.</div>
                 ) : (
                     currentUsers.map((newBorn, index) => (
                         <div
                             key={newBorn._id}
-                            className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow "
+                            className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow"
                         >
                             <div className="flex items-start gap-4">
                                 {newBorn.avatar ? (
@@ -269,28 +269,28 @@ function NewBorn() {
                                 <div className="flex-1">
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <h3 className="font-medium text-gray-800 ">{newBorn.fullName}</h3>
-                                            <p className="text-sm text-blue-600 ">{newBorn.motherName}</p>
+                                            <h3 className="font-medium text-gray-800">{newBorn.fullName}</h3>
+                                            <p className="text-sm text-blue-600">{newBorn.motherName}</p>
                                         </div>
-                                        <span className="text-xs text-gray-500 ">#{indexOfFirstUser + index + 1}</span>
+                                        <span className="text-xs text-gray-500">#{indexOfFirstUser + index + 1}</span>
                                     </div>
 
                                     <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                                         <div>
-                                            <p className="text-xs text-gray-500 ">Gender</p>
-                                            <p className="text-gray-800 ">{newBorn.gender}</p>
+                                            <p className="text-xs text-gray-500">Gender</p>
+                                            <p className="text-gray-800">{newBorn.gender}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs text-gray-500 ">DOB</p>
-                                            <p className="text-gray-800 ">{formatDate(newBorn.dateOfBirth)}</p>
+                                            <p className="text-xs text-gray-500">DOB</p>
+                                            <p className="text-gray-800">{formatDate(newBorn.dateOfBirth)}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs text-gray-500 ">Weight</p>
-                                            <p className="text-gray-800 ">{newBorn.birthWeight}</p>
+                                            <p className="text-xs text-gray-500">Weight</p>
+                                            <p className="text-gray-800">{newBorn.birthWeight}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs text-gray-500 ">Height</p>
-                                            <p className="text-gray-800 ">{newBorn.birthHeight}</p>
+                                            <p className="text-xs text-gray-500">Height</p>
+                                            <p className="text-gray-800">{newBorn.birthHeight}</p>
                                         </div>
                                     </div>
 
@@ -324,9 +324,10 @@ function NewBorn() {
                 <div className="card-body p-0">
                     <div className="relative h-[500px] w-full overflow-auto">
                         <table className="table w-full text-sm">
-                            <thead className="bg-gray-100 text-gray-800 ">
+                            <thead className="bg-gray-100 text-gray-800">
                                 <tr>
                                     <th className="p-3 text-left">#</th>
+                                    <th className="p-3 text-left">Code Number</th>
                                     <th className="p-3 text-left">Avatar</th>
                                     <th className="p-3 text-left">FullName</th>
                                     <th className="p-3 text-left">Gender</th>
@@ -354,7 +355,7 @@ function NewBorn() {
                                     <tr>
                                         <td
                                             colSpan="13"
-                                            className="p-4 text-center text-gray-500 "
+                                            className="p-4 text-center text-gray-500"
                                         >
                                             No records found.
                                         </td>
@@ -363,9 +364,9 @@ function NewBorn() {
                                     currentUsers.map((newBorn, index) => (
                                         <tr
                                             key={newBorn._id}
-                                            className="border-b border-gray-200 "
+                                            className="border-b border-gray-200"
                                         >
-                                            <td className="p-3 align-top text-gray-800 ">{indexOfFirstUser + index + 1}</td>
+                                            <td className="p-3 align-top text-gray-800">{indexOfFirstUser + index + 1}</td>
                                             <td className="p-3 align-top">
                                                 {newBorn.avatar ? (
                                                     <img
@@ -379,21 +380,22 @@ function NewBorn() {
                                                     </div>
                                                 )}
                                             </td>
-                                            <td className="p-3 align-top text-gray-800 ">
+                                            <td className="p-3 align-top text-gray-800">{newBorn.babyCodeNumber}</td>
+                                            <td className="p-3 align-top text-gray-800">
                                                 {newBorn.fullName}
                                                 {newBorn.extensionName ? ` ${newBorn.extensionName}` : ""}
                                             </td>
-                                            <td className="p-3 align-top text-gray-800 ">{newBorn.gender}</td>
-                                            <td className="p-3 align-top text-gray-800 ">{newBorn.dateOfBirth}</td>
-                                            <td className="p-3 align-top text-gray-800 ">{newBorn.birthWeight}</td>
-                                            <td className="p-3 align-top text-gray-800 ">{newBorn.birthHeight}</td>
-                                            <td className="p-3 align-top text-gray-800 ">
+                                            <td className="p-3 align-top text-gray-800">{newBorn.gender}</td>
+                                            <td className="p-3 align-top text-gray-800">{newBorn.dateOfBirth}</td>
+                                            <td className="p-3 align-top text-gray-800">{newBorn.birthWeight}</td>
+                                            <td className="p-3 align-top text-gray-800">{newBorn.birthHeight}</td>
+                                            <td className="p-3 align-top text-gray-800">
                                                 {newBorn.zone ? `${newBorn.zone}, ` : ""}
                                                 {newBorn.fullAddress}
                                             </td>
 
-                                            <td className="p-3 align-top text-gray-800 ">{newBorn.motherName}</td>
-                                            <td className="p-3 align-top capitalize text-gray-800 ">{newBorn.addedByName}</td>
+                                            <td className="p-3 align-top text-gray-800">{newBorn.motherName}</td>
+                                            <td className="p-3 align-top capitalize text-gray-800">{newBorn.addedByName}</td>
 
                                             <td className="p-3 align-top">
                                                 <div className="flex gap-2">
@@ -429,23 +431,19 @@ function NewBorn() {
                 <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row">
                     <button
                         className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
-                            currentPage === totalPages
-                                ? "cursor-not-allowed text-gray-400 "
-                                : "text-gray-700 hover:bg-gray-100 "
+                            currentPage === totalPages ? "cursor-not-allowed text-gray-400" : "text-gray-700 hover:bg-gray-100"
                         }`}
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
                     >
                         Previous
                     </button>
-                    <span className="text-sm text-gray-600 ">
+                    <span className="text-sm text-gray-600">
                         Page {currentPage} of {totalPages} • {filteredUsers.length} new borns
                     </span>
                     <button
                         className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-150 ${
-                            currentPage === totalPages
-                                ? "cursor-not-allowed text-gray-400 "
-                                : "text-gray-700 hover:bg-gray-100 "
+                            currentPage === totalPages ? "cursor-not-allowed text-gray-400" : "text-gray-700 hover:bg-gray-100"
                         }`}
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}

@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import logo from "@/assets/logo.png";
 import LoadingIntro from "../../ReusableFolder/loadingIntro";
 import ForgotPassword from "../ForgotPassword/ForgotPassword";
+import LoginImage from "../../assets/Login.png"
 import { X } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -72,14 +73,14 @@ export default function Login({ isOpen, onClose }) {
                 {/* Logo */}
                 <div className="mb-6 flex justify-center">
                     <img
-                        src={logo}
+                        src={LoginImage}
                         alt="App Logo"
                         className="h-32 w-32 object-contain"
                     />
                 </div>
 
                 {/* Title */}
-                <h2 className="mb-6 text-center text-2xl font-bold text-blue-600">NEWBORN TRACKING SYSTEM</h2>
+                <h2 className="mb-6 text-center text-2xl font-bold text-blue-600">NeoCare System</h2>
 
                 {/* Login Form */}
                 <form className="space-y-5" onSubmit={handleSubmit}>

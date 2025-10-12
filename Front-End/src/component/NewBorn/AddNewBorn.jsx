@@ -4,13 +4,14 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { NewBornDisplayContext } from "../../contexts/NewBornContext/NewBornContext";
 import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
 import { ParentDisplayContext } from "../../contexts/ParentContext/ParentContext";
+
 function AddNewBorn({ isOpen, onClose, born }) {
     const { isParent } = useContext(ParentDisplayContext);
+    const { userId, DesignatedZone, role } = useContext(AuthContext);
+    const { AddNewBorn: addNewBornApi, UpdateBorn, customError } = useContext(NewBornDisplayContext);
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownOpenGender, setDropdownOpenGender] = useState(false);
-    const { userId, DesignatedZone, role } = useContext(AuthContext);
-    const { AddNewBorn, UpdateBorn, customError } = useContext(NewBornDisplayContext);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -23,6 +24,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
         birthWeight: "",
         motherName: "",
         birthHeight: "",
+        babyCodeNumber: "", // 👈 Added Baby Code Number
     });
 
     const resetForm = () => {
@@ -36,8 +38,10 @@ function AddNewBorn({ isOpen, onClose, born }) {
             birthWeight: "",
             motherName: "",
             birthHeight: "",
+            babyCodeNumber: "", 
         });
     };
+
     useEffect(() => {
         if (born) {
             setFormData({
@@ -50,19 +54,10 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 birthWeight: born.birthWeight || "",
                 motherName: born.motherID || born.motherName || "",
                 birthHeight: born.birthHeight || "",
+                babyCodeNumber: born.babyCodeNumber || "", // 👈 Populate when editing
             });
         } else {
-            setFormData({
-                firstName: "",
-                lastName: "",
-                middleName: "",
-                dateOfBirth: "",
-                gender: "",
-                birthWeight: "",
-                motherName: "",
-                birthHeight: "",
-                extensionName: "",
-            });
+            resetForm(); // Use resetForm to ensure consistency
         }
     }, [born]);
 
@@ -85,19 +80,14 @@ function AddNewBorn({ isOpen, onClose, born }) {
         setIsSubmitting(true);
         if (born) {
             await UpdateBorn(born._id, formData);
-            setTimeout(() => {
-                resetForm();
-                setIsSubmitting(false);
-                onClose();
-            }, 1000);
         } else {
-            await AddNewBorn(formData, userId);
-            setTimeout(() => {
-                resetForm();
-                setIsSubmitting(false);
-                onClose();
-            }, 1000);
+            await addNewBornApi(formData, userId);
         }
+        setTimeout(() => {
+            resetForm();
+            setIsSubmitting(false);
+            onClose();
+        }, 1000);
     };
 
     if (!isOpen) return null;
@@ -110,7 +100,9 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 exit={{ opacity: 0, y: -40 }}
                 className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl"
             >
-                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">{born ? "Edit Newborn Info" : "Add Newborn"}</h2>
+                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
+                    {born ? "Edit Newborn Info" : "Add Newborn"}
+                </h2>
 
                 {customError && (
                     <div className="mb-4 rounded-md border border-red-400 bg-red-100 px-4 py-2 text-sm text-red-700">
@@ -118,10 +110,8 @@ function AddNewBorn({ isOpen, onClose, born }) {
                     </div>
                 )}
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="space-y-4"
-                >
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* First & Middle Name */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-gray-600">First Name</label>
@@ -145,6 +135,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         </div>
                     </div>
 
+                    {/* Last Name & DOB */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-gray-600">Last Name</label>
@@ -167,6 +158,8 @@ function AddNewBorn({ isOpen, onClose, born }) {
                             />
                         </div>
                     </div>
+
+                    {/* Extension Name */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-gray-600">Extension Name</label>
@@ -180,8 +173,21 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         </div>
                     </div>
 
+                    {/* 👇 Baby Code Number - NEW FIELD */}
+                    <div>
+                        <label className="mb-1 block text-sm text-gray-600">Baby Code Number</label>
+                        <input
+                            type="text"
+                            name="babyCodeNumber"
+                            value={formData.babyCodeNumber}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="e.g. BC-2025-001"
+                        />
+                    </div>
+
+                    {/* Gender & Birth Weight */}
                     <div className="grid grid-cols-2 gap-4">
-                        {/* Gender Dropdown */}
                         <div className="relative">
                             <label className="mb-1 block text-sm text-gray-600">Gender</label>
                             <div
@@ -227,8 +233,9 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         </div>
                     </div>
 
+                    {/* Mother's Name Dropdown */}
                     <div className="relative">
-                        <label className="mb-1 block text-sm text-gray-600">Mother's Name</label>{" "}
+                        <label className="mb-1 block text-sm text-gray-600">Mother's Name</label>
                         <div
                             className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700"
                             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -250,11 +257,11 @@ function AddNewBorn({ isOpen, onClose, born }) {
                                 >
                                     Select Mother
                                 </li>
-
                                 {isParent
                                     .filter((parent) => {
-                                        if (role === DesignatedZone) {
-                                            return parent.address?.includes(zone);
+                                        // Note: 'zone' is not defined — assuming you meant DesignatedZone
+                                        if (role === "HEALTH_WORKER") {
+                                            return parent.address?.includes(DesignatedZone);
                                         }
                                         return true;
                                     })
@@ -271,6 +278,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         )}
                     </div>
 
+                    {/* Birth Height */}
                     <div>
                         <label className="mb-1 block text-sm text-gray-600">Birth Height (cm)</label>
                         <input
@@ -283,6 +291,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         />
                     </div>
 
+                    {/* Buttons */}
                     <div className="mt-6 flex justify-end gap-4">
                         <button
                             type="button"
@@ -294,9 +303,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className={
-                                "rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700 disabled:bg-gray-400"
-                            }
+                            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700 disabled:bg-gray-400"
                         >
                             {isSubmitting ? (
                                 <div className="flex items-center justify-center gap-2">

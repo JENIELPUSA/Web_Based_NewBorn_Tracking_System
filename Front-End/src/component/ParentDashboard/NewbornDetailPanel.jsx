@@ -4,7 +4,7 @@ import UpcomingVaccinationsCalendarMark from "./UpcomingVaccinationCalendarMark"
 import VaccinationScheduleTracker from "./VaccineRecordTracker";
 import { VisitRecordContexts } from "../../contexts/VisitRecordContext/VisitRecordContext";
 
-const NewbornDetailPanel = ({ newborn, onClose, onDeleteNewborn, theme }) => {
+const NewbornDetailPanel = ({ newborn, onClose, onDeleteNewborn, theme,setClearDataTrack }) => {
     const { fetchVaccinationNewborn, records, patientID, setRecords,setPatientID } = useContext(VaccineRecordDisplayContext);
     const { fetchLatestData, setLatestData, setCustomError } = useContext(VisitRecordContexts);
 
@@ -122,6 +122,7 @@ const NewbornDetailPanel = ({ newborn, onClose, onDeleteNewborn, theme }) => {
                 formatDate={formatDate}
                 newbornName={newborn.newbornName}
                 datos={records}
+                setClearDataTrack={setClearDataTrack}
             />
         </div>
     );

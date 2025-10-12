@@ -19,7 +19,7 @@ export const VaccinePerProvider = ({ children }) => {
         }
 
         fetchPerVaccine();
-    }, [authToken]); // Dependencies to trigger effect when page or items per page change
+    }, [authToken]);
 
         useEffect(() => {
             if (customError) {

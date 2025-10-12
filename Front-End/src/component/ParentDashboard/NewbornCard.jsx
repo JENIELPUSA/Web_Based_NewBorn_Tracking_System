@@ -7,7 +7,7 @@ function NewbornCard({ newborn, onSelect }) {
   };
 
   const handleClick = () => {
-    if (onSelect) onSelect(newborn); // fallback for mobile/tablet
+    if (onSelect) onSelect(newborn);
   };
 
   return (

@@ -86,7 +86,6 @@ export const VisitRecordProvider = ({ children }) => {
         try {
             console.log("Fetching latest record for ID:", id);
             const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Record/latest/${id}`);
-            console.log("Response:", res.data);
             setLatestData(res.data.data);
         } catch (error) {
             const status = error.response?.status;

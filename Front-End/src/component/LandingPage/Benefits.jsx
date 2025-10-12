@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowRight, ArrowLeft, Heart, Shield, Award, TrendingUp, CheckCircle } from "lucide-react";
-import image1 from "../../assets/newborn1.jpg";
-import image2 from "../../assets/newborn2.jpg";
-import image3 from "../../assets/newborn3.jpg";
-import image4 from "../../assets/newborn4.jpg";
+import image1 from "../../assets/baby1.jpg";
+import image2 from "../../assets/baby2.webp";
+import image3 from "../../assets/baby3.webp";
+import image4 from "../../assets/baby5.avif";
 
 const slides = [
     {
@@ -37,8 +37,8 @@ const reasons = [
     },
     {
         icon: <Shield className="h-6 w-6 text-blue-600" />,
-        title: "Better Doctor Communication",
-        description: "Provide accurate data to your pediatrician during check-ups, enabling them to offer more informed care.",
+        title: "Better BHW Communication",
+        description: "Provide accurate data to your BHW during check-ups, enabling them to offer more informed care.",
     },
     {
         icon: <Award className="h-6 w-6 text-blue-600" />,

@@ -139,6 +139,7 @@ export const NewBornDisplayProvider = ({ children }) => {
                     zone: values.zone,
                     addedBy: userId,
                     birthHeight: values.birthHeight,
+                    babyCodeNumber:values.babyCodeNumber
                 },
                 {
                     headers: { Authorization: `Bearer ${authToken}` },
@@ -199,6 +200,7 @@ export const NewBornDisplayProvider = ({ children }) => {
                 birthWeight: values.birthWeight || "",
                 birthHeight: values.birthHeight || "",
                 motherName: values.motherName || "",
+                babyCodeNumber:values.babyCodeNumber || "",
             };
 
             const response = await axiosInstance.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/NewBorn/${bornID}`, dataToSend, {

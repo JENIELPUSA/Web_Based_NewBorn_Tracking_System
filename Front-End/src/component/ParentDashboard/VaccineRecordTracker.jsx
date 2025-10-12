@@ -15,12 +15,19 @@ const formatDate = (dateString) => {
   }
 };
 
-const VaccinationScheduleTracker = ({ datos = [] }) => {
+const VaccinationScheduleTracker = ({ datos = [] ,setClearDataTrack}) => {
   const currentDateTime = new Date();
 
   const upcomingVaccines = [];
   const missedVaccines = [];
   const doseHistory = [];
+  console.log("datos",datos)
+ if (!datos.length) {
+    setClearDataTrack(true);
+}else{
+  setClearDataTrack(false);
+}
+
 
   datos.forEach((vaccineRecord) => {
     vaccineRecord.doses.forEach((dose) => {
@@ -96,24 +103,33 @@ const VaccinationScheduleTracker = ({ datos = [] }) => {
       <div className="mt-6">
         <h3 className="text-lg font-medium text-gray-700 mb-3">Dose History</h3>
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-lg shadow-md">
-            <thead>
-              <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left rounded-tl-lg">Vaccine</th>
-                <th className="py-3 px-6 text-left">Date</th>
-                <th className="py-3 px-6 text-left rounded-tr-lg">Remarks</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-600 text-sm font-light">
-              {doseHistory.map((item, index) => (
-                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="py-3 px-6 text-left whitespace-nowrap">{item.vaccine}</td>
-                  <td className="py-3 px-6 text-left">{item.date}</td>
-                  <td className="py-3 px-6 text-left">{item.remarks}</td>
+          {doseHistory.length > 0 ? (
+            <table className="min-w-full bg-white rounded-lg shadow-md">
+              <thead>
+                <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+                  <th className="py-3 px-6 text-left rounded-tl-lg">Vaccine</th>
+                  <th className="py-3 px-6 text-left">Date</th>
+                  <th className="py-3 px-6 text-left rounded-tr-lg">Remarks</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="text-gray-600 text-sm font-light">
+                {doseHistory.map((item, index) => (
+                  <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="py-3 px-6 text-left whitespace-nowrap">{item.vaccine}</td>
+                    <td className="py-3 px-6 text-left">{item.date}</td>
+                    <td className="py-3 px-6 text-left">{item.remarks}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+              <svg className="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 8h2m-2 4h2m-8-8h2m-2 4h2" />
+              </svg>
+              <span>Not Found Data</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

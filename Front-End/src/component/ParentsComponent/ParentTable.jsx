@@ -5,8 +5,10 @@ import { PencilIcon, TrashIcon, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import UserFormModal from "../User/AddUser";
 import StatusVerification from "../../ReusableFolder/StatusModal";
+import { AuthContext } from "../../contexts/AuthContext";
 
 function ParentTable() {
+    const {role}=useContext(AuthContext)
     const { isParent, DeleteParent } = useContext(ParentDisplayContext);
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -64,7 +66,7 @@ function ParentTable() {
     };
 
     const getInitials = (name) => {
-        if (!name) return "US"; 
+        if (!name) return "US";
         const names = name.split(" ");
         let initials = names[0].substring(0, 1).toUpperCase();
         if (names.length > 1) {
@@ -75,7 +77,7 @@ function ParentTable() {
 
     return (
         <div className="rounded-lg bg-white shadow xs:p-2 sm:p-6">
-            <div className="flex flex-col gap-4 border-b p-4 border-gray-200 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-4 border-b border-gray-200 p-4 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-lg font-semibold text-gray-800">Parent List</h2>
                 <div className="flex items-center gap-2">
                     <input
@@ -175,14 +177,16 @@ function ParentTable() {
                                             >
                                                 <PencilIcon className="h-4 w-4" />
                                             </motion.button>
-                                            <motion.button
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.9 }}
-                                                onClick={() => handleDeleteUser(user._id)}
-                                                className="rounded bg-red-500 p-1.5 text-white hover:bg-red-600"
-                                            >
-                                                <TrashIcon className="h-4 w-4" />
-                                            </motion.button>
+                                            {role === "Admin" && (
+                                                <motion.button
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                    onClick={() => handleDeleteUser(user._id)}
+                                                    className="rounded bg-red-500 p-1.5 text-white hover:bg-red-600"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </motion.button>
+                                            )}
                                         </div>
                                     </td>
                                 </motion.tr>

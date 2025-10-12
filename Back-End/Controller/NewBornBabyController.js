@@ -179,8 +179,17 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
         gender: 1, // Include gender for filtering
         birthWeight: 1,
         birthHeight: 1,
+        babyCodeNumber: 1,
         motherName: {
-          $concat: ["$motherName.FirstName", " ", "$motherName.Middle"," ", "$motherName.LastName"," ", "$motherName.extensionName"],
+          $concat: [
+            "$motherName.FirstName",
+            " ",
+            "$motherName.Middle",
+            " ",
+            "$motherName.LastName",
+            " ",
+            "$motherName.extensionName",
+          ],
         },
         motherID: "$motherName._id",
         address: {
@@ -206,7 +215,7 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
           $concat: ["$firstName", " ", "$middleName", " ", "$lastName"], // Concatenate full name
         },
         fullAddress: {
-          $concat: ["$motherName.address"],// Concatenate zone and address
+          $concat: ["$motherName.address"], // Concatenate zone and address
         },
       },
     },
@@ -241,8 +250,8 @@ exports.DisplayAllData = AsyncErrorHandler(async (req, res) => {
 });
 
 exports.deletedSpecificData = AsyncErrorHandler(async (req, res, next) => {
-  const ipAddress = getClientIp(req); 
-  const userId = req.user._id; 
+  const ipAddress = getClientIp(req);
+  const userId = req.user._id;
 
   const [hasVaccineRecord, hasAssignVaccine, hasCheckup, hasProfilling] =
     await Promise.all([

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Activity, Baby, BarChart3, Clock, Heart, Shield, Smartphone, Users, ArrowRight, CheckCircle, TrendingUp, Zap } from "lucide-react";
+import { Activity, Baby, BarChart3, BellRing , Heart, Shield, Smartphone, Users, ArrowRight, CheckCircle, TrendingUp, Zap } from "lucide-react";
 
 const Features = () => {
     const [visibleCards, setVisibleCards] = useState([]);
@@ -30,11 +30,11 @@ const Features = () => {
             icon: <BarChart3 className="h-8 w-8" />,
             title: "Growth Analytics",
             description: "Beautiful interactive charts showing your baby's development progress over time.",
-            highlights: ["WHO growth charts", "Milestone tracking", "Trend analysis"],
+            highlights: ["New born growth charts", "Milestone tracking", "Trend analysis"],
             color: "from-blue-500 to-blue-500",
             bgColor: "bg-blue-50",
             borderColor: "border-blue-200",
-            iconColor: "text-blue-600",
+            iconColor: "text-emerald-500", // 🟢 Green
         },
         {
             icon: <Users className="h-8 w-8" />,
@@ -44,20 +44,19 @@ const Features = () => {
             color: "from-blue-600 to-blue-600",
             bgColor: "bg-blue-50",
             borderColor: "border-blue-200",
-            iconColor: "text-blue-600",
+            iconColor: "text-amber-500", // 🟠 Amber
         },
         {
-            icon: <Smartphone className="h-8 w-8" />,
+            icon: <BellRing  className="h-8 w-8" />,
             title: "Smart Notifications",
             description: "Intelligent alerts and reminders that learn your routine and send notifications when you need them most.",
             highlights: ["Smart scheduling", "Custom alerts", "Quiet mode", "Emergency notifications"],
             color: "from-blue-700 to-blue-700",
             bgColor: "bg-blue-50",
             borderColor: "border-blue-200",
-            iconColor: "text-blue-700",
+            iconColor: "text-violet-500", // 🟣 Violet
         },
     ];
-
     return (
         <section
             id="features"

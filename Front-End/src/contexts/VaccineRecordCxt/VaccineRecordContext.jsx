@@ -235,68 +235,62 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
         }
     };
 
-    const fetchVaccinationNewborn = useCallback(async (filters = {}) => {
-        const formatFullAddress = (fullAddress) => {
-            if (!fullAddress) return "";
-            if (fullAddress.includes(",")) return fullAddress.trim();
-            const match = fullAddress.match(/^ZONE\s+(\d+)\s+(.*)$/i);
-            if (match) {
-                const zone = match[1];
-                const address = match[2];
-                return `ZONE ${zone}, ${address}`;
-            }
-            return fullAddress.trim();
-        };
+const fetchVaccinationNewborn = useCallback(async (filters = {}) => {
+    const formatFullAddress = (fullAddress) => {
+        if (!fullAddress) return "";
+        if (fullAddress.includes(",")) return fullAddress.trim();
+        const match = fullAddress.match(/^ZONE\s+(\d+)\s+(.*)$/i);
+        if (match) {
+            const zone = match[1];
+            const address = match[2];
+            return `ZONE ${zone}, ${address}`;
+        }
+        return fullAddress.trim();
+    };
 
-        const cleanFilters = Object.fromEntries(
-            Object.entries(filters)
-                .filter(([_, val]) => val !== "" && val !== null && val !== undefined)
-                .map(([key, val]) => {
-                    const trimmed = String(val).trim();
-                    if (key === "FullAddress") {
-                        return [key, formatFullAddress(trimmed)];
-                    }
-                    return [key, trimmed];
-                }),
+    const cleanFilters = Object.fromEntries(
+        Object.entries(filters)
+            .filter(([_, val]) => val !== "" && val !== null && val !== undefined)
+            .map(([key, val]) => {
+                const trimmed = String(val).trim();
+                if (key === "FullAddress") {
+                    return [key, formatFullAddress(trimmed)];
+                }
+                return [key, trimmed];
+            }),
+    );
+
+    try {
+        setLoading(true);
+
+        const params = Object.entries(cleanFilters)
+            .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
+            .join("&");
+
+        console.log("✅ Final encoded query:", params);
+
+        const response = await axios.get(
+            `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/vaccination-records?${params}`,
         );
 
-        if (Object.keys(cleanFilters).length === 0) {
-            setRecords([]);
+        const data = response.data.data;
+
+        if (Array.isArray(data) && data.length > 0) {
+            setRecords(data);
+            setPatientID(response.data.patientID);
             setCustomError(null);
-            return;
-        }
-
-        try {
-            setLoading(true);
-
-            const params = Object.entries(cleanFilters)
-                .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
-                .join("&");
-
-            console.log("✅ Final encoded query:", params);
-
-            const response = await axios.get(
-                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/VaccinationRecord/vaccination-records?${params}`,
-            );
-
-            const data = response.data.data;
-
-            if (Array.isArray(data) && data.length > 0) {
-                setRecords(data);
-                setPatientID(response.data.patientID);
-                setCustomError(null);
-            } else {
-                setRecords([]);
-                setCustomError("Walang tumugma sa iyong filter.");
-            }
-        } catch (err) {
-            console.error("❌ Axios Error:", err);
-            setCustomError("Failed to fetch vaccination records");
+        } else {
             setRecords([]);
-        } finally {
-            setLoading(false);
+            toast.error("No Baby's Record. Please Record.");
         }
-    }, []);
+    } catch (err) {
+        console.error("❌ Axios Error:", err);
+        setCustomError("Failed to fetch vaccination records");
+        setRecords([]);
+    } finally {
+        setLoading(false);
+    }
+}, []);
 
     // Auto-fetch on mount
     useEffect(() => {

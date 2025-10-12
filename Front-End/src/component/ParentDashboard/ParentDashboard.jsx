@@ -3,16 +3,17 @@ import MessageBox from './MessageBox';
 import NewbornForm from './NewbornForm';
 import NewbornCard from './NewbornCard';
 import NewbornDetailPanel from './NewbornDetailPanel';
+import BabyCodeModal from './BabyCodeModal';
 
-function ParentDashboard() {
+function ParentDashboard({ setClearDataTrack }) {
   const [newborns, setNewborns] = useState([]);
   const [selectedNewborn, setSelectedNewborn] = useState(null);
+  const [pendingNewborn, setPendingNewborn] = useState(null);
+  const [showBabyCodeModal, setShowBabyCodeModal] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
   const [isDropZoneHovered, setIsDropZoneHovered] = useState(false);
-
-  // Theme state and logic has been simplified to a fixed 'light' theme.
   const [theme] = useState('light');
 
   useEffect(() => {
@@ -20,11 +21,6 @@ function ParentDashboard() {
     document.documentElement.classList.add(theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
-
-  // The toggleTheme function is no longer needed since dark mode is removed.
-  // const toggleTheme = () => {
-  //   setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
-  // };
 
   const showMessage = (msg, type) => {
     setMessage(msg);
@@ -93,6 +89,7 @@ function ParentDashboard() {
     showMessage('Vaccine successfully deleted.', 'success');
   };
 
+  // 🧩 Drag logic
   const handleDragOverDropZone = (e) => {
     e.preventDefault();
     setIsDropZoneHovered(true);
@@ -109,11 +106,35 @@ function ParentDashboard() {
     const droppedNewborn = newborns.find(nb => nb.id === newbornId);
 
     if (droppedNewborn) {
-      setSelectedNewborn(droppedNewborn);
-      showMessage(`Showing details for ${droppedNewborn.newbornName}.`, 'success');
+      handleSelectNewborn(droppedNewborn); // ✅ Unified logic
     } else {
       showMessage('That newborn could not be found.', 'error');
     }
+  };
+
+  // ✅ Unified selection logic for both click and drag
+  const handleSelectNewborn = (newborn) => {
+    if (newborn.babyCodeNumber) {
+      // Baby code already exists → show details immediately
+      setSelectedNewborn(newborn);
+    } else {
+      // No baby code → show modal first
+      setPendingNewborn(newborn);
+      setShowBabyCodeModal(true);
+    }
+  };
+
+  // ✅ When Baby Code Modal is saved
+  const handleSaveBabyCode = (babyCodeNumber) => {
+    setNewborns(prev =>
+      prev.map(nb =>
+        nb.id === pendingNewborn.id ? { ...nb, babyCodeNumber } : nb
+      )
+    );
+    setShowBabyCodeModal(false);
+    setSelectedNewborn({ ...pendingNewborn, babyCodeNumber });
+    setPendingNewborn(null);
+    showMessage(`Baby Code Number saved for ${pendingNewborn.newbornName}.`, 'success');
   };
 
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -128,17 +149,15 @@ function ParentDashboard() {
   return (
     <div className="font-inter flex flex-col items-center transition-colors duration-300">
       <MessageBox message={message} type={messageType} onClose={closeMessage} />
-      <main
-        className="w-full shadow-md rounded-xl p-6 transition-colors duration-300 bg-white"
-      >
+
+      <main className="w-full shadow-md rounded-xl p-6 transition-colors duration-300 bg-white">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-700">
-            Our Newborns
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-700">Our Newborns</h2>
           <button
             onClick={() => {
               setShowForm(!showForm);
               setSelectedNewborn(null);
+              setClearDataTrack(true);
             }}
             className="bg-red-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition transform hover:scale-105"
           >
@@ -181,7 +200,7 @@ function ParentDashboard() {
                 <NewbornCard
                   key={newborn.id}
                   newborn={newborn}
-                  onSelect={setSelectedNewborn}
+                  onSelect={handleSelectNewborn} // ✅ Updated to use unified handler
                 />
               ))}
             </div>
@@ -196,8 +215,18 @@ function ParentDashboard() {
             onAddVaccine={addVaccine}
             onUpdateVaccineStatus={updateVaccineStatus}
             onDeleteVaccine={deleteVaccine}
+            setClearDataTrack={setClearDataTrack}
           />
         )}
+
+        <BabyCodeModal
+          isOpen={showBabyCodeModal}
+          onClose={() => {
+            setShowBabyCodeModal(false);
+            setPendingNewborn(null);
+          }}
+          onSave={handleSaveBabyCode}
+        />
       </main>
     </div>
   );

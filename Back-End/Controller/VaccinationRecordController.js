@@ -744,21 +744,66 @@ exports.deleteRecord = AsyncErrorHandler(async (req, res, next) => {
 
 exports.DisplayNewbornData = async (req, res) => {
   try {
-    let { newbornName, motherName, gender, FullAddress, dateOfBirth } = req.query;
+    let {
+      newbornName,
+      motherName,
+      gender,
+      FullAddress,
+      dateOfBirth,
+      babyCodeNumber,
+    } = req.query;
 
-    const normalizeRegex = (value) =>
-      value?.replace(/\s+/g, "\\s+").trim(); 
+    console.log("🟢 Incoming Query Params:", req.query);
+
+    const normalizeRegex = (value) => value?.replace(/\s+/g, "\\s+").trim();
 
     const initialMatchStage = {};
     if (gender) {
       initialMatchStage.gender = gender;
     }
+
     let dateOfBirthQuery = null;
     if (dateOfBirth) {
       dateOfBirthQuery = new Date(dateOfBirth);
       if (isNaN(dateOfBirthQuery.getTime())) {
-        return res.status(400).json({ status: "error", message: "Invalid dateOfBirth format." });
+        return res
+          .status(400)
+          .json({ status: "error", message: "Invalid dateOfBirth format." });
       }
+    }
+
+    // 🧠 Debug: Check Newborn records with babyCodeNumber (EXACT match)
+    if (babyCodeNumber) {
+      const newborns = await mongoose.model("Newborn").find({
+        babyCodeNumber: babyCodeNumber, // EXACT match lang
+      });
+
+      if (!newborns) {
+        console.warn(
+          "⚠️ No newborn found with babyCodeNumber:",
+          babyCodeNumber
+        );
+        return res.status(404).json({
+          status: "error",
+          message: "No Baby's Record. Please Record.",
+        });
+      }
+
+      if (newborns.length === 0) {
+        console.warn(
+          "⚠️ Walang newborn na tumama sa babyCodeNumber. Stop execution."
+        );
+        return res.status(404).json({
+          status: "error",
+          message: `No newborn found with babyCodeNumber: ${babyCodeNumber}`,
+        });
+      }
+    } else {
+      console.warn("⚠️ babyCodeNumber is missing in query — returning error.");
+      return res.status(400).json({
+        status: "error",
+        message: "Missing babyCodeNumber in query.",
+      });
     }
 
     const pipeline = [
@@ -771,11 +816,15 @@ exports.DisplayNewbornData = async (req, res) => {
         },
       },
       { $unwind: "$newborn" },
-      // First $match stage for fields directly available after unwinding newborn
       {
         $match: {
           ...(gender ? { "newborn.gender": gender } : {}),
-          ...(dateOfBirthQuery ? { "newborn.dateOfBirth": dateOfBirthQuery } : {}),
+          ...(dateOfBirthQuery
+            ? { "newborn.dateOfBirth": dateOfBirthQuery }
+            : {}),
+          ...(babyCodeNumber
+            ? { "newborn.babyCodeNumber": babyCodeNumber }
+            : {}), // EXACT match
         },
       },
       {
@@ -790,7 +839,7 @@ exports.DisplayNewbornData = async (req, res) => {
       {
         $lookup: {
           from: "parents",
-          localField: "newborn.motherName", // Assuming newborn.motherName stores parent _id
+          localField: "newborn.motherName",
           foreignField: "_id",
           as: "mother",
         },
@@ -805,9 +854,7 @@ exports.DisplayNewbornData = async (req, res) => {
           as: "doseAdmin",
         },
       },
-      {
-        $unwind: { path: "$doseAdmin", preserveNullAndEmptyArrays: true },
-      },
+      { $unwind: { path: "$doseAdmin", preserveNullAndEmptyArrays: true } },
       {
         $addFields: {
           processedDose: {
@@ -856,17 +903,18 @@ exports.DisplayNewbornData = async (req, res) => {
           _id: "$_id",
           doses: { $push: "$processedDose" },
           patientID: { $first: "$newborn._id" },
-          newbornFirstName: { $first: "$newborn.firstName" }, // Keep individual name parts for full name construction
+          newbornFirstName: { $first: "$newborn.firstName" },
           newbornMiddleName: { $first: "$newborn.middleName" },
           newbornLastName: { $first: "$newborn.lastName" },
           newbornExtensionName: { $first: "$newborn.extensionName" },
-          rawDateOfBirth: { $first: "$newborn.dateOfBirth" }, // Keep original date format for consistency
+          rawDateOfBirth: { $first: "$newborn.dateOfBirth" },
           avatar: { $first: "$newborn.avatar" },
           gender: { $first: "$newborn.gender" },
+          babyCodeNumber: { $first: "$newborn.babyCodeNumber" },
           vaccineName: { $first: "$vaccine.name" },
           dosage: { $first: "$vaccine.dosage" },
           description: { $first: "$vaccine.description" },
-          motherFirstName: { $first: "$mother.FirstName" }, // Keep individual name parts
+          motherFirstName: { $first: "$mother.FirstName" },
           motherMiddleName: { $first: "$mother.Middle" },
           motherLastName: { $first: "$mother.LastName" },
           motherExtensionName: { $first: "$mother.extensionName" },
@@ -874,7 +922,6 @@ exports.DisplayNewbornData = async (req, res) => {
           motherAddress: { $first: "$mother.address" },
         },
       },
-      // Project the full names and address AFTER grouping to apply match on them
       {
         $addFields: {
           newbornName: {
@@ -953,13 +1000,10 @@ exports.DisplayNewbornData = async (req, res) => {
                   { $ne: ["$motherAddress", ""] },
                 ],
               },
-              {
-                $concat: ["$motherZone", ", ", "$motherAddress"],
-              },
-              "$motherAddress", // If zone is null/empty, just use address
+              { $concat: ["$motherZone", ", ", "$motherAddress"] },
+              "$motherAddress",
             ],
           },
-          // Convert dateOfBirth to string for final output if needed, but not for matching if you intend to match dates
           dateOfBirth: {
             $dateToString: {
               format: "%Y-%m-%d",
@@ -968,14 +1012,33 @@ exports.DisplayNewbornData = async (req, res) => {
           },
         },
       },
-      // Second $match stage for the newly computed fields
       {
         $match: {
-          ...(newbornName ? { newbornName: { $regex: normalizeRegex(newbornName), $options: "i" } } : {}),
-          ...(motherName ? { motherName: { $regex: normalizeRegex(motherName), $options: "i" } } : {}),
-          ...(FullAddress ? { FullAddress: { $regex: normalizeRegex(FullAddress), $options: "i" } } : {}),
-          // dateOfBirth is now a string, so match it as a string
-          ...(dateOfBirth ? { dateOfBirth: dateOfBirth } : {}), // dateOfBirth from req.query is already a string
+          ...(newbornName
+            ? {
+                newbornName: {
+                  $regex: normalizeRegex(newbornName),
+                  $options: "i",
+                },
+              }
+            : {}),
+          ...(motherName
+            ? {
+                motherName: {
+                  $regex: normalizeRegex(motherName),
+                  $options: "i",
+                },
+              }
+            : {}),
+          ...(FullAddress
+            ? {
+                FullAddress: {
+                  $regex: normalizeRegex(FullAddress),
+                  $options: "i",
+                },
+              }
+            : {}),
+          ...(dateOfBirth ? { dateOfBirth: dateOfBirth } : {}),
         },
       },
       {
@@ -992,13 +1055,21 @@ exports.DisplayNewbornData = async (req, res) => {
           description: 1,
           motherName: 1,
           FullAddress: 1,
-          newbornZone: "$motherZone", // Renaming for clarity if needed
+          newbornZone: "$motherZone",
           dateOfBirth: 1,
+          babyCodeNumber: 1,
         },
       },
     ];
 
     const records = await VaccineRecord.aggregate(pipeline);
+
+    console.log("🔍 Matched Records Count:", records.length);
+    console.log("📋 Sample Record:", records[0]);
+
+    if (!records.length) {
+      console.warn("⚠️ Walang match sa VaccineRecord aggregation pipeline.");
+    }
 
     res.status(200).json({
       status: "success",
@@ -1006,8 +1077,7 @@ exports.DisplayNewbornData = async (req, res) => {
       data: records,
     });
   } catch (err) {
-    console.error("DisplayNewbornData Error:", err);
+    console.error("❌ DisplayNewbornData Error:", err);
     res.status(500).json({ status: "error", message: "Something went wrong." });
   }
 };
-
