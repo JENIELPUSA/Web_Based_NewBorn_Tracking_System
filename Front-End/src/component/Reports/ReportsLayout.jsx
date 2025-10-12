@@ -37,7 +37,6 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
         }
     };
 
-    // Determine main icon to show in the center
     const renderMainIcon = () => {
         if (title === "Profilling Reports") {
             return <File className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
@@ -54,13 +53,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
             <div className="relative flex h-32 w-full items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 sm:h-36">
                 <span className="absolute left-2 top-2 rounded bg-blue-600 px-2 py-0.5 text-xs font-bold tracking-wider text-white">PDF</span>
                 
-                {/* MAIN ICON - CENTERED */}
                 {renderMainIcon()}
-
-                {/* Optional: Keep download indicator in corner if needed, or remove */}
-                {/* <div className="absolute bottom-2 right-2">
-                    <Download className="h-4 w-4 text-red-700 sm:h-5 sm:w-5" />
-                </div> */}
             </div>
 
             <p className="mt-3 text-center text-xs font-bold text-gray-800 sm:mt-4 sm:text-sm md:text-base">{title}</p>
