@@ -42,7 +42,7 @@ function NewBornTrackingBanner() {
             subtitle: "Document every precious moment",
             bgImage: banner1,
             overlayColor: "bg-gradient-to-br from-blue-400/20 to-cyan-500/30",
-            description: "Track feeding, sleep patterns, and development",
+            description: "Track height and weight, and overall development",
         },
         {
             icon: Shield,
@@ -50,7 +50,7 @@ function NewBornTrackingBanner() {
             subtitle: "Protected health records",
             bgImage: banner4,
             overlayColor: "bg-gradient-to-br from-orange-400/20 to-emerald-500/30",
-            description: "HIPAA compliant data protection for your baby",
+            description: "Keep your baby's data safe and private"
         },
     ];
 
