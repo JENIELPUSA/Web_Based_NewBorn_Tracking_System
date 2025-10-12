@@ -1,3 +1,5 @@
+// src/routes/dashboard/AdminBanner.tsx
+
 import { useState, useEffect, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, User, Heart, Shield, Activity } from "lucide-react";
@@ -16,7 +18,7 @@ function NewBornTrackingBanner() {
             icon: User,
             title: `Welcome ${role}`,
             subtitle: "Your Dashboard",
-            bgImage: banner2, 
+            bgImage: banner2,
             overlayColor: "bg-gradient-to-br from-pink-400/20 to-rose-500/50",
             description: "Welcome to your dashboard. You can freely explore more features.",
         },
@@ -50,7 +52,7 @@ function NewBornTrackingBanner() {
             subtitle: "Protected health records",
             bgImage: banner4,
             overlayColor: "bg-gradient-to-br from-orange-400/20 to-emerald-500/30",
-            description: "Keep your baby's data safe and private"
+            description: "Keep your baby's data safe and private",
         },
     ];
 
@@ -97,7 +99,7 @@ function NewBornTrackingBanner() {
                         {/* Overlay gradient */}
                         <div className={`absolute inset-0 ${current.overlayColor}`} />
 
-                        {/* Floating circles & hearts */}
+                        {/* Floating decorative elements */}
                         <motion.div
                             animate={{
                                 scale: [1, 1.2, 1],
@@ -123,21 +125,16 @@ function NewBornTrackingBanner() {
                             className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white opacity-10 blur-3xl"
                         />
 
-                        {/* Floating hearts decoration */}
                         <motion.div
                             animate={{ y: [-20, -40, -20], opacity: [0.3, 0.6, 0.3] }}
                             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                             className="absolute right-20 top-10 text-white opacity-30"
                         >
-                            <Heart
-                                className="h-8 w-8"
-                                fill="currentColor"
-                            />
+                            <Heart className="h-8 w-8" fill="currentColor" />
                         </motion.div>
 
                         {/* Content */}
                         <div className="relative z-10 flex flex-col items-center gap-6 p-8 text-white md:flex-row md:gap-8 md:p-12">
-                            {/* Icon */}
                             <motion.div
                                 initial={{ scale: 0, rotate: -180 }}
                                 animate={{ scale: 1, rotate: 0 }}
@@ -164,7 +161,6 @@ function NewBornTrackingBanner() {
                                 </div>
                             </motion.div>
 
-                            {/* Text */}
                             <div className="flex-1 text-center drop-shadow-lg md:text-left">
                                 <motion.h1
                                     initial={{ y: 20, opacity: 0 }}
@@ -193,7 +189,7 @@ function NewBornTrackingBanner() {
                             </div>
                         </div>
 
-                        {/* Progress Bar */}
+                        {/* Progress bar */}
                         <motion.div
                             initial={{ scaleX: 0 }}
                             animate={{ scaleX: 1 }}
@@ -203,22 +199,7 @@ function NewBornTrackingBanner() {
                         />
                     </motion.div>
                 </AnimatePresence>
-
-                {/* Navigation Buttons */}
-                <button
-                    onClick={prevSlide}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:scale-110 hover:bg-white/30"
-                >
-                    <ChevronLeft className="h-6 w-6 text-white" />
-                </button>
-                <button
-                    onClick={nextSlide}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-2 backdrop-blur-sm transition-all hover:scale-110 hover:bg-white/30"
-                >
-                    <ChevronRight className="h-6 w-6 text-white" />
-                </button>
-
-                {/* Slide Indicators */}
+                {/* Indicators */}
                 <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
                     {slides.map((_, index) => (
                         <button

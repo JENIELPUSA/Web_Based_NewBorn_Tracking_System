@@ -195,10 +195,10 @@ function BrandTable() {
                 <table className="table min-w-full text-sm">
                     <thead className="bg-gray-100">
                         <tr>
-                            <th className="p-3 text-left text-gray-500">#</th>
-                            <th className="p-3 text-left text-gray-500">Name</th>
-                            <th className="p-3 text-left text-gray-500">Created At</th>
-                            <th className="p-3 text-left text-gray-500">
+                            <th className="p-3 text-left text-gray-800">#</th>
+                            <th className="p-3 text-left text-gray-800">Name</th>
+                            <th className="p-3 text-left text-gray-800">Created At</th>
+                            <th className="p-3 text-left text-gray-800">
                                 <button
                                     onClick={handleAddBrand}
                                     className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
@@ -228,9 +228,9 @@ function BrandTable() {
                                     transition={{ duration: 0.3 }}
                                     className="border-b hover:bg-gray-50"
                                 >
-                                    <td className="p-3 align-top text-gray-500">{indexOfFirstBrand + index + 1}</td>
-                                    <td className="p-3 align-top text-gray-500">{brand.name}</td>
-                                    <td className="p-3 align-top text-gray-500">{formatDate(brand.createdAt)}</td>
+                                    <td className="p-3 align-top text-gray-800">{indexOfFirstBrand + index + 1}</td>
+                                    <td className="p-3 align-top text-gray-800">{brand.name}</td>
+                                    <td className="p-3 align-top text-gray-800">{formatDate(brand.createdAt)}</td>
                                     <td className="p-3 align-top">
                                         <div className="flex flex-wrap gap-2">
                                             <motion.button

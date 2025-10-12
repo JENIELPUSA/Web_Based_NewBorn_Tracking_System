@@ -231,22 +231,22 @@ function Profille() {
                 <table className="table min-w-full text-sm">
                     <thead className="bg-gray-100">
                         <tr>
-                            <th className="p-2 text-left text-gray-500">#</th>
-                            <th className="p-2 text-left text-gray-500">Avatar</th>
-                            <th className="p-2 text-left text-gray-500">Name</th>
-                            <th className="p-2 text-left text-gray-500">Gender</th>
-                            <th className="p-2 text-left text-gray-500">DOB</th>
-                            <th className="p-2 text-left text-gray-500">Address</th>
-                            <th className="p-2 text-left text-gray-500">Blood Type</th>
-                            <th className="p-2 text-left text-gray-500">Weight</th>
-                            <th className="p-2 text-left text-gray-500">Height</th>
-                            <th className="p-2 text-left text-gray-500">Condition</th>
-                            <th className="p-2 text-left text-gray-500">Notes</th>
-                            <th className="p-2 text-left text-gray-500">Mother Name</th>
-                            <th className="p-2 text-left text-gray-500">Contact #</th>
-                            <th className="p-2 text-left text-gray-500">Vacination Record</th>
-                            <th className="p-2 text-left text-gray-500">Created At</th>
-                            <th className="p-2 text-left text-gray-500">
+                            <th className="p-2 text-left text-gray-800">#</th>
+                            <th className="p-2 text-left text-gray-800">Avatar</th>
+                            <th className="p-2 text-left text-gray-800">Name</th>
+                            <th className="p-2 text-left text-gray-800">Gender</th>
+                            <th className="p-2 text-left text-gray-800">DOB</th>
+                            <th className="p-2 text-left text-gray-800">Address</th>
+                            <th className="p-2 text-left text-gray-800">Blood Type</th>
+                            <th className="p-2 text-left text-gray-800">Weight</th>
+                            <th className="p-2 text-left text-gray-800">Height</th>
+                            <th className="p-2 text-left text-gray-800">Condition</th>
+                            <th className="p-2 text-left text-gray-800">Notes</th>
+                            <th className="p-2 text-left text-gray-800">Mother Name</th>
+                            <th className="p-2 text-left text-gray-800">Contact #</th>
+                            <th className="p-2 text-left text-gray-800">Vacination Record</th>
+                            <th className="p-2 text-left text-gray-800">Created At</th>
+                            <th className="p-2 text-left text-gray-800">
                                 <button
                                     onClick={handleAddClick}
                                     className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
@@ -262,7 +262,7 @@ function Profille() {
                             <tr>
                                 <td
                                     colSpan="15"
-                                    className="p-4 text-center text-gray-500"
+                                    className="p-4 text-center text-gray-800"
                                 >
                                     No profilling records found.
                                 </td>
@@ -290,19 +290,19 @@ function Profille() {
                                             </div>
                                         )}
                                     </td>
-                                    <td className="p-2 text-gray-500">{user.newbornName}</td>
-                                    <td className="p-2 text-gray-500">{user.gender}</td>
-                                    <td className="p-2 text-gray-500">{formatDate(user.dateOfBirth)}</td>
-                                    <td className="p-2 text-gray-500">{user.motherAddressZone || "N/A"}</td>
-                                    <td className="p-2 text-gray-500">{user.blood_type || "N/A"}</td>
-                                    <td className="p-2 text-gray-500">{user.latestWeight || "N/A"}</td>
-                                    <td className="p-2 text-gray-500">{user.latestHeight || "N/A"}</td>
-                                    <td className="p-2 text-gray-500">{user.latestHealthCondition || "N/A"}</td>
-                                    <td className="p-2 text-gray-500">{user.latestNotes || "N/A"}</td>
-                                    <td className="p-2 text-gray-500">{user.motherName || "N/A"}</td>
-                                    <td className="p-2 text-gray-500">{user.motherPhoneNumber || "N/A"}</td>
+                                    <td className="p-2 text-gray-800">{user.newbornName}</td>
+                                    <td className="p-2 text-gray-800">{user.gender}</td>
+                                    <td className="p-2 text-gray-800">{formatDate(user.dateOfBirth)}</td>
+                                    <td className="p-2 text-gray-800">{user.motherAddressZone || "N/A"}</td>
+                                    <td className="p-2 text-gray-800">{user.blood_type || "N/A"}</td>
+                                    <td className="p-2 text-gray-800">{user.latestWeight || "N/A"}</td>
+                                    <td className="p-2 text-gray-800">{user.latestHeight || "N/A"}</td>
+                                    <td className="p-2 text-gray-800">{user.latestHealthCondition || "N/A"}</td>
+                                    <td className="p-2 text-gray-800">{user.latestNotes || "N/A"}</td>
+                                    <td className="p-2 text-gray-800">{user.motherName || "N/A"}</td>
+                                    <td className="p-2 text-gray-800">{user.motherPhoneNumber || "N/A"}</td>
                                     {/* Vaccination Record Column - KEEP THIS */}
-                                    <td className="p-2 text-gray-500">
+                                    <td className="p-2 text-gray-800">
                                         {user.vaccinationRecords?.length ? (
                                             <ul className="list-disc space-y-2 pl-4">
                                                 {user.vaccinationRecords.map((record, i) => (

@@ -41,7 +41,7 @@ const Hero = () => {
             title: "Blood Type",
             value: "O+",
             color: "bg-blue-500/70 text-blue-300",
-            position: "-top-8 -left-8",
+            position: "-top-8 -left-12",
             delay: "delay-300",
         },
         {

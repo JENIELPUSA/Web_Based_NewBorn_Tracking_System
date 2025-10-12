@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Activity, Baby, BarChart3, BellRing , Heart, Shield, Smartphone, Users, ArrowRight, CheckCircle, TrendingUp, Zap } from "lucide-react";
+import { Activity, Baby, BarChart3, BellRing, Heart, Shield, Smartphone, Users, ArrowRight, CheckCircle, TrendingUp, Zap } from "lucide-react";
 
 const Features = () => {
     const [visibleCards, setVisibleCards] = useState([]);
@@ -47,7 +47,7 @@ const Features = () => {
             iconColor: "text-amber-500", // 🟠 Amber
         },
         {
-            icon: <BellRing  className="h-8 w-8" />,
+            icon: <BellRing className="h-8 w-8" />,
             title: "Smart Notifications",
             description: "Intelligent alerts and reminders that learn your routine and send notifications when you need them most.",
             highlights: ["Smart scheduling", "Custom alerts", "Quiet mode", "Emergency notifications"],
@@ -102,12 +102,10 @@ const Features = () => {
                             onMouseEnter={() => setHoveredCard(index)}
                             onMouseLeave={() => setHoveredCard(null)}
                         >
-                            {/* Gradient border effect (subtle blue glow) */}
                             <div
                                 className={`absolute inset-0 bg-gradient-to-r ${feature.color} -z-10 rounded-2xl opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-100`}
                             ></div>
 
-                            {/* Feature Icon */}
                             <div className="mb-8">
                                 <div
                                     className={`relative h-20 w-20 ${feature.bgColor} flex items-center justify-center rounded-2xl border ${feature.borderColor} transition-transform duration-300 group-hover:scale-110`}
@@ -119,12 +117,12 @@ const Features = () => {
                                 </div>
                             </div>
 
-                            {/* Feature Content */}
                             <div className="space-y-6">
-                                <h3 className="text-2xl font-bold text-black transition-colors group-hover:text-blue-600">{feature.title}</h3>
-                                <p className="text-lg leading-relaxed text-gray-600">{feature.description}</p>
+                                <h3 className="text-2xl font-bold text-black transition-colors group-hover:text-white">{feature.title}</h3>
+                                <p className="text-lg leading-relaxed text-gray-600 transition-colors group-hover:text-white">
+                                    {feature.description}
+                                </p>
 
-                                {/* Feature Highlights */}
                                 <div className="space-y-3">
                                     {feature.highlights.map((highlight, idx) => (
                                         <div
@@ -132,13 +130,12 @@ const Features = () => {
                                             className="flex items-center gap-3 text-sm"
                                         >
                                             <CheckCircle className={`h-4 w-4 ${feature.iconColor} flex-shrink-0`} />
-                                            <span className="text-gray-700">{highlight}</span>
+                                            <span className="text-gray-700 transition-colors group-hover:text-white">{highlight}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Hover arrow */}
                             <div className="absolute right-8 top-8 transform opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
                                 <ArrowRight className={`h-6 w-6 ${feature.iconColor}`} />
                             </div>
