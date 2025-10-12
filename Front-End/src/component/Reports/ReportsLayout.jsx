@@ -22,7 +22,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
         try {
             if (title === "Profilling Reports") {
                 await downloadProfillingReport(fromDate, toDate);
-            } else if (title === "New Born Reports") {
+            } else if (title === "Child Reports") {
                 await downloadNewBornReport(fromDate, toDate);
             } else if (title === "Vaccine Inventory") {
                 await downloadIventoryReport(fromDate, toDate);
@@ -155,7 +155,7 @@ function ReportsLayout() {
                         description="Current stock levels and vaccine expiration tracking."
                     />
                     <PdfReportCard
-                        title="New Born Reports"
+                        title="Child Reports"
                         description="Summary of births, health stats, and delivery details."
                     />
                 </div>
