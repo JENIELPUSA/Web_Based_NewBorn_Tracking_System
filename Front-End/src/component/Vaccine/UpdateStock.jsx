@@ -187,7 +187,7 @@ function VaccineForm({ vaccine, isOpen, onClose, DataDelete }) {
                         </button>
                         <button
                             type="submit"
-                            className="rounded-lg bg-red-600 px-5 py-2 font-medium text-white hover:bg-pink-700"
+                            className="rounded-lg bg-[#7B8D6A] px-5 py-2 font-medium text-white hover:bg-[#7B8D6A]/60"
                         >
                             Submit
                         </button>

@@ -42,11 +42,11 @@ const Header = () => {
                                         className="h-13 w-13 object-contain"
                                     />
                                 </div>
-                                <div className="absolute -inset-2 rounded-2xl bg-blue-400 opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-20"></div>
+                                <div className="absolute -inset-2 rounded-2xl bg-[#7B8D6A] opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-20"></div>
                             </div>
 
                             <div>
-                                <h1 className="cursor-pointer text-2xl font-black text-black transition-colors group-hover:text-blue-600">
+                                <h1 className="cursor-pointer text-2xl font-black text-[#7B8D6A] transition-colors group-hover:text-blue-600">
                                     NeoCare System
                                 </h1>
                             </div>
@@ -56,7 +56,7 @@ const Header = () => {
                         <div className="hidden items-center gap-4 lg:flex">
                             <button
                                 onClick={() => setShowLogin(true)}
-                                className="rounded-xl border border-blue-300 px-6 py-2 font-medium text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-blue-300 hover:text-black"
+                                className="rounded-xl border border-[#7B8D6A]/70 px-6 py-2 font-medium text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-[#7B8D6A]/60 hover:text-white"
                             >
                                 Log In
                             </button>

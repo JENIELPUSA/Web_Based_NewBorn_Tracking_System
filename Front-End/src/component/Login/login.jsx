@@ -80,7 +80,7 @@ export default function Login({ isOpen, onClose }) {
                 </div>
 
                 {/* Title */}
-                <h2 className="mb-6 text-center text-2xl font-bold text-blue-600">NeoCare System</h2>
+                <h2 className="mb-6 text-center text-2xl font-bold text-[#7B8D6A]">NeoCare System</h2>
 
                 {/* Login Form */}
                 <form className="space-y-5" onSubmit={handleSubmit}>
@@ -115,7 +115,7 @@ export default function Login({ isOpen, onClose }) {
                     <button
                         type="submit"
                         className={`flex w-full items-center justify-center gap-2 ${
-                            isLoading ? "cursor-not-allowed bg-blue-400" : "bg-blue-500 hover:bg-blue-600"
+                            isLoading ? "cursor-not-allowed bg-[#7B8D6A]" : "bg-[#7B8D6A] hover:bg-[#7B8D6A]/60"
                         } rounded px-4 py-2 font-semibold text-white`}
                         disabled={isLoading}
                     >
@@ -126,7 +126,7 @@ export default function Login({ isOpen, onClose }) {
                         <button
                             type="button"
                             onClick={() => setForgotModal(true)}
-                            className="text-sm text-blue-600 hover:underline"
+                            className="text-sm text-[#7B8D6A] hover:underline"
                         >
                             Forgot Password?
                         </button>

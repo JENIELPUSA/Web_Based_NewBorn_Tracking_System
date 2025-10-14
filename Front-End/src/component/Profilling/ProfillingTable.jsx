@@ -219,7 +219,7 @@ function Profille() {
             <div className="mt-4 flex justify-center sm:hidden">
                 <button
                     onClick={handleAddClick}
-                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-[#7B8D6A] px-4 py-2 text-white hover:bg-[#7B8D6A]/60"
                 >
                     <Plus className="h-5 w-5" />
                     Add New Profilling
@@ -249,7 +249,7 @@ function Profille() {
                             <th className="p-2 text-left text-gray-800">
                                 <button
                                     onClick={handleAddClick}
-                                    className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                    className="rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                     title="Add Profilling"
                                 >
                                     <Plus className="h-4 w-4" />
@@ -285,7 +285,7 @@ function Profille() {
                                                 className="h-8 w-8 rounded-full object-cover"
                                             />
                                         ) : (
-                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white">
+                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7B8D6A] text-white">
                                                 {getInitials(user.newbornName)}
                                             </div>
                                         )}
@@ -341,7 +341,7 @@ function Profille() {
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => onUserSelect(user)}
-                                                className="rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
+                                                className="rounded bg-[#7B8D6A] p-1 text-white hover:bg-[#7B8D6A]/60"
                                                 title="Edit"
                                             >
                                                 <PencilIcon className="h-4 w-4" />
@@ -387,7 +387,7 @@ function Profille() {
                                             className="h-10 w-10 rounded-full object-cover"
                                         />
                                     ) : (
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7B8D6A] text-white">
                                             {getInitials(user.newbornName)}
                                         </div>
                                     )}
@@ -401,7 +401,7 @@ function Profille() {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => onUserSelect(user)}
-                                        className="rounded bg-blue-500 p-1 text-white hover:bg-blue-600"
+                                        className="rounded bg-[#7B8D6A] p-1 text-white hover:bg-[#7B8D6A]/60"
                                         title="Edit"
                                     >
                                         <PencilIcon className="h-4 w-4" />
@@ -454,7 +454,7 @@ function Profille() {
                                 </div>
                                 {/* Vaccination Records in Mobile Card View */}
                                 <details className="col-span-2 mt-3">
-                                    <summary className="cursor-pointer text-sm font-medium text-blue-600">
+                                    <summary className="cursor-pointer text-sm font-medium text-[#7B8D6A]/60">
                                         Vaccination Records
                                     </summary>
                                     <div className="mt-2 space-y-3 pl-2 text-sm">

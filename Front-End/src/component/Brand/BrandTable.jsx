@@ -201,7 +201,7 @@ function BrandTable() {
                             <th className="p-3 text-left text-gray-800">
                                 <button
                                     onClick={handleAddBrand}
-                                    className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                    className="rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                     title="Add Brand"
                                 >
                                     <Plus className="h-4 w-4" />
@@ -237,7 +237,7 @@ function BrandTable() {
                                                 whileHover={{ scale: 1.1 }}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => onUserSelect(brand)}
-                                                className="shrink-0 rounded bg-blue-500 p-1.5 text-white hover:bg-blue-600"
+                                                className="shrink-0 rounded bg-[#7B8D6A] p-1.5 text-white hover:bg-[#7B8D6A]/60"
                                                 title="Edit"
                                             >
                                                 <PencilIcon className="h-4 w-4" />
@@ -264,7 +264,7 @@ function BrandTable() {
             <div className="mt-4 space-y-4 sm:hidden">
                 <button
                     onClick={handleAddBrand}
-                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-[#7B8D6A] px-4 py-2 text-white hover:bg-[#7B8D6A]/60"
                 >
                     <Plus className="h-5 w-5" />
                     Add Brand
@@ -280,7 +280,7 @@ function BrandTable() {
                         >
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7B8D6A] text-white">
                                         {getInitial(brand.name)}
                                     </div>
                                     <div>
@@ -293,7 +293,7 @@ function BrandTable() {
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.9 }}
                                         onClick={() => onUserSelect(brand)}
-                                        className="shrink-0 rounded bg-blue-500 p-1.5 text-white hover:bg-blue-600"
+                                        className="shrink-0 rounded bg-[#7B8D6A] p-1.5 text-white hover:bg-[#7B8D6A]/60"
                                         title="Edit"
                                     >
                                         <PencilIcon className="h-4 w-4" />

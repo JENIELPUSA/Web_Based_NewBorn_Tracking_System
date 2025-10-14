@@ -53,7 +53,7 @@ export default function DeleteConfirmationModal({
               onConfirmDelete();
               onClose();
             }}
-            className="flex-1 bg-red-600 text-white px-6 py-3 rounded-full hover:bg-red-500 transition duration-300 focus:outline-none"
+            className="flex-1 bg-[#7B8D6A] text-white px-6 py-3 rounded-full hover:bg-[#7B8D6A]/60 transition duration-300 focus:outline-none"
           >
             Delete
           </button>

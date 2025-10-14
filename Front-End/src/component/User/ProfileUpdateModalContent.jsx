@@ -186,7 +186,7 @@ const ProfileUpdateModalContent = ({ onClose, userData }) => {
         </button>
         <button
           type="submit"
-          className="rounded-md bg-blue-500 px-4 py-2 font-bold text-white transition duration-200 hover:bg-blue-600"
+          className="rounded-md bg-[#7B8D6A] px-4 py-2 font-bold text-white transition duration-200 hover:bg-[#7B8D6A]/60"
         >
           Update Profile
         </button>

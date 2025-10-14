@@ -48,7 +48,7 @@ export default function StatusModal({ isOpen, onClose, status = "success" }) {
         </p>
         <button
           onClick={onClose}
-          className="bg-red-600 text-white px-6 py-3 rounded-full hover:bg-pink-500 transition duration-300 w-full focus:outline-none"
+          className="bg-[#7B8D6A] text-white px-6 py-3 rounded-full hover:bg-[#7B8D6A]/60 transition duration-300 w-full focus:outline-none"
         >
           Got it
         </button>

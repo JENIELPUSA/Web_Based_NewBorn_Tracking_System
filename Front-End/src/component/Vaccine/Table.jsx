@@ -220,7 +220,7 @@ function VaccineTable() {
             <div className="mb-4 flex w-full justify-center sm:hidden">
                 <button
                     onClick={openAddModal}
-                    className="flex w-full max-w-[200px] items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                    className="flex w-full max-w-[200px] items-center justify-center gap-2 rounded bg-[#7B8D6A] px-4 py-2 text-white hover:bg-[#7B8D6A]/60"
                 >
                     <Plus className="h-5 w-5" />
                     Add Vaccine
@@ -243,7 +243,7 @@ function VaccineTable() {
                                     <th className="p-3 text-left">
                                         <button
                                             onClick={openAddModal}
-                                            className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                            className="rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                             title="Add Vaccine"
                                         >
                                             <Plus className="h-4 w-4" />
@@ -284,7 +284,7 @@ function VaccineTable() {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => openUpdateModal(item)}
-                                                        className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                                        className="rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                                         title="Edit Stock"
                                                     >
                                                         <PencilIcon className="h-4 w-4" />
@@ -338,7 +338,7 @@ function VaccineTable() {
                                     <div className="mt-4 flex gap-2">
                                         <button
                                             onClick={() => openUpdateModal(item)}
-                                            className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                            className="rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                         >
                                             <PencilIcon className="h-4 w-4" />
                                         </button>

@@ -296,7 +296,7 @@ function AddForm({ isOpen, onClose, onSubmit, record, newbordID, editDose, dataA
               className={`rounded-lg px-5 py-2 font-medium text-white transition ${
                 isSubmitting
                   ? "cursor-not-allowed bg-blue-400"
-                  : "bg-blue-600 hover:bg-blue-700"
+                  : "bg-[#7B8D6A] hover:bg-[#7B8D6A]/60"
               }`}
             >
               {isSubmitting ? (

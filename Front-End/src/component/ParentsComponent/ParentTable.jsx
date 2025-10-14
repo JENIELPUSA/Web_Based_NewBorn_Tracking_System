@@ -96,7 +96,7 @@ function ParentTable() {
             <div className="mt-4 flex justify-center sm:hidden">
                 <button
                     onClick={handleAddClick}
-                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-[#7B8D6A] px-4 py-2 text-white hover:bg-[#7B8D6A]/60"
                 >
                     <Plus className="h-5 w-5" />
                     Add New Born
@@ -118,7 +118,7 @@ function ParentTable() {
                             <th className="p-3 text-left">
                                 <button
                                     onClick={handleAddClick}
-                                    className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                    className="rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                     title="Add User"
                                 >
                                     <Plus className="h-4 w-4" />
@@ -154,7 +154,7 @@ function ParentTable() {
                                                 className="h-10 w-10 rounded-full object-cover"
                                             />
                                         ) : (
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7B8D6A] text-white">
                                                 {getInitials(`${user.FirstName} ${user.LastName}`)}
                                             </div>
                                         )}
@@ -173,7 +173,7 @@ function ParentTable() {
                                                 whileHover={{ scale: 1.1 }}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => onUserSelect(user)}
-                                                className="rounded bg-blue-500 p-1.5 text-white hover:bg-blue-600"
+                                                className="rounded bg-[#7B8D6A] p-1.5 text-white hover:bg-[#7B8D6A]/60"
                                             >
                                                 <PencilIcon className="h-4 w-4" />
                                             </motion.button>
@@ -209,7 +209,7 @@ function ParentTable() {
                                     className="h-12 w-12 rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7B8D6A] text-white">
                                     {getInitials(`${user.FirstName} ${user.LastName}`)}
                                 </div>
                             )}
@@ -238,7 +238,7 @@ function ParentTable() {
                         <div className="mt-3 flex justify-end gap-2">
                             <button
                                 onClick={() => onUserSelect(user)}
-                                className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+                                className="rounded bg-[#7B8D6A] px-3 py-1 text-white hover:bg-[#7B8D6A]/60"
                             >
                                 <PencilIcon className="h-4 w-4" />
                             </button>

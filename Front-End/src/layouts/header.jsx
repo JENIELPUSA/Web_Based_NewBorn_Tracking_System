@@ -43,17 +43,17 @@ socket.on("unvaccinated-alert", (data) => {
   }, []);
 
   return (
-    <header className="relative z-10 flex h-[60px] items-center justify-between bg-white px-4 shadow-md transition-colors">
+    <header className="relative z-10 flex h-[60px] items-center justify-between bg-[#BFDAA4]/50 px-4 shadow-md transition-colors">
       <div className="flex items-center gap-x-3">
         <button className="btn-ghost size-10" onClick={() => setCollapsed(!collapsed)}>
-          <ChevronsLeft className={collapsed && "rotate-180"} />
+           <ChevronsLeft className={`${collapsed ? "rotate-180" : ""} text-black`} />
         </button>
       </div>
       <div className="flex items-center gap-x-3">
         {/* Notification Bell */}
         <div className="relative">
           <button className="btn-ghost size-10" onClick={handleBellClick}>
-            <Bell size={20} />
+            <Bell size={20} className="text-black"  />
             {pendingCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-600 text-xs text-white" />
             )}

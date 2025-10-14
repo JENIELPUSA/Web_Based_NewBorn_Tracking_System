@@ -31,7 +31,7 @@ const Features = () => {
             title: "Growth Analytics",
             description: "Beautiful interactive charts showing your baby's development progress over time.",
             highlights: ["New born growth charts", "Milestone tracking", "Trend analysis"],
-            color: "from-blue-500 to-blue-500",
+            color: "from-[#7B8D6A]  to-[#7B8D6A]",
             bgColor: "bg-blue-50",
             borderColor: "border-blue-200",
             iconColor: "text-emerald-500", // 🟢 Green
@@ -41,7 +41,7 @@ const Features = () => {
             title: "Family Collaboration",
             description: "Share access with caregivers, grandparents, and healthcare providers seamlessly and securely.",
             highlights: ["Role-based access", "Care team integration", "Real-time updates", "Secure sharing"],
-            color: "from-blue-600 to-blue-600",
+            color: "from-[#7B8D6A]  to-[#7B8D6A] ",
             bgColor: "bg-blue-50",
             borderColor: "border-blue-200",
             iconColor: "text-amber-500", // 🟠 Amber
@@ -51,10 +51,10 @@ const Features = () => {
             title: "Smart Notifications",
             description: "Intelligent alerts and reminders that learn your routine and send notifications when you need them most.",
             highlights: ["Smart scheduling", "Custom alerts", "Quiet mode", "Emergency notifications"],
-            color: "from-blue-700 to-blue-700",
+            color: "from-[#7B8D6A]  to-[#7B8D6A]",
             bgColor: "bg-blue-50",
             borderColor: "border-blue-200",
-            iconColor: "text-violet-500", // 🟣 Violet
+            iconColor: "text-blue-500", // 🟣 Violet
         },
     ];
     return (
@@ -73,14 +73,14 @@ const Features = () => {
                 {/* Section Header */}
                 <div className="mb-20 text-center">
                     <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-gray-200 bg-gray-50 px-6 py-3 text-sm font-semibold text-gray-800">
-                        <Activity className="h-5 w-5 text-blue-600" />
+                        <Activity className="h-5 w-5 text-[#7B8D6A] " />
                         Comprehensive Care Features
-                        <div className="h-2 w-2 animate-pulse rounded-full bg-blue-600"></div>
+                        <div className="h-2 w-2 animate-pulse rounded-full bg-[#7B8D6A] "></div>
                     </div>
 
                     <h2 className="mb-8 text-4xl font-black leading-tight text-black md:text-6xl">
                         Everything You Need for
-                        <span className="mt-2 block text-blue-600">Complete Care</span>
+                        <span className="mt-2 block text-[#7B8D6A] ">Complete Care</span>
                     </h2>
 
                     <p className="mx-auto max-w-4xl text-xl leading-relaxed text-gray-700 md:text-2xl">

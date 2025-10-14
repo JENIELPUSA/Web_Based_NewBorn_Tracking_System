@@ -303,7 +303,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700 disabled:bg-gray-400"
+                            className="rounded-lg bg-[#7B8D6A] px-5 py-2 font-medium text-white hover:bg-[#7B8D6A]/60 disabled:bg-gray-400"
                         >
                             {isSubmitting ? (
                                 <div className="flex items-center justify-center gap-2">

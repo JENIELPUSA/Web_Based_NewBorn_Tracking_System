@@ -241,7 +241,7 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
                         onClick={handleSave}
                         type="submit"
                         disabled={isSubmitting}
-                        className="rounded-lg bg-gray-300 px-5 py-2 font-medium text-gray-700 hover:bg-gray-400"
+                        className="rounded-lg bg-[#7B8D6A] px-5 py-2 font-medium text-white hover:bg-[#7B8D6A]/60"
                     >
                         {isSubmitting ? (
                             <div className="flex items-center justify-center gap-2">

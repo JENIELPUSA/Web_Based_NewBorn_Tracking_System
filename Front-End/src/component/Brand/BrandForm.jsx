@@ -98,7 +98,7 @@ function AddBrandModal({ isOpen, onClose, BrandData }) {
                                 `rounded-lg px-5 py-2 font-medium text-white ${
                                     isSubmitting || brandName.trim() === ""
                                         ? "bg-gray-400 cursor-not-allowed"
-                                        : "bg-red-500 hover:bg-pink-600"
+                                        : "bg-[#7B8D6A]  hover:bg-[#7B8D6A]/60 "
                                 }`
                             }
                         >

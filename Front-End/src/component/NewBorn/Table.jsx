@@ -240,7 +240,7 @@ function NewBorn() {
             <div className="block p-4 sm:hidden">
                 <button
                     onClick={handleAddClick}
-                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-[#7B8D6A] px-4 py-2 text-white hover:bg-blue-600"
                 >
                     <Plus className="h-5 w-5" />
                     Add New Born
@@ -262,7 +262,7 @@ function NewBorn() {
                                         className="h-12 w-12 rounded-full object-cover"
                                     />
                                 ) : (
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7B8D6A] text-white">
                                         {newBorn.fullName ? getInitials(newBorn.fullName) : "NB"}
                                     </div>
                                 )}
@@ -297,7 +297,7 @@ function NewBorn() {
                                     <div className="mt-3 flex justify-end gap-2">
                                         <button
                                             onClick={() => handleview(newBorn)}
-                                            className="group relative rounded bg-orange-500 px-2 py-1 text-white hover:bg-orange-600"
+                                            className="group relative rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-orange-600"
                                             title="Assign Vaccine"
                                         >
                                             <MoreHorizontal className="h-4 w-4" />
@@ -341,12 +341,10 @@ function NewBorn() {
                                     <th className="p-3 text-left">
                                         <button
                                             onClick={handleAddClick}
-                                            className="group relative rounded bg-blue-500 px-2 py-1 text-white hover:bg-red-600"
+                                            className="group relative rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                         >
                                             <Plus className="h-4 w-4" />
-                                            <span className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 scale-90 whitespace-nowrap rounded bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-all duration-300 ease-in-out group-hover:scale-100 group-hover:opacity-100">
-                                                Add New Born
-                                            </span>
+                
                                         </button>
                                     </th>
                                 </tr>
@@ -376,7 +374,7 @@ function NewBorn() {
                                                         className="h-10 w-10 rounded-full object-cover"
                                                     />
                                                 ) : (
-                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white">
+                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7B8D6A] text-white">
                                                         {newBorn.fullName ? getInitials(newBorn.fullName) : "NB"}
                                                     </div>
                                                 )}
@@ -402,7 +400,7 @@ function NewBorn() {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => handleview(newBorn)}
-                                                        className="group relative rounded bg-orange-500 px-2 py-1 text-white hover:bg-orange-600"
+                                                        className="group relative rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                                         title="Assign Vaccine"
                                                     >
                                                         <MoreHorizontal className="h-4 w-4" />

@@ -73,7 +73,7 @@ const PhotoUploadModalContent = ({ onClose, userData }) => {
       <div
         className={`flex h-48 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed p-4 text-center transition-colors duration-200 ${
           isDragging
-            ? "border-blue-500 bg-blue-50 text-blue-700"
+            ? "border-[#7B8D6A] bg-blue-50 text-white"
             : "border-gray-300 bg-gray-50 text-gray-500 hover:border-gray-400 hover:bg-gray-100"
         }`}
         onDragOver={onDragOver}
@@ -128,7 +128,7 @@ const PhotoUploadModalContent = ({ onClose, userData }) => {
         </button>
         <button
           type="submit"
-          className="rounded-md bg-blue-500 px-4 py-2 font-bold text-white transition duration-200 hover:bg-blue-600"
+          className="rounded-md bg-[#7B8D6A] px-4 py-2 font-bold text-white transition duration-200 hover:bg-[#7B8D6A]/60"
           disabled={!selectedFile}
         >
           Upload Photo

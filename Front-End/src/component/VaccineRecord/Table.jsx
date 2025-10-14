@@ -292,7 +292,7 @@ function VaccineRecordTable() {
                                             <div className="mt-2 flex gap-2">
                                                 <button
                                                     onClick={() => handleEdit(dose, user)}
-                                                    className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                                    className="rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                                 >
                                                     <PencilIcon className="h-4 w-4" />
                                                 </button>
@@ -396,7 +396,7 @@ function VaccineRecordTable() {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => handleEdit(dose, user)}
-                                                        className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                                        className="rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                                         title="Edit"
                                                     >
                                                         <PencilIcon className="h-4 w-4" />

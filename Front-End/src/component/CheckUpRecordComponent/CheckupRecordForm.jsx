@@ -230,7 +230,7 @@ function CheckupRecordForm({ isOpen, onClose, recordData, newbornData }) {
                             className={`flex items-center justify-center gap-2 rounded-lg px-5 py-2 font-medium text-white transition duration-200 ${
                                 isSubmitting
                                     ? "cursor-not-allowed bg-pink-400"
-                                    : "bg-red-600 hover:bg-pink-700"
+                                    : "bg-[#7B8D6A] hover:bg-[#7B8D6A]/60"
                             }`}
                         >
                             {isSubmitting && (

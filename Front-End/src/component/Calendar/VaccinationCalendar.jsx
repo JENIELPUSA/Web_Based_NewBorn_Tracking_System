@@ -18,7 +18,7 @@ import {
 } from "date-fns";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
 import { AuthContext } from "../../contexts/AuthContext";
-import { useIsMobile } from "./useIsMobile"; // Import the new hook
+import { useIsMobile } from "./useIsMobile";
 
 const VaccinationCalendar = () => {
     const { role, zone } = useContext(AuthContext);
@@ -28,7 +28,7 @@ const VaccinationCalendar = () => {
     const [tooltipContent, setTooltipContent] = useState([]);
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 
-    const isMobile = useIsMobile(); // Use the custom hook
+    const isMobile = useIsMobile();
 
     const latestDueMap = useMemo(() => {
         const map = {};
@@ -64,8 +64,6 @@ const VaccinationCalendar = () => {
                         const dueDateStr = dose.next_due_date ? format(parseISO(dose.next_due_date), "yyyy-MM-dd") : "";
                         const key = `${entry.newbornName}_${entry.vaccineName}`;
                         const isLatestDue = dueDateStr && dueDateStr === latestDueMap[key];
-
-                        // Determine if the current dose item is for a 'next_due_date'
                         const isNextDueDateEntry = dose.next_due_date && isSameDay(parseISO(dose.next_due_date), date);
 
                         return {
@@ -75,8 +73,8 @@ const VaccinationCalendar = () => {
                             status: dose.status,
                             remarks: dose.remarks,
                             administeredBy: dose.administeredBy,
-                            isDue: isLatestDue && isNextDueDateEntry, // Use isNextDueDateEntry here
-                            isDateGiven: dose.dateGiven && isSameDay(parseISO(dose.dateGiven), date), // Add this to differentiate
+                            isDue: isLatestDue && isNextDueDateEntry,
+                            isDateGiven: dose.dateGiven && isSameDay(parseISO(dose.dateGiven), date),
                         };
                     })
             );
@@ -101,40 +99,55 @@ const VaccinationCalendar = () => {
         setClickedDate(date);
         setTooltipContent(doses);
 
-        // Only set tooltip position if not mobile
         if (!isMobile) {
             const rect = event.currentTarget.getBoundingClientRect();
+            const tooltipHeight = 400; // estimated max height
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+            
+            // Check if tooltip should appear above or below
+            const shouldShowAbove = spaceBelow < tooltipHeight && spaceAbove > spaceBelow;
+            
             setTooltipPosition({
-                top: rect.bottom + window.scrollY,
+                top: shouldShowAbove 
+                    ? rect.top + window.scrollY - tooltipHeight - 10 
+                    : rect.bottom + window.scrollY + 10,
                 left: rect.left + window.scrollX,
+                showAbove: shouldShowAbove
             });
         }
     };
 
     const renderHeader = () => (
-        <div className="mb-4 flex items-center justify-between">
-            <div className="flex space-x-2">
-                <button
-                    onClick={handlePrevMonth}
-                    className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
-                >
-                    ‹
-                </button>
+        <div className="mb-6 flex items-center justify-between bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+            <button
+                onClick={handlePrevMonth}
+                className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#7B8D6A] to-[#6a7a5a] text-white hover:shadow-md transition-all duration-200 hover:scale-105"
+            >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            
+            <div className="flex flex-col items-center">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-[#7B8D6A] to-[#5a6a4a] bg-clip-text text-transparent">
+                    {format(currentMonth, "MMMM yyyy")}
+                </h2>
                 <button
                     onClick={handleToday}
-                    className="rounded bg-gray-200 px-3 py-1 text-black hover:bg-gray-300 "
+                    className="mt-2 px-4 py-1.5 text-sm rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
                 >
                     Today
                 </button>
             </div>
-            <h2 className="text-xl font-bold text-gray-800 ">
-                {format(currentMonth, "MMMM yyyy")}
-            </h2>
+
             <button
                 onClick={handleNextMonth}
-                className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+                className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[#7B8D6A] to-[#6a7a5a] text-white hover:shadow-md transition-all duration-200 hover:scale-105"
             >
-                ›
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
             </button>
         </div>
     );
@@ -144,12 +157,12 @@ const VaccinationCalendar = () => {
         const startDate = startOfWeek(currentMonth, { weekStartsOn: 1 });
         for (let i = 0; i < 7; i++) {
             days.push(
-                <div key={i} className="text-center text-sm font-semibold text-gray-700 ">
+                <div key={i} className="text-center py-3 text-sm font-bold text-gray-600 uppercase tracking-wide">
                     {format(addDays(startDate, i), "EEE")}
                 </div>
             );
         }
-        return <div className="grid grid-cols-7 mb-2">{days}</div>;
+        return <div className="grid grid-cols-7 mb-2 bg-white rounded-lg shadow-sm border border-gray-200">{days}</div>;
     };
 
     const renderCells = () => {
@@ -165,125 +178,153 @@ const VaccinationCalendar = () => {
             const isClicked = clickedDate && isSameDay(clickedDate, date);
 
             days.push(
-                <div
+                <motion.div
                     key={date}
                     onClick={(e) => handleDateClick(date, e)}
-                    className={`relative min-h-[80px] rounded p-1 border cursor-pointer transition ${
-                        !isCurrentMonth ? "opacity-40" : ""
-                    } ${isCurrentDay ? "bg-blue-100 border-blue-400 " : ""} ${
-                        doses.length > 0 ? "bg-green-50 hover:bg-green-100  " : "hover:bg-gray-10"
-                    } ${isClicked ? "ring-2 ring-blue-400" : ""}`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`relative min-h-[100px] rounded-lg p-2 border-2 cursor-pointer transition-all duration-200 ${
+                        !isCurrentMonth ? "opacity-40 bg-gray-50" : "bg-white"
+                    } ${isCurrentDay ? "border-[#7B8D6A] shadow-md" : "border-gray-200"} ${
+                        doses.length > 0 ? "hover:shadow-lg hover:border-[#7B8D6A]/50" : "hover:shadow-md hover:border-gray-300"
+                    } ${isClicked ? "ring-4 ring-[#7B8D6A]/30 shadow-lg" : ""}`}
                 >
-                    <div className="text-right text-xs">
+                    <div className="text-right mb-2">
                         <span
-                            className={`inline-flex h-5 w-5 items-center justify-center rounded-full${
-                                isCurrentDay ? "bg-blue-500 text-white" : "text-gray-700"
+                            className={`inline-flex h-7 w-7 items-center justify-center rounded-full font-semibold text-sm transition-colors ${
+                                isCurrentDay 
+                                    ? "bg-gradient-to-br from-[#7B8D6A] to-[#6a7a5a] text-white shadow-md" 
+                                    : "text-gray-700 hover:bg-gray-100"
                             }`}
                         >
                             {format(date, "d")}
                         </span>
                     </div>
                     {doses.length > 0 && (
-                        <div className="mt-1 space-y-1 max-h-[60px] overflow-hidden">
+                        <div className="space-y-1.5">
                             {doses.slice(0, 2).map((dose, idx) => (
-                                <div
+                                <motion.div
                                     key={idx}
-                                    className={`truncate rounded px-1 py-[1px] text-[10px] text-white ${
+                                    initial={{ opacity: 0, y: -5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    className={`truncate rounded-md px-2 py-1 text-[11px] font-medium text-white shadow-sm ${
                                         dose.status === "On-Time"
-                                            ? "bg-green-500"
+                                            ? "bg-gradient-to-r from-green-500 to-green-600"
                                             : dose.status === "Missed"
-                                            ? "bg-red-500"
-                                            : "bg-yellow-500"
+                                            ? "bg-gradient-to-r from-red-500 to-red-600"
+                                            : "bg-gradient-to-r from-yellow-500 to-yellow-600"
                                     }`}
                                 >
-                                    {/* Conditionally display dose number based on whether it's a 'next_due_date' */}
-                                    {dose.vaccineName} {dose.isDue ? "" : `(D${dose.doseNumber})`} {dose.isDue ? "📌" : ""}
-                                </div>
+                                    <div className="flex items-center justify-between gap-1">
+                                        <span className="truncate">{dose.vaccineName}</span>
+                                        {dose.isDue ? (
+                                            <span className="text-sm">📌</span>
+                                        ) : (
+                                            <span className="text-xs bg-white/20 px-1.5 py-0.5 rounded">D{dose.doseNumber}</span>
+                                        )}
+                                    </div>
+                                </motion.div>
                             ))}
                             {doses.length > 2 && (
-                                <div className="text-[10px] text-gray-500">
-                                    +{doses.length - 2} more...
+                                <div className="text-[10px] text-gray-500 font-medium text-center py-1 bg-gray-100 rounded-md">
+                                    +{doses.length - 2} more
                                 </div>
                             )}
                         </div>
                     )}
-                </div>
+                </motion.div>
             );
 
             if ((i + 1) % 7 === 0) {
-                rows.push(<div key={i} className="grid grid-cols-7 gap-1">{days}</div>);
+                rows.push(<div key={i} className="grid grid-cols-7 gap-2">{days}</div>);
                 days = [];
             }
         });
 
-        return <div className="space-y-1">{rows}</div>;
+        return <div className="space-y-2 bg-white rounded-xl shadow-sm p-4 border border-gray-200">{rows}</div>;
     };
 
-    // Modal Component for Mobile
     const MobileModal = ({ date, content, onClose }) => (
         <motion.div
-            initial={{ opacity: 0, y: "100%" }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "100%" }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[100] bg-gray-900 bg-opacity-75 flex items-end justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end justify-center"
+            onClick={onClose}
         >
             <motion.div
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
                 exit={{ y: "100%" }}
-                transition={{ duration: 0.3 }}
-                className="w-full max-w-md bg-white rounded-t-lg shadow-lg p-4 pb-8 relative"
+                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-6 pb-8 relative"
             >
+                <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
                 <div className="mb-4 flex justify-between items-center">
-                    <h3 className="font-semibold text-lg text-gray-900">
-                        Doses on {format(date, "MMM d, yyyy")}
+                    <h3 className="font-bold text-xl text-gray-900">
+                        {format(date, "MMM d, yyyy")}
                     </h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-red-500 text-xl"
+                        className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-600 transition-colors"
                     >
-                        ✕
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
                 </div>
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                     {content.map((item, i) => (
-                        <div key={i} className="border-b border-gray-20 pb-3 last:border-0">
-                            <div className="font-medium text-blue-600 ">{item.newbornName}</div>
-                            <div className="text-sm text-gray-800 ">
-                                <span className="font-medium">Vaccine:</span> {item.vaccineName}
-                            </div>
-                            {/* Conditional rendering for Dose, Status, and AssignedBy */}
-                            {!item.isDue && ( // Only show if NOT a next_due_date entry
-                                <>
-                                    <div className="text-sm text-gray-800 ">
-                                        <span className="font-medium">Dose:</span> {item.doseNumber}
-                                    </div>
-                                    <div className="text-sm text-gray-800 ">
-                                        <span className="font-medium">Status:</span>
-                                        <span
-                                            className={`ml-1 rounded px-1 py-0.5 text-sm ${
-                                                item.status === "On-Time"
-                                                    ? "bg-green-100 text-green-800"
-                                                    : item.status === "Missed"
-                                                    ? "bg-red-100 text-red-800"
-                                                    : "bg-yellow-100 text-yellow-800"
-                                            }`}
-                                        >
-                                            {item.status}
-                                        </span>
-                                    </div>
-                                    <div className="text-sm text-gray-700 ">
-                                        <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
-                                    </div>
-                                </>
-                            )}
-                            {item.isDue && ( // Show "Due Date" if it's a next_due_date entry
-                                <div className="text-sm text-red-500  font-medium">
-                                    Next Due Date!
+                        <motion.div 
+                            key={i} 
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.05 }}
+                            className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4 shadow-sm"
+                        >
+                            <div className="font-bold text-lg text-[#7B8D6A] mb-2">{item.newbornName}</div>
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-semibold text-gray-500 uppercase">Vaccine:</span>
+                                    <span className="text-sm font-medium text-gray-800">{item.vaccineName}</span>
                                 </div>
-                            )}
-                        </div>
+                                {!item.isDue && (
+                                    <>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-semibold text-gray-500 uppercase">Dose:</span>
+                                            <span className="text-sm font-medium text-gray-800">{item.doseNumber}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-semibold text-gray-500 uppercase">Status:</span>
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
+                                                    item.status === "On-Time"
+                                                        ? "bg-green-100 text-green-800 border border-green-200"
+                                                        : item.status === "Missed"
+                                                        ? "bg-red-100 text-red-800 border border-red-200"
+                                                        : "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                                                }`}
+                                            >
+                                                {item.status}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-semibold text-gray-500 uppercase">Assigned By:</span>
+                                            <span className="text-sm font-medium text-gray-800">{item.administeredBy || "None"}</span>
+                                        </div>
+                                    </>
+                                )}
+                                {item.isDue && (
+                                    <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg p-2">
+                                        <span className="text-2xl">📌</span>
+                                        <span className="text-sm text-red-600 font-bold">Next Due Date!</span>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
                     ))}
                 </div>
             </motion.div>
@@ -292,10 +333,13 @@ const VaccinationCalendar = () => {
 
     return (
         <motion.div
-            className="min-h-screen w-full max-w-[1400px] px-4 xs:px-2 sm:px-6 lg:px-8 mx-auto bg-gray-100 "
+            className="min-h-screen w-full max-w-[1400px] px-4 xs:px-2 sm:px-6 lg:px-8 mx-auto py-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.5 }}
+            style={{
+                background: "linear-gradient(135deg, #f5f7fa 0%, #e8f0e8 100%)"
+            }}
         >
             {renderHeader()}
             {renderDays()}
@@ -311,65 +355,82 @@ const VaccinationCalendar = () => {
                         />
                     ) : (
                         <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed z-50 rounded-md border border-gray-300 bg-white p-4 shadow-lg "
+                            initial={{ opacity: 0, scale: 0.9, y: tooltipPosition.showAbove ? 10 : -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="fixed z-50 rounded-xl border-2 border-gray-200 bg-white shadow-2xl overflow-hidden"
                             style={{
-                                top: tooltipPosition.top + 10,
+                                top: tooltipPosition.top,
                                 left: tooltipPosition.left,
-                                maxWidth: "320px",
+                                maxWidth: "380px",
                             }}
                         >
-                            <div className="mb-2 flex justify-between items-center">
-                                <span className="font-semibold text-gray-900  xs:text-xs lg:text-sm sm:text-sm">
-                                    Doses on {format(clickedDate, "MMM d, yyyy")}
+                            {tooltipPosition.showAbove && (
+                                <div className="absolute bottom-[-8px] left-4 w-4 h-4 bg-white border-r-2 border-b-2 border-gray-200 transform rotate-45"></div>
+                            )}
+                            {!tooltipPosition.showAbove && (
+                                <div className="absolute top-[-8px] left-4 w-4 h-4 bg-[#7B8D6A] transform rotate-45"></div>
+                            )}
+                            <div className="bg-gradient-to-r from-[#7B8D6A] to-[#6a7a5a] p-4 flex justify-between items-center">
+                                <span className="font-bold text-white">
+                                    {format(clickedDate, "MMM d, yyyy")}
                                 </span>
                                 <button
                                     onClick={() => setClickedDate(null)}
-                                    className="text-gray-500 hover:text-red-500 "
+                                    className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
                                 >
-                                    ✕
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
                                 </button>
                             </div>
-                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                            <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
                                 {tooltipContent.map((item, i) => (
-                                    <div key={i} className="border-b border-gray-200  pb-2 last:border-0">
-                                        <div className="font-medium text-blue-600  xs:text-xs lg:text-sm sm:text-sm">{item.newbornName}</div>
-                                        <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 ">
-                                            <span className="font-medium">Vaccine:</span> {item.vaccineName}
-                                        </div>
-                                        {/* Conditional rendering for Dose, Status, and AssignedBy */}
-                                        {!item.isDue && ( // Only show if NOT a next_due_date entry
-                                            <>
-                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 ">
-                                                    <span className="font-medium">Dose:</span> {item.doseNumber}
-                                                </div>
-                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-800 ">
-                                                    <span className="font-medium">Status:</span>
-                                                    <span
-                                                        className={`ml-1 rounded px-1 py-0.5 xs:text-xs lg:text-sm sm:text-sm ${
-                                                            item.status === "On-Time"
-                                                                ? "bg-green-100 text-green-800 "
-                                                                : item.status === "Missed"
-                                                                ? "bg-red-100 text-red-800 "
-                                                                : "bg-yellow-100 text-yellow-800 "
-                                                        }`}
-                                                    >
-                                                        {item.status}
-                                                    </span>
-                                                </div>
-                                                <div className="xs:text-xs lg:text-sm sm:text-sm text-gray-700 ">
-                                                    <span className="font-medium">AssignedBy:</span> {item.administeredBy || "None"}
-                                                </div>
-                                            </>
-                                        )}
-                                        {item.isDue && ( // Show "Next Due Date!" if it's a next_due_date entry
-                                            <div className="xs:text-xs lg:text-sm sm:text-sm text-red-500  font-medium">
-                                                Next Due Date!
+                                    <motion.div 
+                                        key={i}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                        className="border-b border-gray-200 pb-3 last:border-0"
+                                    >
+                                        <div className="font-bold text-[#7B8D6A] mb-1">{item.newbornName}</div>
+                                        <div className="space-y-1">
+                                            <div className="text-sm text-gray-700">
+                                                <span className="font-semibold">Vaccine:</span> {item.vaccineName}
                                             </div>
-                                        )}
-                                    </div>
+                                            {!item.isDue && (
+                                                <>
+                                                    <div className="text-sm text-gray-700">
+                                                        <span className="font-semibold">Dose:</span> {item.doseNumber}
+                                                    </div>
+                                                    <div className="text-sm text-gray-700 flex items-center gap-2">
+                                                        <span className="font-semibold">Status:</span>
+                                                        <span
+                                                            className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                                                                item.status === "On-Time"
+                                                                    ? "bg-green-100 text-green-800 border border-green-200"
+                                                                    : item.status === "Missed"
+                                                                    ? "bg-red-100 text-red-800 border border-red-200"
+                                                                    : "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                                                            }`}
+                                                        >
+                                                            {item.status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-sm text-gray-700">
+                                                        <span className="font-semibold">Assigned By:</span> {item.administeredBy || "None"}
+                                                    </div>
+                                                </>
+                                            )}
+                                            {item.isDue && (
+                                                <div className="flex items-center gap-1 text-sm bg-red-50 border border-red-200 rounded-md p-2">
+                                                    <span>📌</span>
+                                                    <span className="text-red-600 font-bold">Next Due Date!</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
                                 ))}
                             </div>
                         </motion.div>

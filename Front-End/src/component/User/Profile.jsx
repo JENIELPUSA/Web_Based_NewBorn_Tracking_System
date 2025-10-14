@@ -76,7 +76,7 @@ function Profile() {
                     {/* Profile Picture Section */}
                     <div className="flex flex-col items-center rounded-lg bg-gray-50 p-4 shadow-inner">
                         <h2 className="mb-6 text-xl font-bold text-gray-800">Profile Picture</h2>
-                        <div className="mb-6 flex h-48 w-48 items-center justify-center overflow-hidden rounded-full border-4 border-blue-400 bg-blue-100 shadow-md">
+                        <div className="mb-6 flex h-48 w-48 items-center justify-center overflow-hidden rounded-full border-4 border-[#7B8D6A] bg-[#D4F3B7]/50 shadow-md">
                             {avatar ? (
                                 <img
                                     src={`https://web-based-newborn-tracking-system-server.onrender.com${avatar?.replace(/\\/g, "/")}`}
@@ -85,7 +85,7 @@ function Profile() {
                                 />
                             ) : (
                                 <div className="flex h-48 w-48 items-center justify-center rounded-full bg-blue-100">
-                                    <User className="h-12 w-12 text-blue-600" />
+                                    <User className="h-12 w-12 text-[#7B8D6A]" />
                                 </div>
                             )}
                         </div>
@@ -143,7 +143,7 @@ function Profile() {
                     </button>
                     <button
                         onClick={() => setShowProfileModal(true)}
-                        className="rounded-full bg-blue-600 px-6 py-2 font-bold text-white hover:bg-blue-700"
+                        className="rounded-full bg-[#7B8D6A] px-6 py-2 font-bold text-white hover:bg-[#7B8D6A]/60"
                     >
                         Update Profile
                     </button>

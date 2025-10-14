@@ -277,7 +277,7 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                 <div className="block p-4 sm:hidden">
                                     <button
                                         onClick={handleAddRecord}
-                                        className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                                        className="mb-4 flex w-full items-center justify-center gap-2 rounded bg-[#7B8D6A] px-4 py-2 text-white hover:bg-[#7B8D6A]/60"
                                     >
                                         <Plus className="h-5 w-5" />
                                         Add New Record
@@ -301,7 +301,7 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                         <div className="flex items-start justify-between">
                                                             <div>
                                                                 <h3 className="font-medium text-gray-800">{record.newbornName}</h3>
-                                                                <p className="text-sm text-blue-600">
+                                                                <p className="text-sm text-[#7B8D6A]/60">
                                                                     Visit: {formatDate(record.visitDate)}
                                                                 </p>
                                                             </div>
@@ -347,7 +347,7 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                             </button>
                                                             <button
                                                                 onClick={() => handleEditRecord(record)}
-                                                                className="rounded bg-blue-500 p-1.5 text-white hover:bg-blue-600"
+                                                                className="rounded bg-[#7B8D6A] p-1.5 text-white hover:bg-[#7B8D6A]/60"
                                                                 title="Edit"
                                                             >
                                                                 <PencilIcon className="h-4 w-4" />
@@ -384,7 +384,7 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                         <th className="p-3 text-left">
                                                             <button
                                                                 onClick={handleAddRecord}
-                                                                className="group relative rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                                                className="group relative rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                                                 title="Add New Record"
                                                             >
                                                                 <Plus className="h-4 w-4" />
@@ -445,13 +445,11 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                                     <div className="flex gap-2">
                                                                         <button
                                                                             onClick={() => handleEditRecord(record)}
-                                                                            className="group relative rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                                                                            className="group relative rounded bg-[#7B8D6A] px-2 py-1 text-white hover:bg-[#7B8D6A]/60"
                                                                             title="Edit"
                                                                         >
                                                                             <PencilIcon className="h-4 w-4" />
-                                                                            <span className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 scale-90 whitespace-nowrap rounded bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-all duration-300 ease-in-out group-hover:scale-100 group-hover:opacity-100">
-                                                                                Edit Record
-                                                                            </span>
+                                                                
                                                                         </button>
                                                                         <button
                                                                             onClick={() => handleDeleteRecord(record._id)}
@@ -459,9 +457,7 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
                                                                             title="Delete"
                                                                         >
                                                                             <TrashIcon className="h-4 w-4" />
-                                                                            <span className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 scale-90 whitespace-nowrap rounded bg-gray-800 px-3 py-1 text-sm text-white opacity-0 shadow-lg transition-all duration-300 ease-in-out group-hover:scale-100 group-hover:opacity-100">
-                                                                                Delete Record
-                                                                            </span>
+                                                                            
                                                                         </button>
                                                                     </div>
                                                                 </td>

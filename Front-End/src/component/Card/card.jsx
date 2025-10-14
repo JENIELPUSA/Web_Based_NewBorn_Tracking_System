@@ -115,7 +115,7 @@ const Card = () => {
                         <div className="relative">
                             {/* Icon and Title Row */}
                             <div className="mb-4 flex items-start justify-between">
-                                <div className="flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-3 shadow-md transition-transform duration-300 group-hover:scale-110">
+                                <div className="flex items-center justify-center rounded-xl bg-[#93A87E] p-3 shadow-md transition-transform duration-300 group-hover:scale-110">
                                     {typeof Icon === "function" ? (
                                         <Icon className="text-2xl text-white" />
                                     ) : (
@@ -138,13 +138,13 @@ const Card = () => {
                             {/* Percentage Info */}
                             {card.percentage && (
                                 <div className="flex items-center gap-2 text-sm">
-                                    <div className="flex items-center justify-center rounded-full bg-blue-100 p-1">
+                                    <div className="flex items-center justify-center rounded-full bg-[#93A87E] p-1">
                                         <TrendingUp
                                             size={14}
-                                            className="text-blue-600"
+                                            className="text-white"
                                         />
                                     </div>
-                                    <span className="font-medium text-slate-600">{card.percentage}</span>
+                                    <span className="font-medium text-[#93A87E]">{card.percentage}</span>
                                 </div>
                             )}
                         </div>

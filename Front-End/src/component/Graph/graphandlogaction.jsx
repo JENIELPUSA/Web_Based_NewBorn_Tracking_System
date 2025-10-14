@@ -95,10 +95,10 @@ function LogActionsAudit() {
                     ) : (
                       <div
                         className={`flex size-10 items-center justify-center rounded-full ${
-                          theme === "light" ? "bg-slate-200" : "bg-slate-700"
+                          theme === "light" ? "bg-[#93A87E]" : "bg-slate-700"
                         }`}
                       >
-                        <User className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+                        <User className="h-5 w-5 text-white" />
                       </div>
                     )}
                   </div>

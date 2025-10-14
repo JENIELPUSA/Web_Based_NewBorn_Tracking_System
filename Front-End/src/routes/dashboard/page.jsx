@@ -29,10 +29,10 @@ const DashboardPage = () => {
                     <div className="flex flex-col gap-6">
                         <Banner />
                         <div className="rounded-2xl border border-gray-300 bg-gray-100 p-4 shadow-lg sm:p-6 md:p-8">
-                            <h1 className="mb-4 text-2xl font-bold text-blue-500 sm:text-3xl">Dashboard</h1>
+                            <h1 className="mb-4 text-2xl font-bold text-[#7B8D6A] sm:text-3xl">Dashboard</h1>
                             <div className="space-y-6">
                                 <Card />
-                                <AdminLogActionAudit />
+                                <AdminLogActionAudit /> 
                             </div>
                         </div>
                     </div>

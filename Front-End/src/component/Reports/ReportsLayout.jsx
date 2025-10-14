@@ -39,19 +39,19 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
 
     const renderMainIcon = () => {
         if (title === "Profilling Reports") {
-            return <File className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
+            return <File className="h-14 w-14 text-[#7B8D6A] sm:h-16 sm:w-16" />;
         } else if (title === "Vaccine Inventory") {
-            return <Syringe className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
+            return <Syringe className="h-14 w-14 text-[#7B8D6A] sm:h-16 sm:w-16" />;
         } else if (title === "Child Reports") {
-            return <User className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
+            return <User className="h-14 w-14 text-[#7B8D6A] sm:h-16 sm:w-16" />;
         }
-        return <Download className="h-14 w-14 text-blue-500 sm:h-16 sm:w-16" />;
+        return <Download className="h-14 w-14 text-[#7B8D6A] sm:h-16 sm:w-16" />;
     };
 
     return (
         <div className="w-full max-w-xs transform rounded-2xl border border-gray-100 bg-white p-4 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl sm:p-6">
             <div className="relative flex h-32 w-full items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 sm:h-36">
-                <span className="absolute left-2 top-2 rounded bg-blue-600 px-2 py-0.5 text-xs font-bold tracking-wider text-white">PDF</span>
+                <span className="absolute left-2 top-2 rounded bg-[#7B8D6A] px-2 py-0.5 text-xs font-bold tracking-wider text-white">PDF</span>
                 
                 {renderMainIcon()}
             </div>
@@ -96,7 +96,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
 
             <button
                 onClick={handleDownload}
-                className="mt-3 flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-5 sm:text-sm"
+                className="mt-3 flex w-full items-center justify-center rounded-lg bg-[#7B8D6A] px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-[#7B8D6A]sm:mt-5 sm:text-sm"
                 disabled={loading}
             >
                 {loading ? (
@@ -137,7 +137,7 @@ function ReportsLayout() {
     return (
         <div className="flex min-h-screen flex-col">
             <main className="flex flex-grow flex-col items-center rounded-lg bg-gray-50 p-4 transition-colors duration-300 sm:p-6 md:p-8">
-                <div className="mb-8 w-full rounded-md bg-blue-600 px-4 py-3 text-center text-white shadow-lg">
+                <div className="mb-8 w-full rounded-md bg-[#7B8D6A] px-4 py-3 text-center text-white shadow-lg">
                     <p className="text-base font-semibold sm:text-lg">Important Announcement: New Reports Available!</p>
                 </div>
 

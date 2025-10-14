@@ -104,7 +104,7 @@ const DisplayVaccine = ({ isOpen, onClose, newbornID }) => {
                                                     ? "bg-green-100 text-green-600 hover:bg-green-200"
                                                     : vaccine.status === "Overdose"
                                                     ? "bg-red-100 text-red-600 hover:bg-red-200" // Overdose condition styling
-                                                    : "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                                                    : "bg-blue-100 text-[#7B8D6A] hover:bg-blue-200"
                                             }`}
                                             title={vaccine.status}
                                         >
@@ -121,16 +121,16 @@ const DisplayVaccine = ({ isOpen, onClose, newbornID }) => {
 
                                     {/* Vaccine Info */}
                                     <div className="flex-1">
-                                        <h3 className="text-lg font-semibold text-gray-800 transition-colors duration-200 hover:text-blue-600">
+                                        <h3 className="text-lg font-semibold text-gray-800 transition-colors duration-200 hover:text-[#7B8D6A]">
                                             {vaccine.vaccineName}
                                         </h3>
                                         <p className="text-sm text-gray-600">{vaccine.description}</p>
 
                                         <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-700">
-                                            <span className="transition-colors duration-200 hover:text-blue-600">
+                                            <span className="transition-colors duration-200 hover:text-[#7B8D6A]">
                                                 Total Doses: {vaccine.totalDoses}
                                             </span>
-                                            <span className="transition-colors duration-200 hover:text-blue-600">
+                                            <span className="transition-colors duration-200 hover:text-[#7B8D6A]">
                                                 Doses Given: {vaccine.dosesGiven}
                                             </span>
                                             <span
@@ -139,7 +139,7 @@ const DisplayVaccine = ({ isOpen, onClose, newbornID }) => {
                                                         ? "text-green-600 hover:text-green-700"
                                                         : vaccine.status === "Overdose"
                                                         ? "text-red-600 hover:text-red-700" // Overdose status
-                                                        : "text-blue-600 hover:text-blue-700"
+                                                        : "text-[#7B8D6A] hover:text-[#7B8D6A]/60"
                                                 } transition-colors duration-200`}
                                             >
                                                 Status: {vaccine.status}
@@ -153,7 +153,7 @@ const DisplayVaccine = ({ isOpen, onClose, newbornID }) => {
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => onVaccineSelect(vaccine)}
-                                            className="rounded bg-blue-500 px-2 py-1 text-white transition-colors duration-200 hover:bg-blue-600"
+                                            className="rounded bg-[#7B8D6A] px-2 py-1 text-white transition-colors duration-200 hover:bg-[#7B8D6A]"
                                         >
                                             <PencilIcon className="h-4 w-4" />
                                         </motion.button>
@@ -185,7 +185,7 @@ const DisplayVaccine = ({ isOpen, onClose, newbornID }) => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleAssign(newbornID)}
-                            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white shadow-md transition-all duration-200 hover:bg-blue-700 hover:shadow-lg"
+                            className="inline-flex items-center gap-2 rounded-lg bg-[#7B8D6A] px-5 py-2.5 text-sm font-medium text-white shadow-md transition-all duration-200 hover:bg-[#7B8D6A]/60 hover:shadow-lg"
                         >
                             <Plus className="h-4 w-4" />
                             Add New Vaccine

@@ -15,8 +15,9 @@ function VaccineStockGraph() {
   const { vaccine } = useContext(VaccineDisplayContext);
   const { theme } = useTheme();
 
-  const gradientColor = theme === "light" ? "#3B82F6" : "#60A5FA";
-  const gradientColorEnd = theme === "light" ? "#93C5FD" : "#1E3A8A";
+  // ✅ Grass light tone — fresh & natural
+  const gradientColor = "#A7D489";
+  const gradientColorEnd = "#AEDB93";
 
   const vaccineStockData = useMemo(() => {
     if (!Array.isArray(vaccine)) return [];
@@ -70,12 +71,14 @@ function VaccineStockGraph() {
       </div>
 
       <div className="h-[300px]">
-        
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={vaccineStockData} margin={{ top: 10, right: 30, left: -20, bottom: 40 }}>
+          <AreaChart
+            data={vaccineStockData}
+            margin={{ top: 10, right: 30, left: -20, bottom: 40 }}
+          >
             <defs>
               <linearGradient id="stockGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={gradientColor} stopOpacity={0.8} />
+                <stop offset="5%" stopColor={gradientColor} stopOpacity={0.9} />
                 <stop offset="95%" stopColor={gradientColorEnd} stopOpacity={0.1} />
               </linearGradient>
             </defs>

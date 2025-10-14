@@ -283,7 +283,7 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
                             type="submit"
                             disabled={isSubmitting}
                             className={
-                                "rounded-lg bg-blue-600 px-5 py-2 font-medium text-gray-200 hover:bg-blue-500"
+                                "rounded-lg bg-[#7B8D6A] px-5 py-2 font-medium text-gray-200 hover:bg-[#7B8D6A]/60"
                             }
                         >
                             {isSubmitting ? (

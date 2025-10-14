@@ -19,7 +19,7 @@ function NewBornTrackingBanner() {
             title: `Welcome ${role}`,
             subtitle: "Your Dashboard",
             bgImage: banner2,
-            overlayColor: "bg-gradient-to-br from-pink-400/20 to-rose-500/50",
+            overlayColor: "bg-[#7B8D6A]/50",
             description: "Welcome to your dashboard. You can freely explore more features.",
         },
         {
@@ -27,7 +27,7 @@ function NewBornTrackingBanner() {
             title: "Welcome Little One",
             subtitle: "Comprehensive newborn care tracking",
             bgImage: banner1,
-            overlayColor: "bg-gradient-to-br from-pink-400/20 to-rose-500/50",
+            overlayColor: "bg-[#7B8D6A]/50",
             description: "Monitor your baby's health journey from day one",
         },
         {
@@ -35,7 +35,7 @@ function NewBornTrackingBanner() {
             title: "Care with Love",
             subtitle: "Track vital signs & wellness",
             bgImage: banner3,
-            overlayColor: "bg-gradient-to-br from-purple-400/20 to-pink-500/30",
+            overlayColor: "bg-[#7B8D6A]/50",
             description: "Real-time health monitoring for peace of mind",
         },
         {
@@ -43,7 +43,7 @@ function NewBornTrackingBanner() {
             title: "Growth Milestones",
             subtitle: "Document every precious moment",
             bgImage: banner1,
-            overlayColor: "bg-gradient-to-br from-blue-400/20 to-cyan-500/30",
+            overlayColor: "bg-[#7B8D6A]/50",
             description: "Track height and weight, and overall development",
         },
         {
@@ -51,7 +51,7 @@ function NewBornTrackingBanner() {
             title: "Safe & Secure",
             subtitle: "Protected health records",
             bgImage: banner4,
-            overlayColor: "bg-gradient-to-br from-orange-400/20 to-emerald-500/30",
+            overlayColor: "bg-[#7B8D6A]/50",
             description: "Keep your baby's data safe and private",
         },
     ];
@@ -62,9 +62,6 @@ function NewBornTrackingBanner() {
         }, 5000);
         return () => clearInterval(timer);
     }, []);
-
-    const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-    const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
     const current = slides[currentSlide];
     const IconComponent = current.icon;
