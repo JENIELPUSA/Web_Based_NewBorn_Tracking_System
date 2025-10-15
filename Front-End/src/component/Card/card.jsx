@@ -57,13 +57,13 @@ const Card = () => {
             title: "Total Male",
             value: TotalMale,
             percentage: malePercentage,
-            icon: FaMale, // 👈 React Icon for Male
+            icon: FaMale,
         },
         {
             title: "Total Female",
             value: TotalFemale,
             percentage: femalePercentage,
-            icon: FaFemale, // 👈 React Icon for Female
+            icon: FaFemale,
         },
         {
             title: "Total User",
@@ -84,13 +84,13 @@ const Card = () => {
             title: "Total Male",
             value: TotalMale,
             percentage: malePercentage,
-            icon: FaMale, // 👈 React Icon for Male
+            icon: FaMale, 
         },
         {
             title: "Total Female",
             value: TotalFemale,
             percentage: femalePercentage,
-            icon: FaFemale, // 👈 React Icon for Female
+            icon: FaFemale, 
         },
         {
             title: "Monthly Vaccinated",

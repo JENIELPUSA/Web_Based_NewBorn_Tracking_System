@@ -188,7 +188,7 @@ const Hero = () => {
                             >
                                 <span className="relative z-10 flex items-center justify-center">
                                     Click Here to Monitor
-                                    <Baby className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                                    <Users className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" />
                                 </span>
                             </button>
                         </motion.div>

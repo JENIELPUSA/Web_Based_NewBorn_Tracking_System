@@ -19,7 +19,7 @@ function NewBornTrackingBanner() {
             title: `Welcome ${role}`,
             subtitle: "Your Dashboard",
             bgImage: banner2,
-            overlayColor: "bg-[#7B8D6A]/50",
+            overlayColor: "",
             description: "Welcome to your dashboard. You can freely explore more features.",
         },
         {
@@ -27,7 +27,7 @@ function NewBornTrackingBanner() {
             title: "Welcome Little One",
             subtitle: "Comprehensive newborn care tracking",
             bgImage: banner1,
-            overlayColor: "bg-[#7B8D6A]/50",
+            overlayColor: "",
             description: "Monitor your baby's health journey from day one",
         },
         {
@@ -35,7 +35,7 @@ function NewBornTrackingBanner() {
             title: "Care with Love",
             subtitle: "Track vital signs & wellness",
             bgImage: banner3,
-            overlayColor: "bg-[#7B8D6A]/50",
+            overlayColor: "",
             description: "Real-time health monitoring for peace of mind",
         },
         {
@@ -43,7 +43,7 @@ function NewBornTrackingBanner() {
             title: "Growth Milestones",
             subtitle: "Document every precious moment",
             bgImage: banner1,
-            overlayColor: "bg-[#7B8D6A]/50",
+            overlayColor: "",
             description: "Track height and weight, and overall development",
         },
         {
@@ -51,7 +51,7 @@ function NewBornTrackingBanner() {
             title: "Safe & Secure",
             subtitle: "Protected health records",
             bgImage: banner4,
-            overlayColor: "bg-[#7B8D6A]/50",
+            overlayColor: "",
             description: "Keep your baby's data safe and private",
         },
     ];
@@ -127,43 +127,32 @@ function NewBornTrackingBanner() {
                             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                             className="absolute right-20 top-10 text-white opacity-30"
                         >
-                            <Heart className="h-8 w-8" fill="currentColor" />
+                            <Heart
+                                className="h-8 w-8"
+                                fill="currentColor"
+                            />
                         </motion.div>
 
                         {/* Content */}
                         <div className="relative z-10 flex flex-col items-center gap-6 p-8 text-white md:flex-row md:gap-8 md:p-12">
                             <motion.div
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
-                                className="flex-shrink-0"
+                                animate={{
+                                    boxShadow: ["0 0 20px rgba(255,255,255,0.3)", "0 0 40px rgba(255,255,255,0.6)", "0 0 20px rgba(255,255,255,0.3)"],
+                                }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className="rounded-full bg-white/20 p-6 backdrop-blur-sm"
                             >
-                                <div className="relative">
-                                    <motion.div
-                                        animate={{
-                                            boxShadow: [
-                                                "0 0 20px rgba(255,255,255,0.3)",
-                                                "0 0 40px rgba(255,255,255,0.6)",
-                                                "0 0 20px rgba(255,255,255,0.3)",
-                                            ],
-                                        }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                        className="rounded-full bg-white/20 p-6 backdrop-blur-sm"
-                                    >
-                                        <IconComponent
-                                            className="h-16 w-16 text-white md:h-20 md:w-20"
-                                            strokeWidth={1.5}
-                                        />
-                                    </motion.div>
-                                </div>
+                                <IconComponent
+                                    className={`h-16 w-16 md:h-20 md:w-20 ${currentSlide === 0 ? "text-black" : "text-white"}`}
+                                    strokeWidth={1.5}
+                                />
                             </motion.div>
-
                             <div className="flex-1 text-center drop-shadow-lg md:text-left">
                                 <motion.h1
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.3, duration: 0.6 }}
-                                    className="mb-2 text-4xl font-bold md:text-5xl lg:text-6xl"
+                                    className={`mb-4 text-4xl font-bold md:text-5xl lg:text-6xl ${currentSlide === 0 ? "text-black" : "text-white"}`}
                                 >
                                     {current.title}
                                 </motion.h1>
@@ -171,7 +160,7 @@ function NewBornTrackingBanner() {
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.4, duration: 0.6 }}
-                                    className="mb-3 text-xl font-light opacity-95 md:text-2xl"
+                                    className={`mb-3 text-xl font-light opacity-95 md:text-2xl ${currentSlide === 0 ? "text-black" : "text-white"}`}
                                 >
                                     {current.subtitle}
                                 </motion.p>
@@ -179,7 +168,7 @@ function NewBornTrackingBanner() {
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.5, duration: 0.6 }}
-                                    className="text-base opacity-90 md:text-lg"
+                                    className={`text-base opacity-90 md:text-lg ${currentSlide === 0 ? "text-black" : "text-white"}`}
                                 >
                                     {current.description}
                                 </motion.p>

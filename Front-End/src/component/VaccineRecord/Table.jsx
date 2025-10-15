@@ -1,6 +1,6 @@
 import React, { useState, useContext, useMemo, useEffect } from "react";
 import { VaccineRecordDisplayContext } from "../../contexts/VaccineRecordCxt/VaccineRecordContext";
-import { PencilIcon, TrashIcon, BabyIcon, Plus } from "lucide-react";
+import { PencilIcon, TrashIcon, Users, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import AddNewBornForm from "../VaccineRecord/AddForm";
 import StatusVerification from "../../ReusableFolder/StatusModal";
@@ -271,7 +271,7 @@ function VaccineRecordTable() {
                                                     />
                                                 ) : (
                                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-100">
-                                                        <BabyIcon className="h-6 w-6 text-pink-500" />
+                                                        <Users className="h-6 w-6 text-pink-500" />
                                                     </div>
                                                 )}
                                                 <div>
@@ -361,8 +361,8 @@ function VaccineRecordTable() {
                                                         className="h-10 w-10 rounded-full object-cover"
                                                     />
                                                 ) : (
-                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
-                                                        <BabyIcon className="h-6 w-6 text-pink-500" />
+                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7B8D6A]">
+                                                        <Users className="h-6 w-6 text-white" />
                                                     </div>
                                                 )}
                                             </td>
