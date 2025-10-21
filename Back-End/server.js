@@ -1,8 +1,8 @@
-
 const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+const path = require("path");
+dotenv.config({ path: path.resolve(__dirname, "config.env") });
 
-const Notification =require("./Models/NotificationSchema")
+const Notification = require("./Models/NotificationSchema");
 
 const mongoose = require("mongoose");
 const http = require("http");
@@ -10,7 +10,7 @@ const socketIo = require("socket.io");
 const app = require("./app");
 
 const user = require("./Models/usermodel");
-const sendEmail = require("./Utils/email"); 
+const sendEmail = require("./Utils/email");
 
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception! Shutting down...");
@@ -22,7 +22,7 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: "https://web-based-newborn-tracking-system.onrender.com",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -30,7 +30,6 @@ const io = socketIo(server, {
   pingInterval: 25000,
   pingTimeout: 60000,
 });
-
 
 app.set("io", io);
 
@@ -120,8 +119,6 @@ io.on("connection", (socket) => {
   });
 });
 
-
-
 mongoose
   .connect(process.env.CONN_STR, {
     useNewUrlParser: true,
@@ -132,6 +129,7 @@ mongoose
     console.error("Database connection error:", err.message);
     process.exit(1);
   });
+
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => {

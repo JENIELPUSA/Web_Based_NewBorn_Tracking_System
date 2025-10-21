@@ -2,15 +2,14 @@ const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        pool: true,
-        maxMessages: Infinity,
-        maxConnections: 500,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD
-        }
-    });
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+        user: process.env.EMAIL_USER, // Mailtrap username
+        pass: process.env.EMAIL_PASSWORD // Mailtrap password
+    }
+});
+
 
     const mailOptions = {
         from: `NEW BORN TRACKING SYSTEM <${process.env.EMAIL_USER}>`,
