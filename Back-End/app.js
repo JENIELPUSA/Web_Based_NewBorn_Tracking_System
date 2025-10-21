@@ -27,8 +27,7 @@ const logger = function (req, res, next) {
 };
 
 app.use(express.json());
-app.set("trust proxy", 1);
-
+app.set("trust proxy", true);
 app.use(
   session({
     secret: process.env.SECRET_STR,
@@ -43,13 +42,13 @@ app.use(
       httpOnly: true,
       sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
-    },
+    },rolling: true,
   })
 );
 app.use(
   cors({
-    //origin: process.env.FRONTEND_URL,
-    origin: "https://web-based-newborn-tracking-system.onrender.com",
+    origin: process.env.FRONTEND_URL,
+    //origin: "https://web-based-newborn-tracking-system.onrender.com",
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
   })
