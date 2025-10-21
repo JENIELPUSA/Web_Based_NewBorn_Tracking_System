@@ -94,10 +94,6 @@ const logout = () => {
   setUserID(null);
 
   delete axios.defaults.headers["Authorization"];
-
-  console.log("UserID after removal:", localStorage.getItem("userId")); 
-
-  window.location.href = "/login";
 };
 
   <ToastContainer />

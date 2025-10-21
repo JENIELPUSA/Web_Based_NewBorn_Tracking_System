@@ -18,7 +18,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     select: false,
   },
-  avatar: { type: String },
+  avatar: {
+    public_id: String,
+    url: String,
+  },
 
   FirstName: { type: String, required: [true, "Please Enter FirstName."] },
   LastName: { type: String, required: [true, "Please Enter LastName."] },

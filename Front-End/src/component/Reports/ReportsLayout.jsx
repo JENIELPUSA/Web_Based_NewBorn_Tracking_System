@@ -96,7 +96,7 @@ function PdfReportCard({ title, description, defaultFromDate = "", defaultToDate
 
             <button
                 onClick={handleDownload}
-                className="mt-3 flex w-full items-center justify-center rounded-lg bg-[#7B8D6A] px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-[#7B8D6A]sm:mt-5 sm:text-sm"
+                className="mt-3 flex w-full items-center justify-center rounded-lg bg-[#7B8D6A] px-4 py-2 text-xs font-semibold text-white shadow-md transition-colors duration-200 hover:bg-[#7B8D6A]/40  focus:outline-none focus:ring-2 focus:ring-[#7B8D6A]sm:mt-5 sm:text-sm"
                 disabled={loading}
             >
                 {loading ? (

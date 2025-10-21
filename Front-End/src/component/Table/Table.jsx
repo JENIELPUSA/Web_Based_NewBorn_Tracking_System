@@ -1,9 +1,9 @@
 import React, { useState, useContext, useMemo, useEffect } from "react";
-import { UserDisplayContext } from "../../contexts/UserContxet/UserContext"; 
+import { UserDisplayContext } from "../../contexts/UserContxet/UserContext";
 import { PencilIcon, TrashIcon, Plus } from "lucide-react";
 import { motion } from "framer-motion";
-import UserFormModal from "../User/AddUser"; 
-import StatusVerification from "../../ReusableFolder/StatusModal"; 
+import UserFormModal from "../User/AddUser";
+import StatusVerification from "../../ReusableFolder/StatusModal";
 
 function UserTable() {
     const [selectedUser, setSelectedUser] = useState(null);
@@ -21,7 +21,9 @@ function UserTable() {
 
     const filteredUsers = useMemo(() => {
         return users.filter((user) => {
-            const matchesSearchTerm = `${user.FirstName} ${user.LastName} ${user.username} ${user.email}`.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesSearchTerm = `${user.FirstName} ${user.LastName} ${user.username} ${user.email}`
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase());
 
             let matchesDateRange = true;
             if (user.createdAt) {
@@ -57,7 +59,7 @@ function UserTable() {
         if (currentPage > newTotalPages && newTotalPages > 0) {
             setCurrentPage(newTotalPages);
         } else if (filteredUsers.length > 0 && currentUsers.length === 0 && currentPage > 1) {
-            setCurrentPage(prevPage => prevPage - 1);
+            setCurrentPage((prevPage) => prevPage - 1);
         } else if (filteredUsers.length === 0 && currentPage !== 1) {
             setCurrentPage(1);
         }
@@ -117,12 +119,12 @@ function UserTable() {
         <div className="rounded-lg bg-white shadow xs:p-2 sm:p-6">
             <div className="flex flex-col gap-4 border-b border-gray-200 p-4 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-lg font-semibold text-gray-800">User List</h2>
-                <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                <div className="flex w-full flex-wrap items-center gap-4 md:w-auto">
                     {/* Search input */}
                     <input
                         type="text"
                         placeholder="Search users..."
-                        className="input input-sm flex-grow rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 min-w-[180px] md:min-w-0"
+                        className="input input-sm min-w-[180px] flex-grow rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 md:min-w-0"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
@@ -130,8 +132,13 @@ function UserTable() {
                         }}
                     />
                     {/* Date filter inputs - Now uses flex-wrap to stack on small screens */}
-                    <div className="flex flex-wrap items-center gap-2 flex-grow-0">
-                        <label htmlFor="dateFrom" className="text-sm font-medium text-gray-700">From:</label>
+                    <div className="flex flex-grow-0 flex-wrap items-center gap-2">
+                        <label
+                            htmlFor="dateFrom"
+                            className="text-sm font-medium text-gray-700"
+                        >
+                            From:
+                        </label>
                         <input
                             type="date"
                             id="dateFrom"
@@ -140,10 +147,15 @@ function UserTable() {
                                 setDateFrom(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 w-32 md:w-auto"
+                            className="input input-xs w-32 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 md:w-auto"
                             title="Filter by 'Created At' date (From)"
                         />
-                        <label htmlFor="dateTo" className="text-sm font-medium text-gray-700">To:</label>
+                        <label
+                            htmlFor="dateTo"
+                            className="text-sm font-medium text-gray-700"
+                        >
+                            To:
+                        </label>
                         <input
                             type="date"
                             id="dateTo"
@@ -152,13 +164,18 @@ function UserTable() {
                                 setDateTo(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="input input-xs rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 w-32 md:w-auto"
+                            className="input input-xs w-32 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 md:w-auto"
                             title="Filter by 'Created At' date (To)"
                         />
                     </div>
                     {/* Page size selector */}
-                    <div className="flex items-center gap-2 flex-grow-0">
-                        <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700">Show:</label>
+                    <div className="flex flex-grow-0 items-center gap-2">
+                        <label
+                            htmlFor="itemsPerPage"
+                            className="text-sm font-medium text-gray-700"
+                        >
+                            Show:
+                        </label>
                         <input
                             type="number"
                             id="itemsPerPage"
@@ -167,11 +184,11 @@ function UserTable() {
                             onChange={handleItemsPerPageChange}
                             onBlur={handleItemsPerPageChange}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
+                                if (e.key === "Enter") {
                                     handleItemsPerPageChange(e);
                                 }
                             }}
-                            className="input input-xs w-16 text-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800"
+                            className="input input-xs w-16 rounded-md border border-gray-300 bg-white px-2 py-1 text-center text-sm text-gray-800"
                             aria-label="Items per page"
                         />
                         <span className="text-sm text-gray-700">users per page</span>
@@ -237,10 +254,10 @@ function UserTable() {
                                 >
                                     <td className="p-3 align-top text-gray-800">{indexOfFirstUser + index + 1}</td>
                                     <td className="p-3 align-top">
-                                        {user.avatar ? (
+                                        {user.avatar?.url ? (
                                             <img
-                                                src={user.avatar}
-                                                alt={user.username}
+                                                src={user.avatar.url}
+                                                alt={`${user.FirstName} ${user.LastName}`}
                                                 className="h-10 w-10 rounded-full object-cover"
                                             />
                                         ) : (
@@ -249,6 +266,7 @@ function UserTable() {
                                             </div>
                                         )}
                                     </td>
+
                                     <td className="p-3 align-top text-gray-800">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
                                     <td className="p-3 align-top text-gray-800">{user.email}</td>
                                     <td className="p-3 align-top capitalize text-gray-800">{user.role}</td>
@@ -288,9 +306,7 @@ function UserTable() {
 
             <div className="mt-4 space-y-4 sm:hidden">
                 {currentUsers.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">
-                        No users found.
-                    </div>
+                    <div className="p-4 text-center text-gray-500">No users found.</div>
                 ) : (
                     currentUsers.map((user) => (
                         <div
@@ -353,7 +369,7 @@ function UserTable() {
                 )}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 px-4 py-3 gap-3">
+            <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-4 py-3 sm:flex-row">
                 {totalPages > 0 && (
                     <div className="flex items-center gap-4">
                         <button

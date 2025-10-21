@@ -47,12 +47,12 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                 setVaccineRecord(vaccineData);
                 setCalendarData(vaccineData);
             } else if (role === "BHW") {
-                // ✅ Get all records from the same zone
+                // Get all records from the same zone
                 const recordsInMyZone = vaccineData.filter(
                     (record) => record.newbornZone?.toLowerCase().trim() === Designatedzone?.toLowerCase().trim(),
                 );
 
-                // ✅ From zone records, extract only those with doses administered by this BHW
+                // From zone records, extract only those with doses administered by this BHW
                 const recordsWithMyDoses = recordsInMyZone
                     .map((record) => {
                         const bhwDoses = record.doses.filter((dose) => dose.administeredById === userId);
@@ -60,13 +60,13 @@ export const VaccineRecordDisplayProvider = ({ children }) => {
                     })
                     .filter((record) => record !== null);
 
-                // ✅ Calendar shows all from zone
+                // Calendar shows all from zone
                 setCalendarData(recordsInMyZone);
 
-                // ✅ Table shows only their own doses
+                // Table shows only their own doses
                 setVaccineRecord(recordsWithMyDoses);
 
-                // ✅ Count vaccinations done by this BHW this month
+                // Count vaccinations done by this BHW this month
                 const now = new Date();
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
                 const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);

@@ -86,37 +86,37 @@ const VaccinationCalendar = () => {
     const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
     const handleToday = () => setCurrentMonth(new Date());
 
-    const handleDateClick = (date, event) => {
-        const doses = getDosesByDate(date);
-        if (doses.length === 0) {
-            setClickedDate(null);
-            return;
-        }
-        if (clickedDate && isSameDay(clickedDate, date)) {
-            setClickedDate(null);
-            return;
-        }
-        setClickedDate(date);
-        setTooltipContent(doses);
+const handleDateClick = (date, event) => {
+    const doses = getDosesByDate(date);
+    if (doses.length === 0) {
+        setClickedDate(null);
+        return;
+    }
+    if (clickedDate && isSameDay(clickedDate, date)) {
+        setClickedDate(null);
+        return;
+    }
+    setClickedDate(date);
+    setTooltipContent(doses);
 
-        if (!isMobile) {
-            const rect = event.currentTarget.getBoundingClientRect();
-            const tooltipHeight = 400; // estimated max height
-            const spaceBelow = window.innerHeight - rect.bottom;
-            const spaceAbove = rect.top;
-            
-            // Check if tooltip should appear above or below
-            const shouldShowAbove = spaceBelow < tooltipHeight && spaceAbove > spaceBelow;
-            
-            setTooltipPosition({
-                top: shouldShowAbove 
-                    ? rect.top + window.scrollY - tooltipHeight - 10 
-                    : rect.bottom + window.scrollY + 10,
-                left: rect.left + window.scrollX,
-                showAbove: shouldShowAbove
-            });
-        }
-    };
+    if (!isMobile) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const tooltipHeight = 250; // conservative max height
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+
+        // Only show above if there's NOT enough space below
+        const shouldShowAbove = spaceBelow < tooltipHeight;
+
+        setTooltipPosition({
+            top: shouldShowAbove
+                ? rect.top + window.scrollY - tooltipHeight - 10
+                : rect.bottom + window.scrollY + 10,
+            left: rect.left + window.scrollX,
+            showAbove: shouldShowAbove
+        });
+    }
+};
 
     const renderHeader = () => (
         <div className="mb-6 flex items-center justify-between bg-white rounded-xl shadow-sm p-4 border border-gray-200">

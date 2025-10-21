@@ -77,15 +77,22 @@ function Profile() {
                     <div className="flex flex-col items-center rounded-lg bg-gray-50 p-4 shadow-inner">
                         <h2 className="mb-6 text-xl font-bold text-gray-800">Profile Picture</h2>
                         <div className="mb-6 flex h-48 w-48 items-center justify-center overflow-hidden rounded-full border-4 border-[#7B8D6A] bg-[#D4F3B7]/50 shadow-md">
-                            {avatar ? (
+                            {avatar?.url ? (
                                 <img
-                                    src={`https://web-based-newborn-tracking-system-server.onrender.com${avatar?.replace(/\\/g, "/")}`}
+                                    src={avatar.url}
                                     alt={`${FirstName} ${LastName} Avatar`}
-                                    className="h-48 w-48 rounded-full object-cover"
+                                    className="h-full w-full rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="flex h-48 w-48 items-center justify-center rounded-full bg-blue-100">
-                                    <User className="h-12 w-12 text-[#7B8D6A]" />
+                                <div className="flex h-full w-full items-center justify-center rounded-full bg-blue-100">
+                                    <svg
+                                        className="h-24 w-24 text-[#7B8D6A]"
+                                        fill="currentColor"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
                                 </div>
                             )}
                         </div>

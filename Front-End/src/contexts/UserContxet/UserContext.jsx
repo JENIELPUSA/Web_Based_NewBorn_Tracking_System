@@ -188,7 +188,7 @@ export const UserDisplayProvider = ({ children }) => {
                     return updated;
                 });
 
-                   setUsers((prevUsers) => prevUsers.map((u) => (u._id === res.data.data._id ? { ...u, ...res.data.data } : u)));
+                setUsers((prevUsers) => prevUsers.map((u) => (u._id === res.data.data._id ? { ...u, ...res.data.data } : u)));
 
                 setModalStatus("success");
                 setShowModal(true);
@@ -204,13 +204,14 @@ export const UserDisplayProvider = ({ children }) => {
 
     const UpdateUserProfile = async (id, values) => {
         try {
-            if (!values.avatar || !(values.avatar instanceof File)) {
-                throw new Error("No valid avatar file provided.");
+            const formData = new FormData();
+
+            // Only append avatar if it's a new File
+            if (values.avatar instanceof File) {
+                formData.append("avatar", values.avatar);
             }
 
-            const formData = new FormData();
-            formData.append("avatar", values.avatar);
-
+            // Send PATCH request
             const res = await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/users/ProfilePicture/${id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -219,13 +220,13 @@ export const UserDisplayProvider = ({ children }) => {
             });
 
             if (res.data?.status === "success") {
+                const updatedAvatar = res.data.data.avatar; // should be { public_id, url }
+
                 setProfile((prev) => {
                     const updated = [...prev];
-                    updated[0] = { ...updated[0], avatar: res.data.data.avatar };
+                    updated[0] = { ...updated[0], avatar: updatedAvatar };
                     return updated;
                 });
-
-                             
 
                 setModalStatus("success");
                 setShowModal(true);

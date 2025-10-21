@@ -8,6 +8,7 @@ const newBorn = require("./../Models/NewBornmodel");
 const Checkup = require("./../Models/CheckupRecords");
 const Notify = require("./../Models/NotificationSchema");
 const VaccinationRecrd = require("./../Models/VaccinationRecord");
+const cloudinary = require("../Utils/cloudinary");
 
 exports.createUser = AsyncErrorHandler(async (req, res) => {
   const { FirstName, LastName, email, password, role } = req.body;
@@ -238,6 +239,8 @@ exports.DisplayProfile = AsyncErrorHandler(async (req, res) => {
 
 
 exports.updateUserProfile = AsyncErrorHandler(async (req, res) => {
+
+  console.log(req.body)
   const { id } = req.params;
 
   if (!req.file) {
@@ -246,17 +249,40 @@ exports.updateUserProfile = AsyncErrorHandler(async (req, res) => {
       .json({ status: "error", message: "No file uploaded" });
   }
 
-  const updateFields = {
-    avatar: `/uploads/${req.file.filename}`,
-  };
+  try {
+    const existingUser = await user.findById(id);
+    if (!existingUser) {
+      return res.status(404).json({ status: "error", message: "User not found" });
+    }
 
-  const updatedUser = await user.findByIdAndUpdate(id, updateFields, {
-    new: true,
-  });
+    if (existingUser.avatar?.public_id) {
+      await cloudinary.uploader.destroy(existingUser.avatar.public_id);
+    }
 
-  if (!updatedUser) {
-    return res.status(404).json({ status: "error", message: "User not found" });
+    const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+
+    const uploadedResponse = await cloudinary.uploader.upload(base64Image, {
+      folder: "NewBornTracking/UserAvatars", 
+      use_filename: true,
+      unique_filename: false,
+    });
+
+    // I-prepare ang bagong avatar object
+    const avatar = {
+      public_id: uploadedResponse.public_id,
+      url: uploadedResponse.secure_url,
+    };
+
+    // I-update ang user
+    const updatedUser = await user.findByIdAndUpdate(
+      id,
+      { avatar },
+      { new: true }
+    );
+
+    res.status(200).json({ status: "success", data: updatedUser });
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    return res.status(500).json({ status: "error", message: "Upload failed" });
   }
-
-  res.status(200).json({ status: "success", data: updatedUser });
 });

@@ -11,7 +11,7 @@ export const ProfillingDisplayProvider = ({ children }) => {
     const [isProfilling, setProfilling] = useState([]); // Change this to an empty array
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
-    const { authToken,role,Designatedzone } = useContext(AuthContext);
+    const { authToken, role, Designatedzone } = useContext(AuthContext);
     const [customError, setCustomError] = useState("");
 
     useEffect(() => {
@@ -35,8 +35,16 @@ export const ProfillingDisplayProvider = ({ children }) => {
 
             if (Array.isArray(vaccineData)) {
                 if (role === "BHW") {
-                    vaccineData = vaccineData.filter((item) => item.zone === Designatedzone);
+                    const normalize = (str) => str?.toLowerCase().replace(/\s+/g, " ").trim();
+
+                    vaccineData = vaccineData.filter((item) => normalize(item.zone) === normalize(Designatedzone));
                 }
+
+                // Optional: Normalize avatar to always be URL string
+                vaccineData = vaccineData.map((item) => ({
+                    ...item,
+                    avatar: typeof item.avatar === "object" ? item.avatar.url : item.avatar,
+                }));
 
                 setProfilling(vaccineData);
             } else {

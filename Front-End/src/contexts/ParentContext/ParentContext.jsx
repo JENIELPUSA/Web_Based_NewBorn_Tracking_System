@@ -10,7 +10,7 @@ export const ParentDisplayProvider = ({ children }) => {
     const [isParent, setParent] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const { authToken,Designatedzone,role} = useContext(AuthContext);
+    const { authToken, Designatedzone, role } = useContext(AuthContext);
     const [showModal, setShowModal] = useState(false);
     const [modalStatus, setModalStatus] = useState("success");
     const [customError, setCustomError] = useState("");
@@ -24,7 +24,7 @@ export const ParentDisplayProvider = ({ children }) => {
                 {
                     FirstName: values.FirstName,
                     Middle: values.Middle,
-                    email:values.email,
+                    email: values.email,
                     LastName: values.LastName,
                     extensionName: values.extensionName,
                     role: values.role,
@@ -59,36 +59,31 @@ export const ParentDisplayProvider = ({ children }) => {
             }
         }
     };
-const fetchParent = async () => {
-    if (!authToken) return;
+    const fetchParent = async () => {
+        if (!authToken) return;
 
-    setLoading(true);
-    try {
-        const res = await axios.get(
-            `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Parent`,
-            {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Parent`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${authToken}` },
+            });
+
+            let parents = res.data.data;
+
+            const normalize = (str) => str?.toLowerCase().replace(/\s+/g, " ").trim();
+            if (role === "BHW") {
+                parents = parents.filter((parent) => normalize(parent.zone) === normalize(Designatedzone));
             }
-        );
 
-        let parents = res.data.data;
-
-        // Filter if role is BHW
-        if (role === "BHW") {
-            parents = parents.filter(parent => parent.zone === Designatedzone);
-
-            console.log("SAmple",parents)
+            setParent(parents);
+        } catch (error) {
+            console.error("Error fetching parents:", error);
+            setError("Failed to fetch data.");
+        } finally {
+            setLoading(false);
         }
-
-        setParent(parents);
-    } catch (error) {
-        console.error("Error fetching parents:", error);
-        setError("Failed to fetch data.");
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
     const UpdateParent = async (ID, values) => {
         try {
@@ -98,7 +93,7 @@ const fetchParent = async () => {
                 Middle: values.Middle || "",
                 LastName: values.LastName || "",
                 extensionName: values.extensionName || "",
-                email:values.email || "",
+                email: values.email || "",
                 role: values.role || "",
                 address: values.address || "",
                 phoneNumber: values.phoneNumber || "",
@@ -133,29 +128,29 @@ const fetchParent = async () => {
         }
     };
 
-     const DeleteParent = async (ParentId) => {
-            try {
-                const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Parent/${ParentId}`, {
-                    headers: { Authorization: `Bearer ${authToken}` },
-                });
-    
-                if (response.data.status === "success") {
-                    setParent((prevUsers) => prevUsers.filter((user) => user._id !== ParentId));
-                    setModalStatus("success");
-                    setShowModal(true);
-                } else {
-                    setModalStatus("failed");
-                    setShowModal(true);
-                    return { success: false, error: "Unexpected response from server." };
-                }
-            } catch (error) {
-                console.error("Error deleting user:", error);
-                toast.error(error.response?.data?.message || "Failed to delete user.");
+    const DeleteParent = async (ParentId) => {
+        try {
+            const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Parent/${ParentId}`, {
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
+
+            if (response.data.status === "success") {
+                setParent((prevUsers) => prevUsers.filter((user) => user._id !== ParentId));
+                setModalStatus("success");
+                setShowModal(true);
+            } else {
+                setModalStatus("failed");
+                setShowModal(true);
+                return { success: false, error: "Unexpected response from server." };
             }
-        };
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            toast.error(error.response?.data?.message || "Failed to delete user.");
+        }
+    };
 
     return (
-        <ParentDisplayContext.Provider value={{ DeleteParent,isParent, AddParent, fetchParent, UpdateParent }}>
+        <ParentDisplayContext.Provider value={{ DeleteParent, isParent, AddParent, fetchParent, UpdateParent }}>
             {children}
 
             <SuccessFailed

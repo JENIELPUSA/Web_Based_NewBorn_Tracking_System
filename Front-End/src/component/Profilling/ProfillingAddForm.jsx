@@ -98,15 +98,30 @@ const NewbornFormModal = ({ onClose, selectedUser, isOpen }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: "-10%" }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "-10%" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 p-4"
         >
             <motion.div
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.9 }}
+                initial={{ scale: 0.3, opacity: 0, y: -50 }}
+                animate={{
+                    scale: 1,
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                        type: "spring",
+                        damping: 20,
+                        stiffness: 300,
+                        mass: 0.8,
+                    },
+                }}
+                exit={{
+                    scale: 0.8,
+                    opacity: 0,
+                    y: -20,
+                    transition: { duration: 0.2 },
+                }}
                 className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg"
             >
                 <div className="mb-4 flex items-center justify-between border-b pb-2">

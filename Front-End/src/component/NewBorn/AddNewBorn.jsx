@@ -24,7 +24,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
         birthWeight: "",
         motherName: "",
         birthHeight: "",
-        babyCodeNumber: "", // 👈 Added Baby Code Number
+        babyCodeNumber: "",
     });
 
     const resetForm = () => {
@@ -32,13 +32,13 @@ function AddNewBorn({ isOpen, onClose, born }) {
             firstName: "",
             lastName: "",
             middleName: "",
-            dateOfBirth: "",
             extensionName: "",
+            dateOfBirth: "",
             gender: "",
             birthWeight: "",
             motherName: "",
             birthHeight: "",
-            babyCodeNumber: "", 
+            babyCodeNumber: "",
         });
     };
 
@@ -54,10 +54,10 @@ function AddNewBorn({ isOpen, onClose, born }) {
                 birthWeight: born.birthWeight || "",
                 motherName: born.motherID || born.motherName || "",
                 birthHeight: born.birthHeight || "",
-                babyCodeNumber: born.babyCodeNumber || "", // 👈 Populate when editing
+                babyCodeNumber: born.babyCodeNumber || "",
             });
         } else {
-            resetForm(); // Use resetForm to ensure consistency
+            resetForm();
         }
     }, [born]);
 
@@ -135,7 +135,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         </div>
                     </div>
 
-                    {/* Last Name & DOB */}
+                    {/* Last Name & Date of Birth */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-gray-600">Last Name</label>
@@ -159,7 +159,7 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         </div>
                     </div>
 
-                    {/* Extension Name */}
+                    {/* Extension Name & Birth Height */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm text-gray-600">Extension Name</label>
@@ -171,19 +171,60 @@ function AddNewBorn({ isOpen, onClose, born }) {
                                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
+                        <div>
+                            <label className="mb-1 block text-sm text-gray-600">Birth Height (cm)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                name="birthHeight"
+                                value={formData.birthHeight}
+                                onChange={handleChange}
+                                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
                     </div>
-
-                    {/* 👇 Baby Code Number - NEW FIELD */}
-                    <div>
-                        <label className="mb-1 block text-sm text-gray-600">Baby Code Number</label>
-                        <input
-                            type="text"
-                            name="babyCodeNumber"
-                            value={formData.babyCodeNumber}
-                            onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="e.g. BC-2025-001"
-                        />
+                                        {/* Mother's Name Dropdown */}
+                    <div className="relative">
+                        <label className="mb-1 block text-sm text-gray-600">Mother's Name</label>
+                        <div
+                            className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700"
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                        >
+                            <span>
+                                {formData.motherName
+                                    ? isParent.find((parent) => parent._id === formData.motherName)?.FirstName +
+                                      " " +
+                                      isParent.find((parent) => parent._id === formData.motherName)?.LastName
+                                    : "Select Mother"}
+                            </span>
+                            <i className={`fas ${dropdownOpen ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
+                        </div>
+                        {dropdownOpen && (
+                            <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
+                                <li
+                                    className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                                    onClick={() => handleSelect("motherName", "")}
+                                >
+                                    Select Mother
+                                </li>
+                                {isParent
+                                    .filter((parent) => {
+                                        if (role === "HEALTH_WORKER") {
+                                            return parent.address?.includes(DesignatedZone);
+                                        }
+                                        return true;
+                                    })
+                                    .map((parent) => (
+                                        <li
+                                            key={parent._id}
+                                            className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                                            onClick={() => handleSelect("motherName", parent._id)}
+                                        >
+                                            {parent.FirstName} {parent.LastName}
+                                        </li>
+                                    ))}
+                            </ul>
+                        )}
                     </div>
 
                     {/* Gender & Birth Weight */}
@@ -233,61 +274,18 @@ function AddNewBorn({ isOpen, onClose, born }) {
                         </div>
                     </div>
 
-                    {/* Mother's Name Dropdown */}
-                    <div className="relative">
-                        <label className="mb-1 block text-sm text-gray-600">Mother's Name</label>
-                        <div
-                            className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700"
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                        >
-                            <span>
-                                {formData.motherName
-                                    ? isParent.find((parent) => parent._id === formData.motherName)?.FirstName +
-                                      " " +
-                                      isParent.find((parent) => parent._id === formData.motherName)?.LastName
-                                    : "Select Mother"}
-                            </span>
-                            <i className={`fas ${dropdownOpen ? "fa-chevron-up" : "fa-chevron-down"} text-gray-500`} />
-                        </div>
-                        {dropdownOpen && (
-                            <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
-                                <li
-                                    className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                                    onClick={() => handleSelect("motherName", "")}
-                                >
-                                    Select Mother
-                                </li>
-                                {isParent
-                                    .filter((parent) => {
-                                        // Note: 'zone' is not defined — assuming you meant DesignatedZone
-                                        if (role === "HEALTH_WORKER") {
-                                            return parent.address?.includes(DesignatedZone);
-                                        }
-                                        return true;
-                                    })
-                                    .map((parent) => (
-                                        <li
-                                            key={parent._id}
-                                            className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                                            onClick={() => handleSelect("motherName", parent._id)}
-                                        >
-                                            {parent.FirstName} {parent.LastName}
-                                        </li>
-                                    ))}
-                            </ul>
-                        )}
-                    </div>
 
-                    {/* Birth Height */}
+
+                    {/* Baby Code Number */}
                     <div>
-                        <label className="mb-1 block text-sm text-gray-600">Birth Height (cm)</label>
+                        <label className="mb-1 block text-sm text-gray-600">Baby Code Number</label>
                         <input
-                            type="number"
-                            step="0.01"
-                            name="birthHeight"
-                            value={formData.birthHeight}
+                            type="text"
+                            name="babyCodeNumber"
+                            value={formData.babyCodeNumber}
                             onChange={handleChange}
                             className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="e.g. BC-2025-001"
                         />
                     </div>
 

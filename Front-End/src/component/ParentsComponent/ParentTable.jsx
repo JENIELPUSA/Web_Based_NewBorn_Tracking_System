@@ -8,7 +8,7 @@ import StatusVerification from "../../ReusableFolder/StatusModal";
 import { AuthContext } from "../../contexts/AuthContext";
 
 function ParentTable() {
-    const {role}=useContext(AuthContext)
+    const { role } = useContext(AuthContext);
     const { isParent, DeleteParent } = useContext(ParentDisplayContext);
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -19,11 +19,28 @@ function ParentTable() {
     const [isDeleteID, setIsDeleteId] = useState("");
     const { setUsers } = useContext(UserDisplayContext);
 
+    // Enhanced search: includes zone, address, phone, and full name
     const filteredUsers = useMemo(() => {
         const data = Array.isArray(isParent) ? isParent : [];
-        return data.filter((user) =>
-            `${user.FirstName} ${user.LastName} ${user.username} ${user.email}`.toLowerCase().includes(searchTerm.toLowerCase()),
-        );
+        const term = searchTerm.toLowerCase().trim();
+
+        if (!term) return data;
+
+        return data.filter((user) => {
+            const fullName = `${user.FirstName || ''} ${user.Middle || ''} ${user.LastName || ''} ${user.extensionName || ''}`.toLowerCase();
+            const email = (user.email || '').toLowerCase();
+            const zone = (user.zone || '').toLowerCase();
+            const address = (user.address || '').toLowerCase();
+            const phone = (user.phoneNumber || '').toLowerCase();
+
+            return (
+                fullName.includes(term) ||
+                email.includes(term) ||
+                zone.includes(term) ||
+                address.includes(term) ||
+                phone.includes(term)
+            );
+        });
     }, [isParent, searchTerm]);
 
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
@@ -82,7 +99,7 @@ function ParentTable() {
                 <div className="flex items-center gap-2">
                     <input
                         type="text"
-                        placeholder="Search users..."
+                        placeholder="Search by name, email, zone, address, or phone..."
                         className="input input-sm w-full rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 md:w-56"
                         value={searchTerm}
                         onChange={(e) => {
@@ -159,7 +176,7 @@ function ParentTable() {
                                             </div>
                                         )}
                                     </td>
-                                    <td className="p-3 align-top text-gray-800">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
+                                    <td className="p-3 align-top text-gray-800">{`${user.FirstName || ''} ${user.Middle || ''} ${user.LastName || ''} ${user.extensionName || ''}`}</td>
                                     <td className="p-3 align-top text-gray-800">{user.email}</td>
                                     <td className="max-w-xs truncate p-3 align-top text-gray-800">
                                         {user.zone ? `${user.zone}, ${user.address}` : user.address || "N/A"}

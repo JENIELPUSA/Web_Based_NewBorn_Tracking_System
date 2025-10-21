@@ -25,6 +25,7 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
             "/dashboard/add-parent",
             "/dashboard/new-vaccine",
             "/dashboard/update-password",
+             "/dashboard/Profilling_Dash",
         ],
         Admin: [],
     };
