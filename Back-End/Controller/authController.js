@@ -105,16 +105,18 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
       otpExpiresAt: Date.now() + 5 * 60 * 1000,
       isVerified: true,
     });
-
-    // Send email only if not Guest
-    if (role !== "Guest" && email) {
-      console.log("Email being passed to sendEmail:", email);
-      await sendEmail({
-        email: email,
-        subject: "Temporary Password Generated",
-        text: `Your temporary password is ${password}. Please change your password immediately.`,
-      });
-    }
+    
+/*
+// Send email only if not Guest
+if (role !== "Guest" && email) {
+  console.log("Email being passed to sendEmail:", email);
+  await sendEmail({
+    email: email,
+    subject: "Temporary Password Generated",
+    text: `Your temporary password is ${password}. Please change your password immediately.`,
+  });
+}
+*/
 
     return res.send({
       status: "Success",
