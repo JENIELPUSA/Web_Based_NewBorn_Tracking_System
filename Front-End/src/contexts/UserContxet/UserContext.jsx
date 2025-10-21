@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext";
 import SuccessFailed from "../../ReusableFolder/SuccessandField";
-import OtpForm from "../../component/OTPform/OtpForm ";
+//import OtpForm from "../../component/OTPform/OtpForm ";
 import axiosInstance from "../../ReusableFolder/axioxInstance";
 
 export const UserDisplayContext = createContext();
@@ -130,6 +130,7 @@ export const UserDisplayProvider = ({ children }) => {
     };
 
     const AddUser = async (values) => {
+        console.log("values",values)
         try {
             const res = await axiosInstance.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/authentication/signup`, values, {
                 headers: { Authorization: `Bearer ${authToken}` },
@@ -137,9 +138,11 @@ export const UserDisplayProvider = ({ children }) => {
 
             if (res.data.status === "Success") {
                 fetchUserData();
-                if (["BHW", "Admin"].includes(values.role)) {
-                    handleOTP(res.data.data._id);
-                }
+                setModalStatus("success");
+                setShowModal(true);
+                //if (["BHW", "Admin"].includes(values.role)) {
+                //handleOTP(res.data.data._id);
+                //}
             } else {
                 setModalStatus("failed");
                 setShowModal(true);
@@ -263,11 +266,14 @@ export const UserDisplayProvider = ({ children }) => {
         >
             {children}
 
-            <OtpForm
-                isOpen={isOTPModal}
-                onClose={() => setOTPModal(false)}
-                userId={userId}
-            />
+            {/*
+<OtpForm
+  isOpen={isOTPModal}
+  onClose={() => setOTPModal(false)}
+  userId={userId}
+/>
+*/}
+
             <SuccessFailed
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}

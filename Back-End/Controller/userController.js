@@ -12,7 +12,6 @@ const cloudinary = require("../Utils/cloudinary");
 
 exports.createUser = AsyncErrorHandler(async (req, res) => {
   const { FirstName, LastName, email, password, role } = req.body;
-
   // Laging required ang FirstName at LastName
   if (!FirstName || !LastName) {
     return res.status(400).json({

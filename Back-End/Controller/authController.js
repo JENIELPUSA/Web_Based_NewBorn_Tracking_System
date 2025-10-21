@@ -53,6 +53,8 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
     Designatedzone,
   } = req.body;
 
+  console.log("req.body", req.body);
+
   const otp = Math.floor(1000 + Math.random() * 9000).toString();
   const missingFields = [];
 
@@ -101,7 +103,7 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
       Designatedzone,
       otp,
       otpExpiresAt: Date.now() + 5 * 60 * 1000,
-      isVerified: false,
+      isVerified: true,
     });
 
     // Send email only if not Guest
@@ -109,8 +111,8 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
       console.log("Email being passed to sendEmail:", email);
       await sendEmail({
         email: email,
-        subject: "Email Verification OTP",
-        text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
+        subject: "Temporary Password Generated",
+        text: `Your temporary password is ${password}. Please change your password immediately.`,
       });
     }
 
