@@ -22,7 +22,7 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: "https://web-based-newborn-tracking-system.onrender.com",
     methods: ["GET", "POST"],
     credentials: true,
   },
