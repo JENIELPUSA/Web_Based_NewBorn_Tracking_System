@@ -4,6 +4,7 @@
   "description": "Responsive Web Site",
   "main": "app.js",
   "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
     "@headlessui/react": "^2.2.2",
     "@react-three/drei": "^10.0.7",
     "@react-three/fiber": "^9.1.2",

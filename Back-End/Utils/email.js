@@ -1,26 +1,23 @@
-const nodemailer = require('nodemailer');
+// utils/sendEmail.js
+const Brevo = require("@getbrevo/brevo");
+
+const client = new Brevo.TransactionalEmailsApi();
+client.setApiKey(
+  Brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY
+);
 
 const sendEmail = async (options) => {
-    const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false, 
-    pool: true,
-    maxMessages: Infinity,
-    maxConnections: 500,
-    auth: {
-        user: process.env.EMAIL_USER,  
-        pass: process.env.EMAIL_PASSWORD
-    }
-});
-
-
-    const mailOptions = {
-        from: `newBornTrackingSystem <jeniel12300@gmail.com>`,
-        to: options.email,
-        subject: options.subject,
-        html: `
-            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
+  try {
+    const emailData = {
+      sender: {
+        name: "Newborn Tracking System",
+        email: "jeniel12300@gmail.com",
+      },
+      to: [{ email: options.email }],
+      subject: options.subject,
+      htmlContent: `
+         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
                 <div style="background-color: #b3e0ff; padding: 25px; text-align: center;">
                     <h1 style="color: #004d99; margin: 0; font-size: 28px;">Newborn Tracking System</h1>
                 </div>
@@ -43,16 +40,17 @@ const sendEmail = async (options) => {
                     <p style="margin: 5px 0 0;">&copy; 2025 Newborn Tracking System. All rights reserved.</p>
                 </div>
             </div>
-        `
+      `,
     };
 
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
-    } catch (error) {
-        console.error('Error sending email:', error);
-        throw new Error('There was an error sending the email');
-    }
+    await client.sendTransacEmail(emailData);
+    console.log("✅ Email sent successfully via Brevo API!");
+  } catch (error) {
+    console.error(
+      "❌ Error sending email via Brevo API:",
+      error.response?.body || error
+    );
+  }
 };
 
 module.exports = sendEmail;

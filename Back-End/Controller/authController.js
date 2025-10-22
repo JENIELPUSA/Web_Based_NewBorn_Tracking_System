@@ -296,6 +296,7 @@ exports.forgotPassword = AsyncErrorHandler(async (req, res, next) => {
         text: message,
       });
 
+
       res.status(200).json({
         status: "Success",
         message: "Password reset link sent to the user email",
