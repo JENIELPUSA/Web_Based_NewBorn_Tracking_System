@@ -2,14 +2,15 @@ const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
-    host: "sandbox.smtp.mailtrap.io",
-    port: 2525,
-    auth: {
-        user: process.env.EMAIL_USER, // Mailtrap username
-        pass: process.env.EMAIL_PASSWORD // Mailtrap password
-    }
-});
-
+        service: 'gmail',
+        pool: true,
+        maxMessages: Infinity,
+        maxConnections: 500,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
 
     const mailOptions = {
         from: `NEW BORN TRACKING SYSTEM <${process.env.EMAIL_USER}>`,
@@ -31,7 +32,7 @@ const sendEmail = async (options) => {
                         </table>
                     <p style="font-size: 16px; margin-top: 25px;">For more information or assistance, please visit our website or contact support.</p>
                     <p style="text-align: center; margin-top: 30px;">
-                        <a href="https://web-based-newborn-tracking-system.onrender.com" style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: bold;">Visit Our Site</a>
+                        <a href="https://web-based-newborn-tracking-system.onrender.com/parent-dashboard" style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: bold;">Visit Our Site</a>
                     </p>
                 </div>
                 <div style="background-color: #f8f8f8; padding: 20px; text-align: center; font-size: 13px; color: #777;">

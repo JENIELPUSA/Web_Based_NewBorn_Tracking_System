@@ -634,7 +634,7 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
                   { $ifNull: ["$newborn.middleName", ""] },
                   " ",
                   { $ifNull: ["$newborn.lastName", ""] },
-                         " ",
+                  " ",
                   { $ifNull: ["$newborn.extensionName", ""] },
                   {
                     $cond: {
@@ -858,11 +858,13 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
     }
 
     function addPageNumbers(doc) {
-      let pages = doc.bufferedPageRange();
+      const pages = doc.bufferedPageRange();
       for (let i = 0; i < pages.count; i++) {
-        doc.switchToPage(i);
-        let oldBottomMargin = doc.page.margins.bottom;
+        doc.switchToPage(i + 1); // ✅ Fixes the "out of bounds" error
+
+        const oldBottomMargin = doc.page.margins.bottom;
         doc.page.margins.bottom = 0;
+
         doc
           .font("Helvetica")
           .fontSize(9)
@@ -872,6 +874,7 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
             doc.page.height - oldBottomMargin / 2,
             { align: "center" }
           );
+
         doc.page.margins.bottom = oldBottomMargin;
       }
     }

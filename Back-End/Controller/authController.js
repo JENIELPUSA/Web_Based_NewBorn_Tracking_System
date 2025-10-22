@@ -105,7 +105,7 @@ exports.signup = AsyncErrorHandler(async (req, res, next) => {
       otpExpiresAt: Date.now() + 5 * 60 * 1000,
       isVerified: true,
     });
-    
+
 /*
 // Send email only if not Guest
 if (role !== "Guest" && email) {
@@ -265,52 +265,67 @@ exports.restrict = (role) => {
 };
 
 exports.forgotPassword = AsyncErrorHandler(async (req, res, next) => {
-  const { email } = req.body;
-
-  // Find the user based on email
-  const user = await User.findOne({ email });
-
-  // If user doesn't exist, trigger an error and return
-  if (!user) {
-    return next(
-      new CustomError("We could not find the user with given email", 404)
-    );
-  }
-
-  // Generate the reset token and save it in the user's document
-  const resetToken = user.createResetTokenPassword();
-  await user.save({ validateBeforeSave: false });
-
-  // Generate the reset URL
-  const resetUrl = `https://web-based-newborn-tracking-system.onrender.com/reset-password/${resetToken}`;
-  const message = `We have received a password reset request. Please use the below link to reset your password:\n\n${resetUrl} \n\nThis reset password link will be available for 10 minutes.`;
-
   try {
-    // Send the email with the reset link
-    await sendEmail({
-      email: user.email,
-      subject: "Password change request received",
-      text: message,
-    });
+    const { email } = req.body;
 
-    res.status(200).json({
-      status: "Success",
-      message: "Password reset link sent to the user email",
-    });
-  } catch (err) {
-    user.passwordResetToken = undefined;
-    user.passwordResetTokenExpires = undefined;
+    console.log("req.body", req.body);
 
+    // Find the user based on email
+    const user = await User.findOne({ email });
+
+    // If user doesn't exist, trigger an error and return
+    if (!user) {
+      return next(
+        new CustomError("We could not find the user with given email", 404)
+      );
+    }
+
+    // Generate the reset token and save it in the user's document
+    const resetToken = user.createResetTokenPassword();
     await user.save({ validateBeforeSave: false });
 
+    // Generate the reset URL
+    const resetUrl = `https://web-based-newborn-tracking-system.onrender.com/reset-password/${resetToken}`;
+    const message = `We have received a password reset request. Please use the below link to reset your password:\n\n${resetUrl} \n\nThis reset password link will be available for 10 minutes.`;
+
+    try {
+      // Send the email with the reset link
+      await sendEmail({
+        email: user.email,
+        subject: "Password change request received",
+        text: message,
+      });
+
+      res.status(200).json({
+        status: "Success",
+        message: "Password reset link sent to the user email",
+      });
+    } catch (err) {
+      console.error("Error sending email:", err);
+
+      // Reset the token fields if email sending fails
+      user.passwordResetToken = undefined;
+      user.passwordResetTokenExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return next(
+        new CustomError(
+          "There was an error sending password reset email. Please try again later",
+          500
+        )
+      );
+    }
+  } catch (error) {
+    console.error("Forgot password error:", error);
     return next(
       new CustomError(
-        "There was an error sending password reset email. Please try again later",
+        "An unexpected error occurred. Please try again later.",
         500
       )
     );
   }
 });
+
 
 exports.verifyOtp = AsyncErrorHandler(async (req, res, next) => {
   const { otp, userId } = req.body;
