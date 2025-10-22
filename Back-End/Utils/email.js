@@ -2,18 +2,21 @@ const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        pool: true,
-        maxMessages: Infinity,
-        maxConnections: 500,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD
-        }
-    });
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false, 
+    pool: true,
+    maxMessages: Infinity,
+    maxConnections: 500,
+    auth: {
+        user: process.env.EMAIL_USER,  
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
+
 
     const mailOptions = {
-        from: `NEW BORN TRACKING SYSTEM <${process.env.EMAIL_USER}>`,
+        from: `newBornTrackingSystem <jeniel12300@gmail.com>`,
         to: options.email,
         subject: options.subject,
         html: `
