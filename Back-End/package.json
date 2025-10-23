@@ -103,6 +103,7 @@
     "get-proto": "^1.0.1",
     "glob-parent": "^5.1.2",
     "glob-to-regexp": "^0.4.1",
+    "googleapis": "^164.1.0",
     "gopd": "^1.2.0",
     "graceful-fs": "^4.2.11",
     "has-flag": "^3.0.0",

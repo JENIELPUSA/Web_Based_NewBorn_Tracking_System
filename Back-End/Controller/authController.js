@@ -6,6 +6,29 @@ const util = require("util");
 const sendEmail = require("../Utils/email");
 const crypto = require("crypto");
 
+// controllers/authController.js
+const { google } = require("googleapis");
+
+exports.gmailCallback = async (req, res) => {
+  const code = req.query.code;
+  const oAuth2Client = new google.auth.OAuth2(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    process.env.REDIRECT_URI
+  );
+
+  try {
+    const { tokens } = await oAuth2Client.getToken(code);
+    // Save refresh_token to .env or database
+    console.log("Refresh Token:", tokens.refresh_token);
+    res.send("Authorization successful! Check your console for the refresh token.");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error retrieving access token");
+  }
+};
+
+
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.SECRET_STR, {
     expiresIn: "1d",
