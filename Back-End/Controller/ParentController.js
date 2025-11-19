@@ -3,13 +3,25 @@ const parent = require("./../Models/ParentSchema");
 const Apifeatures = require("./../Utils/ApiFeatures");
 const Newborn = require("./../Models/NewBornmodel");
 
-exports.createParent = AsyncErrorHandler(async (req, res) => {
-  const parents = await parent.create(req.body);
-  res.status(201).json({
-    status: "success",
-    data: parents,
-  });
-});
+exports.createParent = async (req, res) => {
+  try {
+    const parents = await parent.create(req.body);
+
+    res.status(201).json({
+      status: "success",
+      data: parents,
+    });
+  } catch (error) {
+    console.error("Error creating parent:", error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Failed to create parent",
+      error: error.message,
+    });
+  }
+};
+
 
 exports.DisplayParent = AsyncErrorHandler(async (req, res) => {
   const features = new Apifeatures(parent.find(), req.query)

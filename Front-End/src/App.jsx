@@ -21,7 +21,7 @@ import ParentLayoutFinals from "./component/ParentsComponent/ParentLayoutFinals"
 import ParentComponent from "./component/ParentsComponent/ParentComponent";
 import Profile from "./component/User/Profile";
 import ParentDashboard from "./component/ParentDashboard/ParentDashboard";
-import ParentLayoutDashboard from "./component/ParentDashboard/ParentLayoutDashboar";
+import ParentLayoutDashboard from "./component/TrackingData/TrackBaby";
 import PrivateRoute from "./component/PrivateRoute/PrivateRoute";
 import PublicRoute from "./component/PublicRoute/PublicRoute";
 import LandingPage from "./component/LandingPage/landingpage";
@@ -47,7 +47,6 @@ function App() {
             ],
         },
 
-        // Parent Routes (optional public)
         {
             path: "/parent-dashboard",
             element: <ParentLayoutDashboard />,
@@ -56,8 +55,6 @@ function App() {
             path: "/parent-view",
             element: <ParentLayoutFinals />,
         },
-
-        // Protected Routes under /dashboard
         {
             element: <PrivateRoute />, // 👈 Require token
             children: [

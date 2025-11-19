@@ -22,11 +22,6 @@ const PasswordUpdateModalContent = ({ onClose, onPasswordUpdateSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
-
-    console.log('Current Password:', passwords.currentPassword);
-    console.log('New Password:', passwords.newPassword);
-    console.log('Confirm New Password:', passwords.confirmNewPassword);
-
     if (passwords.newPassword !== passwords.confirmNewPassword) {
       setMessage('New password and confirm password do not match.');
       return;

@@ -135,19 +135,62 @@ function NewBornTrackingBanner() {
 
                         {/* Content */}
                         <div className="relative z-10 flex flex-col items-center gap-6 p-8 text-white md:flex-row md:gap-8 md:p-12">
+                            {/* Mobile: Smaller icon and centered content */}
+                            <div className="flex flex-col items-center gap-4 md:hidden">
+                                <motion.div
+                                    animate={{
+                                        boxShadow: ["0 0 20px rgba(255,255,255,0.3)", "0 0 40px rgba(255,255,255,0.6)", "0 0 20px rgba(255,255,255,0.3)"],
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                    className="rounded-full bg-white/20 p-4 backdrop-blur-sm"
+                                >
+                                    <IconComponent
+                                        className={`h-12 w-12 ${currentSlide === 0 ? "text-black" : "text-white"}`}
+                                        strokeWidth={1.5}
+                                    />
+                                </motion.div>
+                                <div className="text-center">
+                                    <motion.h1
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.3, duration: 0.6 }}
+                                        className={`mb-2 text-2xl font-bold ${currentSlide === 0 ? "text-black" : "text-white"}`}
+                                    >
+                                        {current.title}
+                                    </motion.h1>
+                                    <motion.p
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.4, duration: 0.6 }}
+                                        className={`mb-2 text-base font-light opacity-95 ${currentSlide === 0 ? "text-black" : "text-white"}`}
+                                    >
+                                        {current.subtitle}
+                                    </motion.p>
+                                    <motion.p
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.5, duration: 0.6 }}
+                                        className={`text-sm opacity-90 ${currentSlide === 0 ? "text-black" : "text-white"}`}
+                                    >
+                                        {current.description}
+                                    </motion.p>
+                                </div>
+                            </div>
+
+                            {/* Desktop: Original layout */}
                             <motion.div
                                 animate={{
                                     boxShadow: ["0 0 20px rgba(255,255,255,0.3)", "0 0 40px rgba(255,255,255,0.6)", "0 0 20px rgba(255,255,255,0.3)"],
                                 }}
                                 transition={{ duration: 2, repeat: Infinity }}
-                                className="rounded-full bg-white/20 p-6 backdrop-blur-sm"
+                                className="hidden rounded-full bg-white/20 p-6 backdrop-blur-sm md:block"
                             >
                                 <IconComponent
                                     className={`h-16 w-16 md:h-20 md:w-20 ${currentSlide === 0 ? "text-black" : "text-white"}`}
                                     strokeWidth={1.5}
                                 />
                             </motion.div>
-                            <div className="flex-1 text-center drop-shadow-lg md:text-left">
+                            <div className="hidden flex-1 text-center drop-shadow-lg md:block md:text-left">
                                 <motion.h1
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
@@ -185,14 +228,15 @@ function NewBornTrackingBanner() {
                         />
                     </motion.div>
                 </AnimatePresence>
-                {/* Indicators */}
-                <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
+                
+                {/* Indicators - Mobile optimized */}
+                <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
                     {slides.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => setCurrentSlide(index)}
                             className={`h-2 rounded-full transition-all ${
-                                index === currentSlide ? "w-8 bg-white" : "w-2 bg-white/50 hover:bg-white/75"
+                                index === currentSlide ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/75"
                             }`}
                         />
                     ))}

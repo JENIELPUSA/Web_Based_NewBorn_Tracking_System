@@ -629,11 +629,11 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
             $trim: {
               input: {
                 $concat: [
+                  { $ifNull: ["$newborn.lastName", ""] },
+                  " ",
                   { $ifNull: ["$newborn.firstName", ""] },
                   " ",
                   { $ifNull: ["$newborn.middleName", ""] },
-                  " ",
-                  { $ifNull: ["$newborn.lastName", ""] },
                   " ",
                   { $ifNull: ["$newborn.extensionName", ""] },
                   {
@@ -652,6 +652,8 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
               },
             },
           },
+          // Add lastName field for sorting
+          lastName: { $ifNull: ["$newborn.lastName", ""] },
           gender: "$newborn.gender",
           dateOfBirth: "$newborn.dateOfBirth",
           motherName: {
@@ -682,6 +684,8 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
           },
         },
       },
+      // Add sorting by lastName
+      { $sort: { lastName: 1 } },
     ]);
 
     if (!profileData || profileData.length === 0) {
@@ -860,7 +864,7 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
     function addPageNumbers(doc) {
       const pages = doc.bufferedPageRange();
       for (let i = 0; i < pages.count; i++) {
-        doc.switchToPage(i + 1); // ✅ Fixes the "out of bounds" error
+        doc.switchToPage(i + 1);
 
         const oldBottomMargin = doc.page.margins.bottom;
         doc.page.margins.bottom = 0;
@@ -1098,3 +1102,284 @@ exports.getSpecificProfilling = AsyncErrorHandler(async (req, res, next) => {
     }
   }
 });
+
+exports.GetChildData = AsyncErrorHandler(async (req, res) => {
+  const { familyCode, parentName } = req.query;
+
+  if (!familyCode || !parentName) {
+    return res.status(400).json({
+      status: "error",
+      message: "Both familyCode and parentName are required",
+    });
+  }
+
+  // 🔹 Normalize input
+  const familyCodeClean = familyCode.trim().toUpperCase();
+  const normalizedParent = parentName.trim().toLowerCase().replace(/\s+/g, " ");
+  const words = normalizedParent.split(" ");
+  const namePattern = words.map((w) => `(?=.*${w})`).join("") + ".*"; // flexible match
+
+  const profileData = await Profile.aggregate([
+    // Join newborns
+    {
+      $lookup: {
+        from: "newborns",
+        localField: "newborn_id",
+        foreignField: "_id",
+        as: "newborn",
+      },
+    },
+    { $unwind: "$newborn" },
+
+    // Join Profiling data
+    {
+      $lookup: {
+        from: "profilings", // collection name ng Profiling schema
+        localField: "newborn_id",
+        foreignField: "newborn_id",
+        as: "profiling",
+      },
+    },
+    { $unwind: { path: "$profiling", preserveNullAndEmptyArrays: true } },
+
+    // Join parents
+    {
+      $lookup: {
+        from: "parents",
+        localField: "newborn.motherName",
+        foreignField: "_id",
+        as: "mother",
+      },
+    },
+    { $unwind: "$mother" },
+
+    // ✅ Smart matching for name + family code
+    {
+      $match: {
+        $and: [
+          {
+            "mother.familyCode": {
+              $regex: `^${familyCodeClean}$`,
+              $options: "i",
+            },
+          },
+          {
+            $expr: {
+              $regexMatch: {
+                input: {
+                  $toLower: {
+                    $replaceAll: {
+                      input: {
+                        $trim: {
+                          input: {
+                            $concat: [
+                              { $ifNull: ["$mother.FirstName", ""] },
+                              " ",
+                              { $ifNull: ["$mother.Middle", ""] },
+                              " ",
+                              { $ifNull: ["$mother.LastName", ""] },
+                            ],
+                          },
+                        },
+                      },
+                      find: "  ", // replace double spaces
+                      replacement: " ",
+                    },
+                  },
+                },
+                regex: namePattern,
+                options: "i",
+              },
+            },
+          },
+        ],
+      },
+    },
+
+    // Join checkup records
+    {
+      $lookup: {
+        from: "checkuprecords",
+        localField: "newborn._id",
+        foreignField: "newborn",
+        as: "allCheckups",
+      },
+    },
+    {
+      $addFields: {
+        latestCheckup: {
+          $cond: {
+            if: { $gt: [{ $size: "$allCheckups" }, 0] },
+            then: { $arrayElemAt: ["$allCheckups", -1] },
+            else: null,
+          },
+        },
+      },
+    },
+
+    // Vaccination records
+    {
+      $lookup: {
+        from: "vaccinationrecords",
+        localField: "newborn._id",
+        foreignField: "newborn",
+        as: "vaccinationRecords",
+      },
+    },
+    {
+      $lookup: {
+        from: "vaccines",
+        localField: "vaccinationRecords.vaccine",
+        foreignField: "_id",
+        as: "vaccineDetails",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "vaccinationRecords.doses.administeredBy",
+        foreignField: "_id",
+        as: "administeredBy",
+      },
+    },
+
+    // Projection
+    {
+      $project: {
+        _id: 1,
+        newbornName: {
+          $concat: ["$newborn.firstName", " ", "$newborn.lastName"],
+        },
+        dateOfBirth: "$newborn.dateOfBirth",
+        gender: "$newborn.gender",
+
+        latestWeight: {
+          $cond: {
+            if: {
+              $and: [
+                "$latestCheckup",
+                { $gt: ["$latestCheckup.visitDate", "$createdAt"] },
+              ],
+            },
+            then: "$latestCheckup.weight",
+            else: "$newborn.birthWeight",
+          },
+        },
+        latestHeight: {
+          $cond: {
+            if: {
+              $and: [
+                "$latestCheckup",
+                { $gt: ["$latestCheckup.visitDate", "$createdAt"] },
+              ],
+            },
+            then: "$latestCheckup.height",
+            else: "$newborn.birthHeight",
+          },
+        },
+        everyVisit: {
+          $map: {
+            input: "$allCheckups",
+            as: "visit",
+            in: {
+              visitDate: "$$visit.visitDate",
+              weight: "$$visit.weight",
+              height: "$$visit.height",
+              health_condition: "$$visit.health_condition",
+              notes: "$$visit.notes",
+            },
+          },
+        },
+
+        // Mother info
+        motherName: {
+          $concat: [
+            "$mother.FirstName",
+            " ",
+            "$mother.Middle",
+            " ",
+            "$mother.LastName",
+          ],
+        },
+        motherPhoneNumber: "$mother.phoneNumber",
+        motherAddressZone: "$mother.address",
+        zone: "$mother.zone",
+        familyCode: "$mother.familyCode",
+
+        // Profiling info
+        blood_type: "$profiling.blood_type",
+        health_condition: "$profiling.health_condition",
+        profilingNotes: "$profiling.notes",
+
+        // Vaccination Data
+        vaccinationRecords: {
+          $map: {
+            input: "$vaccinationRecords",
+            as: "vaccinationRecord",
+            in: {
+              vaccine: "$$vaccinationRecord.vaccine",
+              vaccineName: {
+                $let: {
+                  vars: {
+                    matchedVaccine: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: "$vaccineDetails",
+                            as: "vd",
+                            cond: {
+                              $eq: ["$$vd._id", "$$vaccinationRecord.vaccine"],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                  in: "$$matchedVaccine.name",
+                },
+              },
+              doses: {
+                $map: {
+                  input: "$$vaccinationRecord.doses",
+                  as: "dose",
+                  in: {
+                    doseNumber: "$$dose.doseNumber",
+                    dateGiven: "$$dose.dateGiven",
+                    next_due_date: "$$dose.next_due_date",
+                    remarks: "$$dose.remarks",
+                    status: "$$dose.status",
+                    administeredByName: {
+                      $concat: [
+                        { $ifNull: ["$$dose.administeredBy.FirstName", ""] },
+                        " ",
+                        { $ifNull: ["$$dose.administeredBy.LastName", ""] },
+                      ],
+                    },
+                    administeredByRole: "$$dose.administeredBy.role",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  ]);
+
+  if (!profileData.length) {
+    return res.status(404).json({
+      status: "error",
+      message:
+        "No data found. Ensure both familyCode and full parentName match.",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    count: profileData.length,
+    data: profileData,
+  });
+});
+
+

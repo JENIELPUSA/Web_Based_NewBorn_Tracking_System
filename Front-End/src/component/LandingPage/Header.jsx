@@ -15,12 +15,6 @@ const Header = () => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
-
-    const trustBadges = [
-        { icon: Shield, text: "HIPAA", color: "text-green-600" },
-        { icon: Star, text: "4.9★", color: "text-yellow-500" },
-    ];
-
     return (
         <>
             <header
@@ -31,76 +25,72 @@ const Header = () => {
                 }`}
             >
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between py-4">
+                    <div className="flex items-center justify-between py-3 sm:py-4">
                         {/* Logo */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             <div className="group relative">
-                                <div className="bg-white-600 flex h-12 w-12 items-center justify-center rounded-3xl shadow-xl transition-transform duration-300 group-hover:scale-110">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-3xl bg-white shadow-xl transition-transform duration-300 group-hover:scale-105 sm:h-12 sm:w-12">
                                     <img
                                         src={headicon}
-                                        alt="icon"
-                                        className="h-13 w-13 object-contain"
+                                        alt="NeoCare System"
+                                        className="h-8 w-8 object-contain sm:h-10 sm:w-10"
                                     />
                                 </div>
-                                <div className="absolute -inset-2 rounded-2xl bg-[#7B8D6A] opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-20"></div>
+                                <div className="absolute -inset-1.5 rounded-2xl bg-[#7B8D6A] opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-20 sm:-inset-2"></div>
                             </div>
 
                             <div>
-                                <h1 className="cursor-pointer text-2xl font-black text-[#7B8D6A] transition-colors group-hover:text-blue-600">
+                                <h1 className="cursor-pointer text-xl font-black text-[#7B8D6A] transition-colors duration-200 sm:text-2xl">
                                     NeoCare System
                                 </h1>
                             </div>
                         </div>
 
-                        {/* Desktop CTA */}
+                        {/* Desktop CTA - ONLY on lg and up */}
                         <div className="hidden items-center gap-4 lg:flex">
                             <button
                                 onClick={() => setShowLogin(true)}
-                                className="rounded-xl border border-[#7B8D6A]/70 px-6 py-2 font-medium text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-[#7B8D6A]/60 hover:text-white"
+                                className="rounded-xl border border-[#7B8D6A]/70 px-5 py-2 text-sm font-medium text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-[#7B8D6A]/60 hover:text-white sm:px-6"
                             >
                                 Log In
                             </button>
                         </div>
 
-                        {/* Mobile Menu Button */}
-                        <button
-                            className="rounded-xl border border-gray-200 p-3 text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-gray-100 lg:hidden"
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        >
-                            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                        </button>
+                        {/* Mobile Menu Button - no Login button here anymore */}
+                        <div className="lg:hidden">
+                            <button
+                                className="rounded-xl border border-gray-200 p-2 text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-gray-100 sm:p-3"
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            >
+                                {isMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Mobile Menu */}
                     <div
                         className={`overflow-hidden transition-all duration-300 lg:hidden ${
-                            isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                            isMenuOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
                         }`}
                     >
-                        <div className="border-t border-gray-200 py-6">
-                            <nav className="flex flex-col gap-6">
-                                {/* Trust Badges */}
-                                <div className="flex justify-center gap-4 border-b border-gray-200 pb-4">
-                                    {trustBadges.map((badge, index) => {
-                                        const BadgeIcon = badge.icon;
-                                        return (
-                                            <div
-                                                key={index}
-                                                className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-100 px-4 py-2"
-                                            >
-                                                <BadgeIcon className={`h-4 w-4 ${badge.color}`} />
-                                                <span className="text-sm font-medium text-gray-700">{badge.text}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                        <div className="border-t border-gray-200 py-4">
+                            <nav className="flex flex-col items-center gap-4">
+                                {/* Log In button ONLY inside mobile menu */}
+                                <button
+                                    onClick={() => {
+                                        setShowLogin(true);
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="w-full max-w-xs rounded-xl border border-[#7B8D6A]/70 px-4 py-2 text-sm font-medium text-gray-700 backdrop-blur-sm transition-all duration-300 hover:bg-[#7B8D6A]/60 hover:text-white sm:px-6 sm:py-3"
+                                >
+                                    Log In
+                                </button>
                             </nav>
                         </div>
                     </div>
                 </div>
             </header>
 
-            {/* Login Modal rendered at root for proper center */}
             <AuthFormModal
                 isOpen={showLogin}
                 onClose={() => setShowLogin(false)}

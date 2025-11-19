@@ -27,22 +27,22 @@ const slides = [
 
 const reasons = [
     {
-        icon: <Heart className="h-6 w-6 text-[#7B8D6A] " />,
+        icon: <Heart className="h-6 w-6 text-[#7B8D6A]" />,
         title: "Early Detection of Issues",
         description: "Regular monitoring helps identify any health or development concerns early, allowing for timely intervention.",
     },
     {
-        icon: <TrendingUp className="h-6 w-6 text-[#7B8D6A] " />,
+        icon: <TrendingUp className="h-6 w-6 text-[#7B8D6A]" />,
         title: "Track Growth and Development",
         description: "Monitor your baby's weight, height, and milestones to ensure they are growing well and on the right track.",
     },
     {
-        icon: <Shield className="h-6 w-6 text-[#7B8D6A] " />,
+        icon: <Shield className="h-6 w-6 text-[#7B8D6A]" />,
         title: "Better BHW Communication",
         description: "Provide accurate data to your BHW during check-ups, enabling them to offer more informed care.",
     },
     {
-        icon: <Award className="h-6 w-6 text-[#7B8D6A] " />,
+        icon: <Award className="h-6 w-6 text-[#7B8D6A]" />,
         title: "Peace of Mind",
         description: "Reduce worry by keeping a complete health record of your baby, giving you confidence as a parent.",
     },
@@ -119,8 +119,21 @@ const reasonItemVariants = {
 const CarouselSection = () => {
     const [current, setCurrent] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const intervalRef = useRef(null);
     const totalSlides = slides.length;
+
+    // Check if mobile on mount and resize
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const nextSlide = () => {
         setCurrent((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
@@ -135,20 +148,22 @@ const CarouselSection = () => {
             intervalRef.current = setInterval(nextSlide, 5000);
         }
         return () => intervalRef.current && clearInterval(intervalRef.current);
-    }, [isHovered]);
+    }, [isHovered, isMobile]);
 
     const handleMouseEnter = () => {
-        setIsHovered(true);
-        intervalRef.current && clearInterval(intervalRef.current);
+        if (!isMobile) {
+            setIsHovered(true);
+            intervalRef.current && clearInterval(intervalRef.current);
+        }
     };
 
-    const handleMouseLeave = () => setIsHovered(false);
+    const handleMouseLeave = () => !isMobile && setIsHovered(false);
 
     return (
-        <section className="relative overflow-hidden bg-blue-50 py-20">
-            <div className="mx-auto flex max-w-7xl justify-center px-4 sm:px-6 lg:px-8">
+        <section className="relative overflow-hidden bg-blue-50 py-12 sm:py-16 lg:py-20">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <motion.div 
-                    className="flex w-full flex-col items-center gap-16 lg:flex-row lg:gap-8"
+                    className="flex w-full flex-col items-center gap-8 lg:flex-row lg:gap-12 xl:gap-16"
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
@@ -156,7 +171,7 @@ const CarouselSection = () => {
                 >
                     {/* Left side: Image Carousel */}
                     <motion.div
-                        className="relative w-full max-w-lg overflow-hidden rounded-3xl shadow-2xl transition-all duration-500 lg:w-1/2"
+                        className="relative w-full overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 lg:max-w-lg lg:w-1/2 lg:rounded-3xl"
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                         variants={slideInLeft}
@@ -170,7 +185,7 @@ const CarouselSection = () => {
                                     key={index}
                                     src={slide.image}
                                     alt={slide.alt}
-                                    className="h-[500px] w-full flex-shrink-0 object-cover"
+                                    className="h-[300px] w-full flex-shrink-0 object-cover sm:h-[400px] lg:h-[500px]"
                                 />
                             ))}
                         </div>
@@ -178,25 +193,25 @@ const CarouselSection = () => {
                         {/* Navigation Buttons */}
                         <button
                             onClick={prevSlide}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 transform rounded-full bg-white/30 p-2 text-white hover:bg-white/50 focus:outline-none"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 transform rounded-full bg-white/30 p-2 text-white hover:bg-white/50 focus:outline-none sm:left-4 sm:p-2.5"
                         >
-                            <ArrowLeft className="h-6 w-6" />
+                            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
                         </button>
                         <button
                             onClick={nextSlide}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 transform rounded-full bg-white/30 p-2 text-white hover:bg-white/50 focus:outline-none"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 transform rounded-full bg-white/30 p-2 text-white hover:bg-white/50 focus:outline-none sm:right-4 sm:p-2.5"
                         >
-                            <ArrowRight className="h-6 w-6" />
+                            <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
                         </button>
 
                         {/* Dots Indicator */}
-                        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 transform gap-2">
+                        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 transform gap-1.5 sm:bottom-4 sm:gap-2">
                             {slides.map((_, index) => (
                                 <button
                                     key={index}
                                     onClick={() => setCurrent(index)}
-                                    className={`h-2 w-2 rounded-full transition-all duration-300 ${
-                                        current === index ? "w-6 bg-[#7B8D6A] " : "bg-gray-300"
+                                    className={`h-1.5 rounded-full transition-all duration-300 sm:h-2 ${
+                                        current === index ? "w-6 bg-[#7B8D6A]" : "w-2 bg-gray-300"
                                     }`}
                                 ></button>
                             ))}
@@ -209,20 +224,20 @@ const CarouselSection = () => {
                         variants={itemVariants}
                     >
                         <motion.div 
-                            className="space-y-6 text-center lg:text-left"
+                            className="space-y-4 text-center lg:text-left sm:space-y-6"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true }}
                             variants={containerVariants}
                         >
                             <motion.h2 
-                                className="text-3xl font-bold leading-tight text-[#7B8D6A] md:text-4xl"
+                                className="text-2xl font-bold leading-tight text-[#7B8D6A] sm:text-3xl md:text-4xl"
                                 variants={itemVariants}
                             >
                                 Why Monitoring Your Baby's Health is Important
                             </motion.h2>
                             <motion.p 
-                                className="text-lg leading-relaxed text-gray-700"
+                                className="text-base leading-relaxed text-gray-700 sm:text-lg"
                                 variants={itemVariants}
                             >
                                 Using BabyTracker goes beyond organizing data. It gives you the tools to make informed decisions about your baby's
@@ -231,7 +246,7 @@ const CarouselSection = () => {
                         </motion.div>
                         
                         <motion.div 
-                            className="mt-12 space-y-8"
+                            className="mt-8 space-y-6 sm:mt-12 sm:space-y-8"
                             variants={staggerReasons}
                             initial="hidden"
                             whileInView="visible"
@@ -240,27 +255,27 @@ const CarouselSection = () => {
                             {reasons.map((reason, index) => (
                                 <motion.div
                                     key={index}
-                                    className="flex items-start gap-4"
+                                    className="flex items-start gap-3 sm:gap-4"
                                     variants={reasonItemVariants}
                                     whileHover={{ 
-                                        scale: 1.02, 
-                                        x: 5,
+                                        scale: isMobile ? 1 : 1.02, 
+                                        x: isMobile ? 0 : 5,
                                         transition: { duration: 0.2 }
                                     }}
                                 >
                                     <motion.div 
-                                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-50"
+                                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-50 sm:h-12 sm:w-12"
                                         whileHover={{ 
-                                            scale: 1.1,
-                                            rotate: 5,
+                                            scale: isMobile ? 1 : 1.1,
+                                            rotate: isMobile ? 0 : 5,
                                             transition: { duration: 0.2 }
                                         }}
                                     >
                                         {reason.icon}
                                     </motion.div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-black">{reason.title}</h3>
-                                        <p className="mt-2 text-gray-600">{reason.description}</p>
+                                    <div className="flex-1">
+                                        <h3 className="text-lg font-semibold text-black sm:text-xl">{reason.title}</h3>
+                                        <p className="mt-1 text-sm text-gray-600 sm:mt-2 sm:text-base">{reason.description}</p>
                                     </div>
                                 </motion.div>
                             ))}

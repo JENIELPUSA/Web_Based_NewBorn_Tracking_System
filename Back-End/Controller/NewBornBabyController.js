@@ -643,8 +643,9 @@ exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
           middleName: 1,
           lastName: 1,
           newbornName: {
-            $concat: ["$firstName", " ", "$middleName", " ", "$lastName"],
+            $concat: ["$lastName", ", ", "$firstName", " ", "$middleName"],
           },
+
           dateOfBirth: {
             $dateToString: {
               format: "%b %d, %Y",
@@ -699,7 +700,7 @@ exports.getReportsNewborn = AsyncErrorHandler(async (req, res, next) => {
           createdAt: 1,
         },
       },
-      { $sort: { newbornName: 1 } },
+      { $sort: { lastName: 1 } },
       {
         $group: {
           _id: null,

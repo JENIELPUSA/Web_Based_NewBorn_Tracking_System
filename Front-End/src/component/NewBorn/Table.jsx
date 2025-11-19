@@ -330,8 +330,6 @@ function NewBorn() {
                                 <tr>
                                     <th className="p-3 text-left">#</th>
                                     <th className="p-3 text-left">Avatar</th>
-                                    <th className="p-3 text-left">Code Number</th>
-
                                     <th className="p-3 text-left">FullName</th>
                                     <th className="p-3 text-left">Gender</th>
                                     <th className="p-3 text-left">Birth Date</th>
@@ -381,7 +379,6 @@ function NewBorn() {
                                                     </div>
                                                 )}
                                             </td>
-                                            <td className="p-3 align-top text-gray-800">{newBorn.babyCodeNumber}</td>
                                             <td className="p-3 align-top text-gray-800">
                                                 {newBorn.fullName}
                                                 {newBorn.extensionName ? ` ${newBorn.extensionName}` : ""}

@@ -41,8 +41,6 @@ function HealthRecordModal({ isOpen, onClose, newbornData }) {
         loadData();
     }, [newbornData, fetchSpecificData]);
 
-    console.log("Data", newbornData);
-
     const filteredRecords = useMemo(() => {
         const data = Array.isArray(healthRecords) ? healthRecords : [];
         return data.filter((record) => {

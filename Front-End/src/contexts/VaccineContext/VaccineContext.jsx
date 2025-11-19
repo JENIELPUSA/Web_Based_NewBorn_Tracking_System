@@ -92,8 +92,6 @@ useEffect(() => {
             setTotalVaccine(TotalVaccine);
             setVaccine(vaccineDAta);
             setstocks(TotalStocks);
-
-            console.log("Stocks",TotalStocks)
         } catch (error) {
             console.error("Error fetching data:", error);
             setError("Failed to fetch data");

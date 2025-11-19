@@ -17,8 +17,6 @@ function UserTable() {
     const [isAddFormOpen, setAddFormOpen] = useState(false);
     const [isVerification, setVerification] = useState(false);
     const [isDeleteID, setIsDeleteId] = useState("");
-    console.log("Current users in UserTable:", users);
-
     const filteredUsers = useMemo(() => {
         return users.filter((user) => {
             const matchesSearchTerm = `${user.FirstName} ${user.LastName} ${user.username} ${user.email}`
@@ -216,7 +214,6 @@ function UserTable() {
                             <th className="p-3 text-left text-gray-500">Email</th>
                             <th className="p-3 text-left text-gray-500">Role</th>
                             <th className="p-3 text-left text-gray-500">Address</th>
-                            <th className="p-3 text-left text-gray-500">Zone</th>
                             <th className="p-3 text-left text-gray-500">Designated Zone</th>
                             <th className="p-3 text-left text-gray-500">Phone</th>
                             <th className="p-3 text-left text-gray-500">DOB</th>
@@ -270,8 +267,7 @@ function UserTable() {
                                     <td className="p-3 align-top text-gray-800">{`${user.FirstName} ${user.Middle} ${user.LastName} ${user.extensionName}`}</td>
                                     <td className="p-3 align-top text-gray-800">{user.email}</td>
                                     <td className="p-3 align-top capitalize text-gray-800">{user.role}</td>
-                                    <td className="max-w-xs truncate p-3 align-top text-gray-800">{user.address || "N/A"}</td>
-                                    <td className="p-3 align-top text-gray-800">{user.zone || "N/A"}</td>
+                                    <td className="max-w-xs truncate p-3 align-top text-gray-800">{`${user.zone} ${user.address || "N/A"}`}</td>
                                     <td className="p-3 align-top text-gray-800">{user.Designatedzone || "N/A"}</td>
                                     <td className="p-3 align-top text-gray-800">{user.phoneNumber || "N/A"}</td>
                                     <td className="p-3 align-top text-gray-800">{formatDate(user.dateOfBirth)}</td>

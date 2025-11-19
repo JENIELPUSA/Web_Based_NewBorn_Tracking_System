@@ -19,6 +19,8 @@ function ParentTable() {
     const [isDeleteID, setIsDeleteId] = useState("");
     const { setUsers } = useContext(UserDisplayContext);
 
+    console.log("isParent",isParent)
+
     // Enhanced search: includes zone, address, phone, and full name
     const filteredUsers = useMemo(() => {
         const data = Array.isArray(isParent) ? isParent : [];
@@ -126,6 +128,7 @@ function ParentTable() {
                         <tr>
                             <th className="p-3 text-left text-gray-500">#</th>
                             <th className="p-3 text-left text-gray-500">Avatar</th>
+                            <th className="p-3 text-left text-gray-500">Family Code</th>
                             <th className="p-3 text-left text-gray-500">Full Name</th>
                             <th className="p-3 text-left text-gray-500">Email</th>
                             <th className="p-3 text-left text-gray-500">Address</th>
@@ -176,6 +179,7 @@ function ParentTable() {
                                             </div>
                                         )}
                                     </td>
+                                       <td className="p-3 align-top text-gray-800">{user.familyCode || "N/A"}</td>
                                     <td className="p-3 align-top text-gray-800">{`${user.FirstName || ''} ${user.Middle || ''} ${user.LastName || ''} ${user.extensionName || ''}`}</td>
                                     <td className="p-3 align-top text-gray-800">{user.email}</td>
                                     <td className="max-w-xs truncate p-3 align-top text-gray-800">

@@ -55,8 +55,6 @@ function AddVacine({ isOpen, onClose, vaccine, bybatch }) {
         fetchBrands();
     }, []);
 
-    console.log("BatchID",batchId)
-
     useEffect(() => {
         if (vaccine && bybatch) {
             setFormData({

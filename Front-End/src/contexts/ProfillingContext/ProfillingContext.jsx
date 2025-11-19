@@ -13,6 +13,8 @@ export const ProfillingDisplayProvider = ({ children }) => {
     const [modalStatus, setModalStatus] = useState("success");
     const { authToken, role, Designatedzone } = useContext(AuthContext);
     const [customError, setCustomError] = useState("");
+    const [isTrackingBabyData, setTrackingBabyData] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (!authToken) {
@@ -22,6 +24,7 @@ export const ProfillingDisplayProvider = ({ children }) => {
 
         fetchProfilling();
     }, [authToken]);
+
     const fetchProfilling = async () => {
         if (!authToken) return;
 
@@ -54,6 +57,25 @@ export const ProfillingDisplayProvider = ({ children }) => {
         } catch (error) {
             console.error("Error fetching profilling:", error);
             setCustomError("Failed to fetch data");
+        }
+    };
+
+    const fetchTrackingBaby = async (familyCode, parentName) => {
+        try {
+            setIsLoading(true);
+            setTrackingBabyData([]);
+
+            const encodedParentName = encodeURIComponent(parentName?.trim() || "");
+            const res = await axiosInstance.get(
+                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/v1/Profilling/GetChildData?familyCode=${familyCode}&parentName=${encodedParentName}`,
+            );
+            const vaccineData = res?.data?.data || [];
+            setTrackingBabyData(vaccineData);
+        } catch (error) {
+            console.error("Error fetching profiling:", error);
+            setCustomError("Failed to fetch data");
+        } finally {
+            setIsLoading(false); // stop loading regardless of success/error
         }
     };
 
@@ -165,7 +187,9 @@ export const ProfillingDisplayProvider = ({ children }) => {
     };
 
     return (
-        <ProfillingContexts.Provider value={{ isProfilling, AddProf, DeleteProfile, setProfilling, UpdateProf, customError }}>
+        <ProfillingContexts.Provider
+            value={{ isProfilling, AddProf, DeleteProfile, setProfilling, UpdateProf, customError, isTrackingBabyData, fetchTrackingBaby, isLoading }}
+        >
             {children}
 
             {/* Modal should be rendered here */}

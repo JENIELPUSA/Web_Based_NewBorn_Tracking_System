@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const newbornSchema = new mongoose.Schema({
-  babyCodeNumber:String,
   firstName: String,
   lastName: String,
   middleName: String,

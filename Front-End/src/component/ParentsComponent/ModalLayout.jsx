@@ -20,15 +20,6 @@ function VaccineScheduleModal({ isOpen, onClose, passData }) {
         const matchedGender = item.gender === passData.gender;
         const matchedAddress = item.FullAddress?.toUpperCase().includes(passData.address?.toUpperCase());
         const matchedDOB = item.dateOfBirth === passData.dateOfBirth;
-
-        console.log("🔍 Checking item:", item);
-        console.log("🟢 Matched Name:", matchedName);
-        console.log("🟢 Matched Zone:", matchedZone);
-        console.log("🟢 Matched Mother:", matchedMother);
-        console.log("🟢 Matched Gender:", matchedGender);
-        console.log("🟢 Matched Address:", matchedAddress);
-        console.log("🟢 Matched DOB:", matchedDOB);
-
         const isMatch = matchedName &&
                         matchedZone &&
                         matchedMother &&
