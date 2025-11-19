@@ -143,7 +143,7 @@ export default function TrackBaby() {
                                         type="text"
                                         value={inputName}
                                         onChange={(e) => setInputName(e.target.value)}
-                                        placeholder="Optional"
+                                        placeholder="Enter Mother Name"
                                         className="w-full rounded border border-gray-300 p-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                     />
                                 </div>
