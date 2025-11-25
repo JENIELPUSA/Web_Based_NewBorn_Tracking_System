@@ -6,8 +6,12 @@ const socketIO = require("socket.io-client");
 const checkAllVaccinesAreUnvaccinated = require("../Utils/checkAllVaccinesAreUnvaccinated");
 const Newborn = require("../Models/NewBornmodel");
 const sendEmail = require("../Utils/email");
+
+// ⬇️ IMPORT THE EXPIRATION CHECK LOGIC
+const checkVaccineExpiration = require("../Utils/checkVaccineExpiration");
+
 const socket = socketIO("https://web-based-newborn-tracking-system-server.onrender.com", {
-//const socket = socketIO("http://localhost:3000", {
+// const socket = socketIO("http://localhost:3000", {
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
   transports: ["websocket"],
@@ -30,10 +34,7 @@ cron.schedule("0 7 * * *", async () => {
     const records = await VaccinationRecord.find()
       .populate({
         path: "newborn",
-        populate: {
-          path: "motherName",
-          model: "Parent",
-        },
+        populate: { path: "motherName", model: "Parent" },
       })
       .populate("vaccine");
 
@@ -45,9 +46,7 @@ cron.schedule("0 7 * * *", async () => {
       const zone = (mother?.zone || "").trim().toLowerCase();
 
       for (const dose of record.doses) {
-        if (!dose.next_due_date) {
-          continue;
-        }
+        if (!dose.next_due_date) continue;
 
         const dueDate = new Date(dose.next_due_date);
 
@@ -62,34 +61,21 @@ cron.schedule("0 7 * * *", async () => {
             "_id email Designatedzone"
           );
 
-          if (bhwUsers.length > 0) {
-            bhwUsers.forEach((bhw) => {});
-          }
-
-          if (bhwUsers.length === 0) {
-          }
-
           const allRecipients = [...adminUsers, ...bhwUsers];
           const viewerIds = allRecipients.map((u) => u._id.toString());
-
-          if (mother?._id) {
-            viewerIds.push(mother._id.toString());
-          }
+          if (mother?._id) viewerIds.push(mother._id.toString());
 
           const emails = allRecipients.map((u) => u.email);
-          if (mother?.email) {
-            emails.push(mother.email);
-          }
+          if (mother?.email) emails.push(mother.email);
 
-          const message = `💉 Reminder: Dose ${dose.doseNumber} of "${
-            record.vaccine?.name
-          }" for ${fullName} is due on ${dueDate.toLocaleDateString()}.`;
+          const message = `💉 Reminder: Dose ${dose.doseNumber} of "${record.vaccine?.name}" for ${fullName} is due on ${dueDate.toLocaleDateString()}.`;
+
+          // ➤ SOCKET EMIT FOR DUE DATE
           if (socket.connected) {
             socket.emit("send-vaccine-notification", {
               types_of_message: "Vaccine_due_date",
               message,
             });
-          } else {
           }
 
           const uniqueViewerIds = [...new Set(viewerIds)];
@@ -117,9 +103,37 @@ cron.schedule("0 7 * * *", async () => {
       }
     }
 
+    // ➤ CHECK IF NEWBORN HAS ALL UNVACCINATED
     const allNewborns = await Newborn.find();
     for (const nb of allNewborns) {
       await checkAllVaccinesAreUnvaccinated(nb._id, socket);
     }
+
+    // ==========================================================
+    // ⭐⭐ INSERTED: VACCINE EXPIRATION CHECK + EMIT ⭐⭐
+    // ==========================================================
+
+    const { expiredList, expiringSoonList } = await checkVaccineExpiration();
+
+    if (socket.connected && (expiredList.length > 0 || expiringSoonList.length > 0)) {
+      socket.emit("vaccine-expiration-alert", {
+        expired: expiredList,
+        expiringSoon: expiringSoonList,
+        message: "⚠️ There are vaccine batches that are expired or near expiration.",
+      });
+    }
+
+    // OPTIONAL: Save notification in DB
+    if (expiredList.length > 0 || expiringSoonList.length > 0) {
+      await Notification.create({
+        message: "⚠️ Vaccine batch expiration alert detected.",
+        type: "vaccine_expiration",
+        types_of_message: "Vaccine_expiration",
+        viewers: [], // add admin users if needed
+      });
+    }
+
+    // ==========================================================
+
   } catch (err) {}
 });

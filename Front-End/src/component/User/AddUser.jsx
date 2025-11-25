@@ -380,34 +380,34 @@ const UserFormModal = ({ isOpen, onClose, user, role }) => {
                             className="rounded-lg bg-[#7B8D6A] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#7B8D6A]/80 disabled:opacity-70 sm:px-4 sm:py-2 sm:text-sm"
                         >
                             {isSubmitting ? (
-                                <div className="flex items-center justify-center gap-1.5">
-                                    <svg
-                                        className="h-3 w-3 animate-spin text-white sm:h-4 sm:w-4"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v8z"
-                                        ></path>
-                                    </svg>
-                                    Saving...
-                                </div>
-                            ) : user ? (
-                                "Update User Info"
-                            ) : (
-                                "Add User"
-                            )}
+    <div className="flex items-center justify-center gap-1.5">
+        <svg
+            className="h-3 w-3 animate-spin text-white sm:h-4 sm:w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+        >
+            <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+            ></circle>
+            <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8z"
+            ></path>
+        </svg>
+        Saving...
+    </div>
+) : user ? (
+    role === "Guest" ? "Update Parent" : "Update User Info"
+) : (
+    role === "Guest" ? "Add Parent" : "Add User"
+)}
                         </button>
                     </div>
                 </form>

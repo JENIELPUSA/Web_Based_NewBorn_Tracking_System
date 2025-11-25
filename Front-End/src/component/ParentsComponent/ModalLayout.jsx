@@ -9,9 +9,6 @@ function VaccineScheduleModal({ isOpen, onClose, passData }) {
 
     if (!isOpen) return null;
 
-    console.log("passData", passData);
-    console.log("Vaccine Data from Context", vaccineRecord);
-
     const filteredData = vaccineRecord.filter((item) => {
         const fullName = `${passData.firstName} ${passData.lastName}`.toUpperCase();
         const matchedName = item.newbornName?.toUpperCase() === fullName;
